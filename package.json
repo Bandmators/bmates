@@ -1,0 +1,26 @@
+{
+  "name": "bmates",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -F @bmates/studio run dev",
+    "build": "pnpm -r run build",
+    "editor": "pnpm -F @bmates/editor",
+    "render": "pnpm -F @bmates/render",
+    "studio": "pnpm -F @bmates/studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "vite-tsconfig-paths": "^4.2.2",
+    "vite-plugin-dts": "^3.7.1",
+    "@types/node": "^20.11.6"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

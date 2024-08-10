@@ -1,4 +1,4 @@
-import { EventData, EventHandler, EventType } from './types';
+import { EventData, EventHandler, EventType } from '@/types';
 
 export class Statable {
   events: Map<EventType, Set<EventHandler>> = new Map();

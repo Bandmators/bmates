@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Container } from './Container';
+import { Container } from './';
 
 export class Group extends Container {
   override name = 'Group';

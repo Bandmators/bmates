@@ -8,7 +8,7 @@
     "build": "vite build && tsc"
   },
   "dependencies": {
-    "@bmates/render": "workspace:*"
+    "@bmates/renderer": "workspace:*"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Node } from './Node';
 
 export abstract class Container<ChildType extends Node = Node> extends Node {

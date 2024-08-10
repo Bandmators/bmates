@@ -1,5 +1,5 @@
 {
-  "name": "@bmates/render",
+  "name": "@bmates/renderer",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",

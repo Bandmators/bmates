@@ -1,7 +1,8 @@
-import { EventData, Group } from '@bmates/render';
+import { EventData, Group } from '@bmates/renderer';
+
+import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
 import { Timeline, Track, TrackGroup, Wave } from './';
-import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from './types/editor';
 
 export class Workground extends Group {
   override name = 'Workground';
@@ -109,7 +110,6 @@ export class Workground extends Group {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   override update(dT: number) {}
 
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(-this.scrollX + this.x, this.y);
   }

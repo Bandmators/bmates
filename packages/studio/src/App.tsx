@@ -1,4 +1,5 @@
 import { Editor, EditorDataType } from '@bmates/editor';
+
 import { useEffect, useRef } from 'react';
 
 const data: EditorDataType[] = [
@@ -63,10 +64,6 @@ const App = () => {
   useEffect(() => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data);
-      // data.forEach(d => {
-      //   editor.current?.add(new TrackGroup(d.songs));
-      // });
-      // editor.current.play();
     }
     return () => {
       if (editor.current) {
@@ -79,6 +76,9 @@ const App = () => {
   return (
     <>
       <canvas ref={ref}></canvas>
+      <button onClick={() => editor.current?.play()}>Play</button>
+      <button onClick={() => editor.current?.stop()}>Stop</button>
+      <button onClick={() => editor.current?.pause()}>Pause</button>
     </>
   );
 };

@@ -1,7 +1,6 @@
-// import { Track } from './Track';
-import { Group } from '@bmates/render';
+import { Group } from '@bmates/renderer';
 
-import { TrackDataType } from './types';
+import { TrackDataType } from '@/types';
 
 export class TrackGroup extends Group {
   override name = 'TrackGroup';

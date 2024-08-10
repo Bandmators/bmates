@@ -1,6 +1,6 @@
-import { Node } from '@bmates/render';
+import { Node } from '@bmates/renderer';
 
-import { EditorStyleType, SongDataType } from './types/editor';
+import { EditorStyleType, SongDataType } from '@/types';
 
 export class Wave extends Node {
   override name = 'Wave';

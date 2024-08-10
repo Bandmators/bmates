@@ -1,8 +1,9 @@
-import { Stage } from '@bmates/render';
+import { Stage } from '@bmates/renderer';
 
-import { Sidebar } from './';
+import { EditorDataType, EditorStyleType } from '@/types';
+
+import { Sidebar } from './Sidebar';
 import { Workground } from './Workground';
-import { EditorDataType, EditorStyleType } from './types/editor';
 
 export class Editor extends Stage {
   override name = 'BEditor';

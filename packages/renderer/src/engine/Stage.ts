@@ -1,6 +1,7 @@
-import { Container, Group } from '.';
-import { EventData, EventType } from './types';
-import { getRelativeMousePosition } from './utils/position';
+import { EventData, EventType } from '@/types';
+import { getRelativeMousePosition } from '@/utils';
+
+import { Container, Group } from './';
 
 export abstract class Stage extends Container<Group> {
   override name = 'Stage';

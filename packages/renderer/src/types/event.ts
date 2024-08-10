@@ -1,4 +1,4 @@
-import { Node } from '../';
+import { Node } from '@/engine';
 
 export type EventType = 'click' | 'mousemove' | 'mousedown' | 'mouseup' | 'mouseleave';
 

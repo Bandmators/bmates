@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# lint-staged 
+echo "Lint is being applied..."
+if npx lint-staged; then
+  echo "✅ All lint rules were applied successfully."
+  exit 0
+else
+  echo "❌ An error occurred in the lint rule check."
+  exit 1
+fi

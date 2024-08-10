@@ -36,7 +36,7 @@ export class Editor extends Stage {
 
     this._initLayout();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     (window as any).editor = this;
   }
 

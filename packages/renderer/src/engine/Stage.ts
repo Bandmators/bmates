@@ -21,7 +21,6 @@ export abstract class Stage extends Container<Group> {
     this.prevTime = performance.now();
 
     this._initListener();
-    this._onResize();
     this._startLoop();
 
     this.x = 0;
@@ -30,13 +29,12 @@ export abstract class Stage extends Container<Group> {
     this.height = this.canvas.height;
   }
 
-  private _initListener = () => {
+  protected _initListener = () => {
     this.canvas.addEventListener('click', this._onClick);
     this.canvas.addEventListener('mousedown', this._onMouseDown);
     this.canvas.addEventListener('mousemove', this._onMouseMove);
     this.canvas.addEventListener('mouseup', this._onMouseUp);
     this.canvas.addEventListener('mouseleave', this._onMouseUp);
-    window.addEventListener('resize', this._onResize);
   };
 
   private _startLoop() {
@@ -72,6 +70,7 @@ export abstract class Stage extends Container<Group> {
   };
 
   private _onClick = (event: MouseEvent) => {
+    console.log('---');
     this.handleMouseEvent('click', event);
   };
 
@@ -87,30 +86,13 @@ export abstract class Stage extends Container<Group> {
     this.handleMouseEvent('mouseup', event);
   };
 
-  private _onResize = () => {
-    this.canvas.width = document.body.clientWidth;
-    this.canvas.height = document.body.clientHeight;
-
-    const dpr = window.devicePixelRatio || 2;
-    const displayWidth = document.body.clientWidth;
-    const displayHeight = document.body.clientHeight;
-
-    this.canvas.width = displayWidth * dpr;
-    this.canvas.height = displayHeight * dpr;
-
-    this.canvas.style.width = `${displayWidth}px`;
-    this.canvas.style.height = `${displayHeight}px`;
-
-    this.ctx.scale(dpr, dpr);
-  };
-
   destroy = () => {
     this.canvas.removeEventListener('click', this._onClick);
     this.canvas.removeEventListener('mousedown', this._onMouseDown);
     this.canvas.removeEventListener('mousemove', this._onMouseMove);
     this.canvas.removeEventListener('mouseup', this._onMouseUp);
     this.canvas.removeEventListener('mouseleave', this._onMouseUp);
-    window.removeEventListener('resize', this._onResize);
+
     if (this._raf) cancelAnimationFrame(this._raf);
   };
 }

@@ -1,8 +1,9 @@
 import { Stage } from '@bmates/renderer';
 
 import { EditorDataType, EditorStyleType } from '@/types';
+import { deepMerge } from '@/utils';
 
-import { Sidebar } from './Sidebar';
+// import { Sidebar } from './Sidebar';
 import { Workground } from './Workground';
 
 export class Editor extends Stage {
@@ -31,22 +32,41 @@ export class Editor extends Stage {
     },
   };
 
-  constructor(element: HTMLCanvasElement, data: EditorDataType[]) {
+  constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
     super(element);
     this.data = data;
+    this.style = deepMerge(this.style, style) as EditorStyleType;
 
     this._initLayout();
+    this._onResize();
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (window as any).editor = this;
+
+    window.addEventListener('resize', this._onResize);
+    // window.removeEventListener('resize', this._onResize);   // TODO
   }
 
   private _initLayout = () => {
     this._workground = new Workground(this.canvas, this.style, this.data);
     this.add(this._workground);
 
-    const sidebar = new Sidebar(this.style, this.data);
-    this.add(sidebar);
+    // const sidebar = new Sidebar(this.style, this.data);
+    // this.add(sidebar);
+  };
+
+  private _onResize = () => {
+    const dpr = window.devicePixelRatio || 2;
+    const displayWidth = document.body.clientWidth - this.style.sidebar.width;
+    const displayHeight = document.body.clientHeight;
+
+    this.canvas.width = displayWidth * dpr;
+    this.canvas.height = displayHeight * dpr;
+
+    this.canvas.style.width = `${displayWidth}px`;
+    this.canvas.style.height = `${displayHeight}px`;
+
+    this.ctx.scale(dpr, dpr);
   };
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

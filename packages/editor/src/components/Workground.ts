@@ -17,7 +17,7 @@ export class Workground extends Group {
   ) {
     super();
 
-    this.x = this.style.sidebar.width;
+    this.x = 0;
     this.y = 0;
     this.width = this.canvas.width;
     this.height = this.canvas.height;

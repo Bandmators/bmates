@@ -32,30 +32,32 @@ export class Editor extends Stage {
     },
   };
 
+  private _resizeListener: () => void;
+
   constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
     super(element);
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;
 
-    this._initLayout();
     this._onResize();
+    this._initLayout();
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (window as any).editor = this;
 
-    window.addEventListener('resize', this._onResize);
-    // window.removeEventListener('resize', this._onResize);   // TODO
+    this._resizeListener = () => this._onResize();
+    window.addEventListener('resize', this._resizeListener);
   }
 
-  private _initLayout = () => {
+  private _initLayout() {
     this._workground = new Workground(this.canvas, this.style, this.data);
     this.add(this._workground);
 
     // const sidebar = new Sidebar(this.style, this.data);
     // this.add(sidebar);
-  };
+  }
 
-  private _onResize = () => {
+  private _onResize() {
     const dpr = window.devicePixelRatio || 2;
     const displayWidth = document.body.clientWidth - this.style.sidebar.width;
     const displayHeight = document.body.clientHeight;
@@ -67,7 +69,7 @@ export class Editor extends Stage {
     this.canvas.style.height = `${displayHeight}px`;
 
     this.ctx.scale(dpr, dpr);
-  };
+  }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   override update(dT: number) {}
@@ -89,5 +91,11 @@ export class Editor extends Stage {
 
   stop() {
     this._workground?.stop();
+  }
+
+  override destroy() {
+    super.destroy();
+
+    window.removeEventListener('resize', this._resizeListener);
   }
 }

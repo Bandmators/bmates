@@ -42,7 +42,6 @@ export class Sidebar extends Group {
     let y = 50;
     data.forEach(editorData => {
       editorData.tracks.forEach(track => {
-        console.log('Creat', track.category);
         this.add(new SideTrack(0, y, track, this.style));
         y += this.style.wave.height;
       });

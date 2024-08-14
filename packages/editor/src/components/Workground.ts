@@ -26,16 +26,16 @@ export class Workground extends Group {
     this._initEvent();
   }
 
-  private _initLayout = (data: EditorDataType[]) => {
+  private _initLayout(data: EditorDataType[]) {
     data.forEach(tGroup => {
       this.addTrackGroup(tGroup.tracks);
     });
 
     this.timeline = new Timeline(this.style, 100, 0);
     this.add(this.timeline);
-  };
+  }
 
-  private _initEvent = () => {
+  private _initEvent() {
     let isDragging = false;
     let startX = 0;
     let moveX = 0;
@@ -69,7 +69,7 @@ export class Workground extends Group {
     this.on('mouseleave', () => {
       isDragging = false;
     });
-  };
+  }
 
   addTrackGroup(data: TrackDataType[]) {
     const group = new TrackGroup(data);

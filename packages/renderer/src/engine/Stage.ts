@@ -1,5 +1,7 @@
-import { EventData, EventType } from '@/types';
+import { EventType } from '@/types';
 import { getRelativeMousePosition } from '@/utils';
+
+import { dispatchEventData } from '@/utils/event';
 
 import { Container, Group } from './';
 
@@ -29,70 +31,56 @@ export abstract class Stage extends Container<Group> {
     this.height = this.canvas.height;
   }
 
-  protected _initListener = () => {
-    this.canvas.addEventListener('click', this._onClick);
-    this.canvas.addEventListener('mousedown', this._onMouseDown);
-    this.canvas.addEventListener('mousemove', this._onMouseMove);
-    this.canvas.addEventListener('mouseup', this._onMouseUp);
-    this.canvas.addEventListener('mouseleave', this._onMouseUp);
-  };
+  protected _initListener() {
+    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'];
+    events.forEach(event => this.canvas.addEventListener(event, this));
+  }
 
   private _startLoop() {
     const ticker = (currentTime: number) => {
       this._raf = requestAnimationFrame(ticker);
-
-      this.dT = (currentTime - this.prevTime) / 1000;
-      this.prevTime = currentTime;
-
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.save();
-      this._tick(this.dT, this.ctx);
-      this.ctx.restore();
+      this._updateTime(currentTime);
+      this._render();
     };
     this._raf = requestAnimationFrame(ticker);
   }
 
-  private dispatchEventToChildren(eventType: EventType, e: MouseEvent): void {
-    const { x, y } = getRelativeMousePosition(e, this.canvas);
-    const target = this.hitTest(x, y);
-
-    const eventData: EventData = { type: eventType, target: this, point: { x, y }, originalEvent: e };
-    this.call(eventType, eventData, false);
-
-    if (target) {
-      const eventData: EventData = { type: eventType, target: target, point: { x, y }, originalEvent: e };
-      target.call(eventType, eventData, true);
-    }
+  private _updateTime(currentTime: number) {
+    this.dT = (currentTime - this.prevTime) / 1000;
+    this.prevTime = currentTime;
   }
 
-  private handleMouseEvent = (event: EventType, mouseEvent: MouseEvent) => {
-    this.dispatchEventToChildren(event, mouseEvent);
-  };
+  private _render() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.save();
+    this._tick(this.dT, this.ctx);
+    this.ctx.restore();
+  }
 
-  private _onClick = (event: MouseEvent) => {
-    console.log('---');
-    this.handleMouseEvent('click', event);
-  };
+  private _dispatchEvent(eventType: EventType, e: MouseEvent): void {
+    const point = getRelativeMousePosition(e, this.canvas);
+    const target = this.hitTest(point.x, point.y);
 
-  private _onMouseDown = (event: MouseEvent) => {
-    this.handleMouseEvent('mousedown', event);
-  };
+    dispatchEventData(eventType, this, point, e);
+    if (target) dispatchEventData(eventType, target, point, e);
+  }
 
-  private _onMouseMove = (event: MouseEvent) => {
-    this.handleMouseEvent('mousemove', event);
-  };
+  handleEvent(e: MouseEvent) {
+    const eventMap: { [key: string]: EventType } = {
+      click: 'click',
+      mousedown: 'mousedown',
+      mousemove: 'mousemove',
+      mouseup: 'mouseup',
+      mouseleave: 'mouseup',
+    };
+    const eventType = eventMap[e.type];
+    if (eventType) this._dispatchEvent(eventType, e);
+  }
 
-  private _onMouseUp = (event: MouseEvent) => {
-    this.handleMouseEvent('mouseup', event);
-  };
-
-  destroy = () => {
-    this.canvas.removeEventListener('click', this._onClick);
-    this.canvas.removeEventListener('mousedown', this._onMouseDown);
-    this.canvas.removeEventListener('mousemove', this._onMouseMove);
-    this.canvas.removeEventListener('mouseup', this._onMouseUp);
-    this.canvas.removeEventListener('mouseleave', this._onMouseUp);
+  destroy() {
+    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'];
+    events.forEach(event => this.canvas.removeEventListener(event, this));
 
     if (this._raf) cancelAnimationFrame(this._raf);
-  };
+  }
 }

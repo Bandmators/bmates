@@ -22,6 +22,7 @@ export class Editor extends Stage {
       gapHeight: 10,
       gapWidth: 10,
       timeDivde: 10,
+      height: 45,
     },
     sidebar: {
       width: 300,
@@ -29,6 +30,7 @@ export class Editor extends Stage {
     wave: {
       height: 45,
       borderRadius: 8,
+      margin: 10,
     },
   };
 
@@ -58,9 +60,10 @@ export class Editor extends Stage {
   }
 
   private _onResize() {
-    const dpr = window.devicePixelRatio || 2;
-    const displayWidth = document.body.clientWidth - this.style.sidebar.width;
-    const displayHeight = document.body.clientHeight;
+    const dpr = 1; // || window.devicePixelRatio || 2;
+
+    const displayWidth = this.canvas.parentElement.clientWidth - this.style.sidebar.width;
+    const displayHeight = this.canvas.parentElement.clientHeight;
 
     this.canvas.width = displayWidth * dpr;
     this.canvas.height = displayHeight * dpr;

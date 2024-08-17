@@ -12,7 +12,10 @@ export class Wave extends Node {
     super();
 
     this.x = 1 * this.style.timeline.gapWidth * this.data.start;
-    this.y = 50 + (this.style.wave.height + 20) * this.data.group;
+    this.y =
+      this.style.timeline.height +
+      (this.style.wave.height + this.style.wave.margin) * this.data.group +
+      this.style.wave.margin;
     this.width = 1 * this.style.timeline.gapWidth * this.data.long;
     this.height = this.style.wave.height;
 

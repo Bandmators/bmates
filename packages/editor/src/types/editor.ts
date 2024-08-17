@@ -32,6 +32,7 @@ export type EditorStyleType = {
     gapHeight: number;
     gapWidth: number;
     timeDivde: number; // 5 or 10
+    height: number; // 45 or 60;
   };
   sidebar: {
     width: number;
@@ -39,5 +40,6 @@ export type EditorStyleType = {
   wave: {
     height: number;
     borderRadius: number;
+    margin: number;
   };
 };

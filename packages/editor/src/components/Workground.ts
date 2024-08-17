@@ -9,6 +9,7 @@ export class Workground extends Group {
 
   private timeline: Timeline | undefined;
   private scrollX = 0;
+  private _minScrollX = 0;
 
   constructor(
     protected canvas: HTMLCanvasElement,
@@ -21,6 +22,9 @@ export class Workground extends Group {
     this.y = 0;
     this.width = this.canvas.width;
     this.height = this.canvas.height;
+
+    this._minScrollX = -this.style.timeline.gapWidth;
+    this.scrollX = this._minScrollX;
 
     this._initLayout(data);
     this._initEvent();
@@ -49,7 +53,7 @@ export class Workground extends Group {
     this.on('mousemove', (evt: EventData) => {
       if (isDragging) {
         const deltaX = moveX - evt.originalEvent.clientX;
-        this.scrollX = Math.max(this.scrollX + deltaX, 0);
+        this.scrollX = Math.max(this.scrollX + deltaX, this._minScrollX);
         moveX = evt.originalEvent.clientX;
       }
     });

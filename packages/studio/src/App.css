@@ -1,6 +1,14 @@
 * {
     box-sizing: border-box;
 }
+.bmates-sidebar {    
+    border: 1px solid #c9c9c9;
+}
+
+.bmates-sidebar .bmates-track {
+    padding: 1rem;
+    border-top: 1px solid #c9c9c9;
+}
 
 .track {
     

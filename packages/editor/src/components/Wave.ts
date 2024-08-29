@@ -11,12 +11,12 @@ export class Wave extends Node {
   ) {
     super();
 
-    this.x = 1 * this.style.timeline.gapWidth * this.data.start;
+    this.x = 1 * this.style.timeline.gapWidth * (this.data.start * 10);
     this.y =
       this.style.timeline.height +
       (this.style.wave.height + this.style.wave.margin) * this.data.group +
       this.style.wave.margin;
-    this.width = 1 * this.style.timeline.gapWidth * this.data.long;
+    this.width = 1 * this.style.timeline.gapWidth * (this.data.long * 10);
     this.height = this.style.wave.height;
 
     this.on('mousemove', () => {});

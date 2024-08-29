@@ -63,8 +63,13 @@ export class Timeline extends Node {
     ctx.restore();
   }
 
+  c = 0;
   drawRedLine(ctx: CanvasRenderingContext2D) {
-    if (this.isPlaying()) this._timeRedLinePosX += this.style.timeline.gapWidth * 10 * this._dT;
+    if (this.isPlaying()) {
+      this._timeRedLinePosX += this.style.timeline.gapWidth * this.style.timeline.timeDivde * this._dT;
+      this.c += this._dT;
+      // console.log(this.c);
+    }
     // if (this._timeRedLinePosX > ctx.canvas.width) this._timeRedLinePosX = 0;
 
     ctx.save();

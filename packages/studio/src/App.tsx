@@ -11,18 +11,18 @@ const data: EditorDataType[] = [
         category: 'Category 1',
         songs: [
           {
-            src: '',
+            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
             user: '',
-            start: 10,
-            long: 35,
+            start: 0,
+            long: 5.61,
             group: 0,
             instrument: 'Piano',
           },
           {
-            src: '',
+            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
             user: '',
-            start: 50,
-            long: 15,
+            start: 9,
+            long: 7.41,
             group: 0,
             instrument: 'Drum',
           },
@@ -37,18 +37,18 @@ const data: EditorDataType[] = [
         category: 'Category 2',
         songs: [
           {
-            src: '',
+            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
             user: '',
-            start: 40,
-            long: 15,
+            start: 3,
+            long: 6.67,
             group: 1,
             instrument: 'Piano',
           },
           {
-            src: '',
+            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
             user: '',
-            start: 80,
-            long: 15,
+            start: 10.0,
+            long: 5.67,
             group: 1,
             instrument: 'Guitar',
           },
@@ -79,7 +79,6 @@ const style: Partial<EditorStyleType> = {
     margin: 10,
   },
 };
-
 const App = () => {
   return (
     <>
@@ -98,4 +97,5 @@ const App = () => {
     </>
   );
 };
+
 export default App;

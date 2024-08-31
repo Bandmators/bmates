@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "target": "ES5",
+    "downlevelIteration": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

@@ -1,5 +1,6 @@
 import { Stage } from '@bmates/renderer';
 
+import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType } from '@/types';
 import { deepMerge } from '@/utils';
 
@@ -11,6 +12,8 @@ export class Editor extends Stage {
 
   data: EditorDataType[] = [];
   _workground: Workground | undefined;
+
+  _audioPlayer: AudioPlayer = new AudioPlayer();
 
   style: EditorStyleType = {
     theme: {
@@ -40,9 +43,9 @@ export class Editor extends Stage {
     super(element);
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;
-
     this._onResize();
-    this._initLayout();
+
+    this.init();
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (window as any).editor = this;
@@ -51,12 +54,27 @@ export class Editor extends Stage {
     window.addEventListener('resize', this._resizeListener);
   }
 
+  private async init(): Promise<void> {
+    await this._loadTrackBuffers();
+    this._initLayout();
+    this._onResize();
+  }
+
+  private async _loadTrackBuffers(): Promise<void> {
+    const loadPromises = this.data.flatMap(item =>
+      item.tracks.flatMap(track =>
+        track.songs.map(song => {
+          const trackId = `${song.group}-${song.instrument}`;
+          return this._audioPlayer.prepareTrack(song, trackId);
+        }),
+      ),
+    );
+    await Promise.all(loadPromises);
+  }
+
   private _initLayout() {
     this._workground = new Workground(this.canvas, this.style, this.data);
     this.add(this._workground);
-
-    // const sidebar = new Sidebar(this.style, this.data);
-    // this.add(sidebar);
   }
 
   private _onResize() {
@@ -84,19 +102,24 @@ export class Editor extends Stage {
     return this._workground?.isPlaying();
   }
 
-  play() {
+  async play() {
+    await this._audioPlayer.start();
     this._workground?.play();
+    this._audioPlayer.play();
   }
 
   pause() {
     this._workground?.pause();
+    this._audioPlayer.play();
   }
 
   stop() {
     this._workground?.stop();
+    this._audioPlayer.stop();
   }
 
   override destroy() {
+    this.stop();
     super.destroy();
 
     window.removeEventListener('resize', this._resizeListener);

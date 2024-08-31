@@ -5,6 +5,7 @@ export type SongDataType<T extends string = string> = {
   user: string;
   group: number;
   instrument: T;
+  [key: string]: unknown;
 };
 export type TrackDataType<T extends string = string> = {
   category: string;

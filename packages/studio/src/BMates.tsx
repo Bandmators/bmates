@@ -1,9 +1,6 @@
 import { Editor, EditorDataType, EditorStyleType, TrackDataType } from '@bmates/editor';
 
-import { useRef } from 'react';
-import { useCallback, useEffect, useState } from 'react';
-
-import AudioPlayer from './AudioPlayer';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface BMatesProps {
   data: EditorDataType[];
@@ -14,12 +11,12 @@ interface BMatesProps {
 const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const editor = useRef<Editor | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data, style);
     }
-
     return () => {
       if (editor.current) {
         editor.current.destroy();
@@ -28,89 +25,28 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     };
   }, [ref]);
 
-  const [player, setPlayer] = useState<AudioPlayer | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    const newPlayer = new AudioPlayer();
-    setPlayer(newPlayer);
-
-    return () => {
-      if (isPlaying) {
-        newPlayer.stop();
-      }
-    };
-  }, []);
-
-  const initializeAudio = useCallback(async () => {
-    if (player && !isInitialized) {
-      const state = player.initialize();
-      if (state === 'running') {
-        setIsInitialized(true);
-        // 트랙 준비 로직
-        for (const item of data) {
-          for (const track of item.tracks) {
-            for (const song of track.songs) {
-              const trackId = `${song.group}-${song.instrument}`;
-              await player.prepareTrack(song, trackId);
-            }
-          }
-        }
-      }
+  const togglePlay = useCallback(async () => {
+    if (editor.current?.isPlaying()) {
+      editor.current?.stop();
+    } else {
+      await editor.current?.play();
     }
-  }, [player, isInitialized]);
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
 
-  const togglePlay = useCallback(() => {
-    if (player && isInitialized) {
-      if (isPlaying) {
-        player.stop();
-      } else {
-        player.play();
-      }
-      setIsPlaying(!isPlaying);
-    } else if (player && !isInitialized) {
-      initializeAudio();
-    }
-  }, [player, isPlaying, isInitialized, initializeAudio]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const toggleMute = useCallback(
-    (trackId: string) => {
-      if (player && isInitialized) {
-        player.mute(trackId, !player.isMuted(trackId));
-      }
-    },
-    [player, isInitialized],
-  );
+  // const toggleMute = useCallback(
+  //   (trackId: string) => {
+  //     if (isReady) {
+  //       player.mute(trackId, !player.isMuted(trackId));
+  //     }
+  //   },
+  //   [player, isReady],
+  // );
 
   return (
     <>
       <div>
-        <button
-          onClick={() => {
-            togglePlay();
-            editor.current?.play();
-          }}
-        >
-          Play
-        </button>
-        <button
-          onClick={() => {
-            togglePlay();
-            editor.current?.stop();
-          }}
-        >
-          Stop
-        </button>
-        <button
-          onClick={() => {
-            editor.current?.pause();
-          }}
-        >
-          Pause
-        </button>
-        <button onClick={togglePlay}>{isInitialized ? (isPlaying ? 'Stop' : 'Play') : 'Initialize'} Audio</button>
+        <button onClick={togglePlay}>{isPlaying ? 'Stop' : 'Play'}</button>
       </div>
       <div id="bmates" className="bmates" style={{ display: 'flex', height: '100vh' }}>
         <div
@@ -141,4 +77,5 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     </>
   );
 };
+
 export default BMates;

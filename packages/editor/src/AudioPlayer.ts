@@ -2,9 +2,7 @@ import { SongDataType } from './types';
 
 type Audio = {
   song: SongDataType;
-  buffer: AudioBuffer;
-  source?: AudioBufferSourceNode;
-  gainNode?: GainNode;
+  source: AudioBufferSourceNode;
   muted: boolean;
 };
 
@@ -19,7 +17,7 @@ class AudioPlayer {
     return this.audioContext;
   }
 
-  async loadAudio(src: string): Promise<AudioBuffer> {
+  async loadAudioBuffer(src: string) {
     const context = this.createContext();
     const proxyUrl = src.startsWith('http') ? `/audio${new URL(src).pathname}` : src;
     const response = await fetch(proxyUrl);
@@ -27,39 +25,25 @@ class AudioPlayer {
     return await context.decodeAudioData(arrayBuffer);
   }
 
-  async prepareTrack(song: SongDataType, trackId: string): Promise<void> {
-    const buffer = await this.loadAudio(song.src);
-    this.tracks.set(trackId, { song, buffer, muted: false });
-    song.buffer = buffer;
-  }
-
-  setupTrack(trackId: string) {
+  async prepareTrack(song: SongDataType, trackId: string) {
+    const buffer = await this.loadAudioBuffer(song.src);
     const context = this.createContext();
-    const track = this.tracks.get(trackId);
-    if (!track) return;
 
     const source = context.createBufferSource();
-    source.buffer = track.buffer;
 
-    const gainNode = context.createGain();
-    const analyserNode = context.createAnalyser();
-    analyserNode.fftSize = 2048;
+    // const gainNode = context.createGain();
+    // const analyserNode = context.createAnalyser();
+    // analyserNode.fftSize = 2048;
 
-    source.connect(gainNode);
-    gainNode.connect(analyserNode);
-    analyserNode.connect(context.destination);
+    source.connect(context.destination);
+    // source.connect(gainNode);
+    // gainNode.connect(analyserNode);
+    // analyserNode.connect(context.destination);
 
-    track.source = source;
-    track.gainNode = gainNode;
+    source.buffer = buffer;
+    song.source = source;
 
-    console.log('setup', track);
-  }
-
-  async start() {
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      await this.audioContext.resume();
-    }
-    this.tracks.forEach((_, trackId) => this.setupTrack(trackId));
+    this.tracks.set(trackId, { song, source, muted: false });
   }
 
   play(): void {
@@ -75,14 +59,7 @@ class AudioPlayer {
 
   mute(trackId: string, isMuted: boolean): void {
     const track = this.tracks.get(trackId);
-    if (track?.gainNode && this.audioContext) {
-      track.gainNode.gain.setValueAtTime(isMuted ? 0 : 1, this.audioContext.currentTime);
-      if (isMuted) {
-        track.muted = true;
-      } else {
-        track.muted = false;
-      }
-    }
+    track.muted = isMuted;
   }
 
   isMuted(trackId: string): boolean {
@@ -98,7 +75,7 @@ class AudioPlayer {
   }
 
   getAudioBuffer(trackId: string): AudioBuffer | undefined {
-    return this.tracks.get(trackId)?.buffer;
+    return this.tracks.get(trackId)?.source.buffer;
   }
 }
 

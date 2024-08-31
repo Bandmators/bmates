@@ -21,18 +21,27 @@ export class Wave extends Node {
     this.width = this.style.timeline.gapWidth * (this.data.long * 10);
     this.height = this.style.wave.height;
 
-    this.waveform = this.extractWaveform(this.data.buffer);
+    this.waveform = this.extractWaveform(this.data.source.buffer);
   }
 
-  private extractWaveform(buffer: AudioBuffer): Float32Array {
-    if (!buffer || !buffer.length) return;
-
+  private extractWaveform(buffer: AudioBuffer) {
+    if (!buffer || !buffer.length) return new Float32Array();
     const channelData = buffer.getChannelData(0);
-    const step = Math.ceil(channelData.length / this.width);
-    const waveform = new Float32Array(this.width);
+    const sampleMount = Math.min(channelData.length, 100);
+    const blockSize = Math.floor(channelData.length / sampleMount);
+    const waveform = new Float32Array(sampleMount);
 
-    for (let i = 0; i < this.width; i++) {
-      waveform[i] = channelData[i * step];
+    for (let i = 0; i < sampleMount; i++) {
+      let sum = 0;
+      for (let j = 0; j < blockSize; j++) {
+        sum += Math.abs(channelData[i * blockSize + j]);
+      }
+      waveform[i] = sum / blockSize;
+    }
+
+    const maxAmplitude = Math.max(...waveform);
+    for (let i = 0; i < sampleMount; i++) {
+      waveform[i] /= maxAmplitude;
     }
 
     return waveform;
@@ -44,72 +53,66 @@ export class Wave extends Node {
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
+    ctx.beginPath();
     ctx.roundRect(this.x, this.y, this.width, this.height, this.style.wave.borderRadius);
     ctx.fillStyle = '#c3c3c3';
     ctx.fill();
+    ctx.closePath();
 
-    ctx.fillText(JSON.stringify(this.data), this.x, this.y);
-    if (this.waveform) this.drawWaveform(ctx);
+    // ctx.clip();
+    if (this.waveform) this.drawSmoothWave(ctx);
 
     ctx.restore();
   }
 
-  private drawWaveform(ctx: CanvasRenderingContext2D) {
-    const midY = this.y + this.height / 2;
-    const halfHeight = this.height / 2;
+  private drawSmoothWave(ctx: CanvasRenderingContext2D) {
+    const marginHeight = 8;
+    const middleY = this.y + this.height / 2;
+    const scaleY = this.height / 2 - marginHeight;
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = '#c3c3c3';
     ctx.beginPath();
+    ctx.moveTo(this.x, middleY);
 
-    // 상단 파형 그리기
     let prevX = this.x;
-    let prevY = midY;
+    let prevY = middleY;
+    for (let i = 0; i < this.waveform.length; i++) {
+      const x = this.x + (i / this.waveform.length) * this.width;
+      const y = middleY - this.waveform[i] * scaleY;
 
-    for (let i = 0; i < this.width; i++) {
-      const x = this.x + i;
-      const value = this.waveform[i];
-      const y = midY - value * halfHeight;
+      const midX = (prevX + x) / 2;
+      const midY = (prevY + y) / 2;
 
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        const ctrlX = (prevX + x) / 2;
-        const ctrlY = prevY;
-        ctx.quadraticCurveTo(ctrlX, ctrlY, x, y);
-      }
+      ctx.quadraticCurveTo(prevX, prevY, midX, midY);
 
       prevX = x;
       prevY = y;
     }
-
-    ctx.lineTo(this.x + this.width, midY);
+    ctx.lineTo(this.x + this.width, middleY);
 
     prevX = this.x + this.width;
-    prevY = midY;
+    prevY = middleY;
+    for (let i = this.waveform.length - 1; i >= 0; i--) {
+      const x = this.x + (i / this.waveform.length) * this.width;
+      const y = middleY + this.waveform[i] * scaleY;
 
-    for (let i = this.width - 1; i >= 0; i--) {
-      const x = this.x + i;
-      const value = this.waveform[i];
-      const y = midY + value * halfHeight;
+      const midX = (prevX + x) / 2;
+      const midY = (prevY + y) / 2;
 
-      if (i === this.width - 1) {
-        ctx.lineTo(x, y);
-      } else {
-        const ctrlX = (prevX + x) / 2;
-        const ctrlY = prevY;
-        ctx.quadraticCurveTo(ctrlX, ctrlY, x, y);
-      }
+      ctx.quadraticCurveTo(prevX, prevY, midX, midY);
 
       prevX = x;
       prevY = y;
     }
-
-    ctx.lineTo(this.x, midY);
-    ctx.fillStyle = '#ff0000';
     ctx.closePath();
+
+    const gradient = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+    ctx.fillStyle = gradient;
     ctx.fill();
+
+    ctx.strokeStyle = 'rgb(0, 0, 0, 0.6)';
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
 }

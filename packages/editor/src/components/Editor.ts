@@ -9,12 +9,7 @@ import { Workground } from './Workground';
 
 export class Editor extends Stage {
   override name = 'BEditor';
-
   data: EditorDataType[] = [];
-  _workground: Workground | undefined;
-
-  _audioPlayer: AudioPlayer = new AudioPlayer();
-
   style: EditorStyleType = {
     theme: {
       background: 'white',
@@ -36,7 +31,8 @@ export class Editor extends Stage {
       margin: 10,
     },
   };
-
+  private _workground: Workground;
+  private _audioPlayer: AudioPlayer = new AudioPlayer();
   private _resizeListener: () => void;
 
   constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
@@ -57,7 +53,6 @@ export class Editor extends Stage {
   private async init(): Promise<void> {
     await this._loadTrackBuffers();
     this._initLayout();
-    this._onResize();
   }
 
   private async _loadTrackBuffers(): Promise<void> {
@@ -99,22 +94,21 @@ export class Editor extends Stage {
   override draw(ctx: CanvasRenderingContext2D) {}
 
   isPlaying() {
-    return this._workground?.isPlaying();
+    return this._workground.isPlaying();
   }
 
   async play() {
-    await this._audioPlayer.start();
-    this._workground?.play();
+    this._workground.play();
     this._audioPlayer.play();
   }
 
   pause() {
-    this._workground?.pause();
+    this._workground.pause();
     this._audioPlayer.play();
   }
 
   stop() {
-    this._workground?.stop();
+    this._workground.stop();
     this._audioPlayer.stop();
   }
 

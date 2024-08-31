@@ -26,7 +26,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   }, [ref]);
 
   const togglePlay = useCallback(async () => {
-    if (editor.current?.isPlaying()) {
+    if (isPlaying) {
       editor.current?.stop();
     } else {
       await editor.current?.play();

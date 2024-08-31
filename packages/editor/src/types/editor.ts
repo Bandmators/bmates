@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type SongDataType<T extends string = string> = {
   start: number;
   long: number;
@@ -5,7 +6,7 @@ export type SongDataType<T extends string = string> = {
   user: string;
   group: number;
   instrument: T;
-  [key: string]: unknown;
+  [key: string]: any;
 };
 export type TrackDataType<T extends string = string> = {
   category: string;

@@ -45,6 +45,7 @@ export class Workground extends Group {
     let moveX = 0;
 
     this.on('mousedown', (evt: EventData) => {
+      if (evt.originalEvent.button !== 1) return;
       isDragging = true;
       startX = evt.originalEvent.clientX;
       moveX = evt.originalEvent.clientX;
@@ -70,7 +71,8 @@ export class Workground extends Group {
       }
     });
 
-    this.on('mouseleave', () => {
+    this.on('mouseleave', (evt: EventData) => {
+      if (evt.originalEvent.button !== 1) return;
       isDragging = false;
     });
   }

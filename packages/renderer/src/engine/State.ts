@@ -1,8 +1,10 @@
 import { EventData, EventHandler, EventType } from '@/types';
 
+import { Node } from './Node';
+
 export class Statable {
   events: Map<EventType, Set<EventHandler>> = new Map();
-  parent: Statable | null = null;
+  parent: Node | null = null;
 
   on(eventType: EventType, handler: EventHandler) {
     if (!this.events.has(eventType)) {
@@ -19,6 +21,6 @@ export class Statable {
     const handlers = this.events.get(eventData.type);
     handlers?.forEach(handler => handler(eventData));
 
-    if (eventBubble) this.parent?.call(eventType, eventData, eventBubble);
+    if (eventBubble && eventData.bubble) this.parent?.call(eventType, eventData, eventBubble);
   }
 }

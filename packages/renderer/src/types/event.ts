@@ -1,6 +1,6 @@
 import { Node } from '@/engine';
 
-export type EventType = 'click' | 'mousemove' | 'mousedown' | 'mouseup' | 'mouseleave';
+export type EventType = 'click' | 'mousemove' | 'mousedown' | 'mouseup' | 'mouseleave' | 'mouseover' | 'mouseout';
 
 export interface EventData {
   type: EventType;
@@ -10,6 +10,7 @@ export interface EventData {
     y: number;
   };
   originalEvent: MouseEvent;
+  bubble: boolean;
 }
 
 export type EventHandler = (event: EventData) => void;

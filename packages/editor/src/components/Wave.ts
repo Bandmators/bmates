@@ -1,4 +1,4 @@
-import { Node } from '@bmates/renderer';
+import { EventData, Node } from '@bmates/renderer';
 
 import { EditorStyleType, SongDataType } from '@/types';
 
@@ -22,6 +22,8 @@ export class Wave extends Node {
     this.height = this.style.wave.height;
 
     this.waveform = this.extractWaveform(this.data.source.buffer);
+
+    this._initEvent();
   }
 
   private extractWaveform(buffer: AudioBuffer) {
@@ -114,5 +116,49 @@ export class Wave extends Node {
     ctx.strokeStyle = 'rgb(0, 0, 0, 0.6)';
     ctx.lineWidth = 1;
     ctx.stroke();
+  }
+
+  private setCursor(cursorStyle: string) {
+    document.body.style.cursor = cursorStyle;
+  }
+
+  private _initEvent() {
+    let isDragging = false;
+    // let startX = 0;
+    let moveX = 0;
+
+    this.on('mouseover', () => {
+      this.setCursor('pointer');
+    });
+    this.on('mouseout', () => {
+      this.setCursor('default');
+    });
+
+    this.on('mousedown', (evt: EventData) => {
+      isDragging = true;
+      // startX = evt.originalEvent.clientX;
+      moveX = evt.originalEvent.clientX;
+      evt.bubble = false;
+    });
+
+    this.on('mousemove', (evt: EventData) => {
+      evt.bubble = false;
+      if (isDragging) {
+        const deltaX = evt.originalEvent.clientX - moveX;
+        this.x = this.x + deltaX;
+        this.data.start = this.x / (this.style.timeline.gapWidth * 10);
+        moveX = evt.originalEvent.clientX;
+      }
+    });
+
+    this.on('mouseup', (evt: EventData) => {
+      evt.bubble = false;
+      isDragging = false;
+    });
+
+    this.on('mouseleave', (evt: EventData) => {
+      evt.bubble = false;
+      isDragging = false;
+    });
   }
 }

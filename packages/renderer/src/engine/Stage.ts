@@ -32,8 +32,11 @@ export abstract class Stage extends Container<Group> {
   }
 
   protected _initListener() {
-    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'];
+    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave', 'mouseover', 'mouseout'];
     events.forEach(event => this.canvas.addEventListener(event, this));
+    this.canvas.addEventListener('contextmenu', (evt: MouseEvent) => {
+      evt.preventDefault();
+    });
   }
 
   private _startLoop() {
@@ -63,6 +66,18 @@ export abstract class Stage extends Container<Group> {
 
     dispatchEventData(eventType, this, point, e);
     if (target) dispatchEventData(eventType, target, point, e);
+
+    if (eventType === 'mousemove') {
+      if (target !== this._lastHoveredTarget) {
+        if (this._lastHoveredTarget) {
+          dispatchEventData('mouseout', this._lastHoveredTarget, point, e);
+        }
+        if (target) {
+          dispatchEventData('mouseover', target, point, e);
+        }
+        this._lastHoveredTarget = target;
+      }
+    }
   }
 
   handleEvent(e: MouseEvent) {
@@ -75,6 +90,16 @@ export abstract class Stage extends Container<Group> {
     };
     const eventType = eventMap[e.type];
     if (eventType) this._dispatchEvent(eventType, e);
+    if (e.type === 'mouseleave') {
+      if (this._lastHoveredTarget) {
+        const point = getRelativeMousePosition(e, this.canvas);
+        dispatchEventData('mouseout', this._lastHoveredTarget, point, e);
+        this._lastHoveredTarget = null;
+      }
+    }
+    if (eventType === 'mousedown' && e.button === 1) {
+      e.preventDefault();
+    }
   }
 
   destroy() {

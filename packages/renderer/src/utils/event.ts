@@ -9,7 +9,8 @@ export const dispatchEventData = (
     y: number;
   },
   originalEvent: MouseEvent,
+  bubble: boolean = true,
 ) => {
-  const eventData: EventData = { type, target, point, originalEvent };
+  const eventData: EventData = { type, target, point, originalEvent, bubble };
   target.call(type, eventData, target !== this);
 };

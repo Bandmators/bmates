@@ -8,6 +8,12 @@ export abstract class Node extends Statable {
   height = 0;
 
   eventEnabled = true;
+  draggable = false;
+  isDragging = false;
+  dragStartX = 0;
+  dragStartY = 0;
+
+  _lastHoveredTarget: Node | null = null;
 
   abstract update(dT: number): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
@@ -24,5 +30,24 @@ export abstract class Node extends Statable {
   hitTest(x: number, y: number): Node | null {
     if (this.isIntersection(x, y)) return this;
     return null;
+  }
+
+  startDrag(x: number, y: number) {
+    if (this.draggable) {
+      this.isDragging = true;
+      this.dragStartX = x - this.x;
+      this.dragStartY = y - this.y;
+    }
+  }
+
+  drag(x: number, y: number) {
+    if (this.isDragging) {
+      this.x = x - this.dragStartX;
+      this.y = y - this.dragStartY;
+    }
+  }
+
+  endDrag() {
+    this.isDragging = false;
   }
 }

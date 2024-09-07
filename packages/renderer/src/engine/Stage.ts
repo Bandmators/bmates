@@ -10,6 +10,12 @@ export abstract class Stage extends Container<Group> {
   override name = 'Stage';
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  // scrollX = 0;
+  // scrollY = 0;
+  scroll = {
+    x: 0,
+    y: 0,
+  };
 
   private _raf: number | null = null;
 
@@ -28,8 +34,8 @@ export abstract class Stage extends Container<Group> {
 
     this.x = 0;
     this.y = 0;
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    this.width = this.canvas.width * 1000;
+    this.height = this.canvas.height * 1000;
   }
 
   protected _initListener() {
@@ -61,8 +67,12 @@ export abstract class Stage extends Container<Group> {
   }
 
   private _dispatchEvent(eventType: EventType, e: MouseEvent): void {
-    const point = getRelativeMousePosition(e, this.canvas);
+    const point = getRelativeMousePosition(e, this.canvas, this.scroll);
     const target = this.hitTest(point.x, point.y);
+
+    if (eventType === 'mousedown') {
+      console.log(target);
+    }
 
     dispatchEventData(eventType, this, point, e);
     if (target) dispatchEventData(eventType, target, point, e);
@@ -91,7 +101,7 @@ export abstract class Stage extends Container<Group> {
     const eventType = eventMap[e.type];
     if (eventType) this._dispatchEvent(eventType, e);
     if (e.type === 'mouseleave' || e.type === 'mouseout') {
-      const point = getRelativeMousePosition(e, this.canvas);
+      const point = getRelativeMousePosition(e, this.canvas, this.scroll);
       this._dispatchEventToAll(eventType, point, e);
       this._lastHoveredTarget = null;
     }

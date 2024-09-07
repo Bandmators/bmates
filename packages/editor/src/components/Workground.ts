@@ -8,23 +8,23 @@ export class Workground extends Group {
   override name = 'Workground';
 
   private timeline: Timeline | undefined;
-  private scrollX = 0;
   private _minScrollX = 0;
 
   constructor(
     protected canvas: HTMLCanvasElement,
     protected style: EditorStyleType,
     data: EditorDataType[],
+    private scroll = { x: 0, y: 0 },
   ) {
     super();
 
     this.x = 0;
     this.y = 0;
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    this.width = this.canvas.width * 1000;
+    this.height = this.canvas.height * 1000;
 
     this._minScrollX = -this.style.timeline.gapWidth;
-    this.scrollX = this._minScrollX;
+    this.scroll.x = this._minScrollX;
 
     this._initLayout(data);
     this._initEvent();
@@ -46,7 +46,6 @@ export class Workground extends Group {
 
     this.on('mousedown', (evt: EventData) => {
       startX = evt.originalEvent.clientX;
-
       if (evt.originalEvent.button !== 1) return;
       setCursor('all-scroll');
 
@@ -57,7 +56,7 @@ export class Workground extends Group {
     this.on('mousemove', (evt: EventData) => {
       if (isDragging) {
         const deltaX = moveX - evt.originalEvent.clientX;
-        this.scrollX = Math.max(this.scrollX + deltaX, this._minScrollX);
+        this.scroll.x = Math.max(this.scroll.x + deltaX, this._minScrollX);
         moveX = evt.originalEvent.clientX;
       }
     });
@@ -71,7 +70,7 @@ export class Workground extends Group {
 
       if (startX === endX && this.timeline && evt.originalEvent.button !== 1) {
         const rect = this.canvas.getBoundingClientRect();
-        const clickX = evt.originalEvent.clientX - rect.left + this.scrollX;
+        const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
         this.timeline.setRedLinePos(clickX - this.x);
       }
     });
@@ -121,6 +120,6 @@ export class Workground extends Group {
   override update(dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {
-    ctx.translate(-this.scrollX + this.x, this.y);
+    ctx.translate(this.x - this.scroll.x, this.y);
   }
 }

@@ -68,7 +68,7 @@ export class Editor extends Stage {
   }
 
   private _initLayout() {
-    this._workground = new Workground(this.canvas, this.style, this.data);
+    this._workground = new Workground(this.canvas, this.style, this.data, this.scroll);
     this.add(this._workground);
   }
 

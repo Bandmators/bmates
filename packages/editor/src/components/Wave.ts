@@ -123,10 +123,14 @@ export class Wave extends Node {
     let moveX = 0;
 
     this.on('mouseover', () => {
-      if (getCursor() === 'default') setCursor('pointer');
+      if (getCursor() === 'default' || getCursor() === '') setCursor('pointer');
     });
-    this.on('mouseout', () => {
+    this.on('mouseout', (evt: EventData) => {
       if (getCursor() === 'pointer') setCursor('default');
+      if (isDragging) {
+        evt.bubble = false;
+        isDragging = false;
+      }
     });
 
     this.on('mousedown', (evt: EventData) => {

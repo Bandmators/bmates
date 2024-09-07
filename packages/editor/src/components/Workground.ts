@@ -1,4 +1,4 @@
-import { EventData, Group } from '@bmates/renderer';
+import { EventData, Group, setCursor } from '@bmates/renderer';
 
 import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
@@ -45,9 +45,12 @@ export class Workground extends Group {
     let moveX = 0;
 
     this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button !== 1) return;
-      isDragging = true;
       startX = evt.originalEvent.clientX;
+
+      if (evt.originalEvent.button !== 1) return;
+      setCursor('all-scroll');
+
+      isDragging = true;
       moveX = evt.originalEvent.clientX;
     });
 
@@ -60,19 +63,20 @@ export class Workground extends Group {
     });
 
     this.on('mouseup', (evt: EventData) => {
+      setCursor('default');
+
       isDragging = false;
 
       const endX = evt.originalEvent.clientX;
 
-      if (startX === endX && this.timeline) {
+      if (startX === endX && this.timeline && evt.originalEvent.button !== 1) {
         const rect = this.canvas.getBoundingClientRect();
         const clickX = evt.originalEvent.clientX - rect.left + this.scrollX;
         this.timeline.setRedLinePos(clickX - this.x);
       }
     });
 
-    this.on('mouseleave', (evt: EventData) => {
-      if (evt.originalEvent.button !== 1) return;
+    this.on('mouseleave', () => {
       isDragging = false;
     });
   }

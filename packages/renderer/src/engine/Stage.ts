@@ -1,9 +1,10 @@
 import { EventType } from '@/types';
 import { getRelativeMousePosition } from '@/utils';
 
+import { EVENT_LIST } from '@/constants/event';
 import { dispatchEventData } from '@/utils/event';
 
-import { Container, Group } from './';
+import { Container, Group, Node } from './';
 
 export abstract class Stage extends Container<Group> {
   override name = 'Stage';
@@ -32,8 +33,7 @@ export abstract class Stage extends Container<Group> {
   }
 
   protected _initListener() {
-    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave', 'mouseover', 'mouseout'];
-    events.forEach(event => this.canvas.addEventListener(event, this));
+    EVENT_LIST.forEach(event => this.canvas.addEventListener(event, this));
     this.canvas.addEventListener('contextmenu', (evt: MouseEvent) => {
       evt.preventDefault();
     });
@@ -90,21 +90,28 @@ export abstract class Stage extends Container<Group> {
     };
     const eventType = eventMap[e.type];
     if (eventType) this._dispatchEvent(eventType, e);
-    if (e.type === 'mouseleave') {
-      if (this._lastHoveredTarget) {
-        const point = getRelativeMousePosition(e, this.canvas);
-        dispatchEventData('mouseout', this._lastHoveredTarget, point, e);
-        this._lastHoveredTarget = null;
-      }
+    if (e.type === 'mouseleave' || e.type === 'mouseout') {
+      const point = getRelativeMousePosition(e, this.canvas);
+      this._dispatchEventToAll(eventType, point, e);
+      this._lastHoveredTarget = null;
     }
     if (eventType === 'mousedown' && e.button === 1) {
       e.preventDefault();
     }
   }
 
+  private _dispatchEventToAll(eventType: EventType, point: { x: number; y: number }, e: MouseEvent) {
+    const dispatchToNode = (node: Node) => {
+      dispatchEventData(eventType, node, point, e, false);
+      if (node instanceof Container) {
+        node.children.forEach(dispatchToNode);
+      }
+    };
+    this.children.forEach(dispatchToNode);
+  }
+
   destroy() {
-    const events: EventType[] = ['click', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'];
-    events.forEach(event => this.canvas.removeEventListener(event, this));
+    EVENT_LIST.forEach(event => this.canvas.removeEventListener(event, this));
 
     if (this._raf) cancelAnimationFrame(this._raf);
   }

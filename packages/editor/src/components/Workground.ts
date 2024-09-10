@@ -3,11 +3,13 @@ import { EventData, Group, setCursor } from '@bmates/renderer';
 import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
 import { Timeline, Track, TrackGroup, Wave } from './';
+import { TimeIndicator } from './TimeIndicator';
 
 export class Workground extends Group {
   override name = 'Workground';
 
   private timeline: Timeline | undefined;
+  private timeIndicator: TimeIndicator;
   private _minScrollX = 0;
 
   constructor(
@@ -36,7 +38,11 @@ export class Workground extends Group {
     });
 
     this.timeline = new Timeline(this.style, 100, 0);
+    this.timeline.zIndex = -1;
     this.add(this.timeline);
+    this.timeIndicator = new TimeIndicator(this.style);
+    this.timeIndicator.zIndex = 100;
+    this.add(this.timeIndicator);
   }
 
   private _initEvent() {
@@ -68,10 +74,10 @@ export class Workground extends Group {
 
       const endX = evt.originalEvent.clientX;
 
-      if (startX === endX && this.timeline && evt.originalEvent.button !== 1) {
+      if (startX === endX && this.timeIndicator && evt.originalEvent.button !== 1) {
         const rect = this.canvas.getBoundingClientRect();
         const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
-        this.timeline.setRedLinePos(clickX - this.x);
+        this.timeIndicator.setPosition(clickX - this.x);
       }
     });
 
@@ -101,23 +107,23 @@ export class Workground extends Group {
   }
 
   isPlaying() {
-    return this.timeline?.isPlaying();
+    return this.timeIndicator?.isPlaying();
   }
 
   play() {
-    this.timeline?.play();
+    this.timeIndicator?.play();
   }
 
   pause() {
-    this.timeline?.pause();
+    this.timeIndicator?.pause();
   }
 
   stop() {
-    this.timeline?.stop();
+    this.timeIndicator?.stop();
   }
 
   getCurrentTime() {
-    return this.timeline?.getCurrentTime() || 0;
+    return this.timeIndicator?.getCurrentTime() || 0;
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

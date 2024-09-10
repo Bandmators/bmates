@@ -36,7 +36,6 @@ class AudioPlayer {
   }
 
   play(startTime: number = 0): void {
-    console.log('start', startTime);
     if (!this.audioContext) throw new Error('AudioContext not initialized');
     const currentTime = this.audioContext.currentTime;
 
@@ -59,6 +58,19 @@ class AudioPlayer {
       newSource.start(currentTime + trackStartTime, sourceStartTime);
 
       this.tracks.set(trackId, { ...track, source: newSource });
+    });
+  }
+
+  pause(): void {
+    this.tracks.forEach(track => {
+      if (track.source) {
+        try {
+          track.source.stop();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+          /* */
+        }
+      }
     });
   }
 

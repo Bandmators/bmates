@@ -110,7 +110,7 @@ export class Editor extends Stage {
 
   pause() {
     this._workground.pause();
-    this._audioPlayer.play();
+    this._audioPlayer.pause();
   }
 
   stop() {

@@ -15,6 +15,8 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const editor = useRef<Editor | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  console.log('sdfadsf');
+
   useEffect(() => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data, style);
@@ -29,11 +31,16 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   const togglePlay = useCallback(async () => {
     if (isPlaying) {
-      editor.current?.stop();
+      editor.current?.pause();
     } else {
       await editor.current?.play();
     }
     setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const toggleStopPlay = useCallback(async () => {
+    editor.current?.stop();
+    setIsPlaying(false);
   }, [isPlaying]);
 
   // const toggleMute = useCallback(
@@ -83,7 +90,8 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   return (
     <>
       <div>
-        <button onClick={togglePlay}>{isPlaying ? 'Stop' : 'Play'}</button>
+        <button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</button>
+        <button onClick={toggleStopPlay}>Stop</button>
         <input type="file" accept="audio/*" onChange={handleFileUpload} />
         <button
           onClick={() => {

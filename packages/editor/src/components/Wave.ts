@@ -57,6 +57,8 @@ export class Wave extends Node {
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
+    if (this._isDragging) this._waveSanpping(ctx);
+
     ctx.beginPath();
     ctx.roundRect(this.x, this.y, this.width, this.height, this.style.wave.borderRadius);
     ctx.fillStyle = '#c3c3c3';
@@ -65,8 +67,6 @@ export class Wave extends Node {
 
     // ctx.clip();
     if (this.waveform) this.drawSmoothWave(ctx);
-
-    if (this._isDragging) this._waveSanpping(ctx);
 
     ctx.restore();
   }

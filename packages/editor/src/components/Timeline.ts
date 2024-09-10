@@ -24,7 +24,6 @@ export class Timeline extends Node {
 
   override draw(ctx: CanvasRenderingContext2D) {
     this.drawTime(ctx);
-    this.drawRedLine(ctx);
   }
 
   drawTime(ctx: CanvasRenderingContext2D) {
@@ -40,6 +39,11 @@ export class Timeline extends Node {
       ctx.beginPath();
       ctx.moveTo(begin, this.posY);
       ctx.lineTo(begin, this.posY + this.style.timeline.gapHeight);
+      ctx.stroke();
+
+      ctx.strokeStyle = this.style.theme.lineColor;
+      ctx.moveTo(begin, this.posY + this.style.timeline.gapHeight);
+      ctx.lineTo(begin, this.posY + this.style.timeline.gapHeight + ctx.canvas.height);
       ctx.stroke();
 
       ctx.strokeStyle = this.style.theme.lineColor;
@@ -63,65 +67,11 @@ export class Timeline extends Node {
     ctx.restore();
   }
 
-  c = 0;
-  drawRedLine(ctx: CanvasRenderingContext2D) {
-    if (this.isPlaying()) {
-      this._timeRedLinePosX += this.style.timeline.gapWidth * this.style.timeline.timeDivde * this._dT;
-      this.c += this._dT;
-      // console.log(this.c);
-    }
-    // if (this._timeRedLinePosX > ctx.canvas.width) this._timeRedLinePosX = 0;
-
-    ctx.save();
-
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.moveTo(this._timeRedLinePosX - 6, 0);
-    ctx.lineTo(this._timeRedLinePosX - 6, this.posY / 2);
-    ctx.lineTo(this._timeRedLinePosX, this.posY / 2 + 10);
-    ctx.lineTo(this._timeRedLinePosX + 6, this.posY / 2);
-    ctx.lineTo(this._timeRedLinePosX + 6, 0);
-    ctx.fill();
-
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.moveTo(this._timeRedLinePosX, 0);
-    ctx.lineTo(this._timeRedLinePosX, ctx.canvas.height);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  setRedLinePos(x: number) {
-    this._timeRedLinePosX = x;
-  }
-
   set scrollX(value: number) {
     this._scrollX = value;
   }
 
   get scrollX() {
     return this._scrollX;
-  }
-
-  isPlaying() {
-    return this._isPlaying;
-  }
-
-  play() {
-    this._isPlaying = true;
-  }
-
-  pause() {
-    this._isPlaying = false;
-  }
-
-  stop() {
-    this.pause();
-    this._timeRedLinePosX = 0;
-  }
-
-  getCurrentTime(): number {
-    return this._timeRedLinePosX / (this.style.timeline.gapWidth * this.style.timeline.timeDivde);
   }
 }

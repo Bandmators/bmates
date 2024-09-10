@@ -1,5 +1,7 @@
 import { EditorDataType, EditorStyleType } from '@bmates/editor';
 
+import { DeepPartial } from '@/types/type';
+
 import './App.css';
 import BMates from './BMates';
 
@@ -58,7 +60,7 @@ const data: EditorDataType[] = [
   },
 ];
 
-const style: Partial<EditorStyleType> = {
+const style: DeepPartial<EditorStyleType> = {
   theme: {
     background: 'white',
     lineColor: '#e3e3e3',
@@ -74,7 +76,7 @@ const style: Partial<EditorStyleType> = {
     width: 300,
   },
   wave: {
-    height: 45,
+    height: 95,
     borderRadius: 8,
     margin: 10,
   },
@@ -94,6 +96,13 @@ const App = () => {
           );
         }}
       />
+      <button
+        onClick={() => {
+          console.log(data);
+        }}
+      >
+        Click me
+      </button>
     </>
   );
 };

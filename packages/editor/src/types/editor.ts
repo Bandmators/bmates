@@ -43,5 +43,6 @@ export type EditorStyleType = {
     height: number;
     borderRadius: number;
     margin: number;
+    snapping: string;
   };
 };

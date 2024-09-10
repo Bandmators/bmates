@@ -28,21 +28,10 @@ class AudioPlayer {
   async prepareTrack(song: SongDataType, trackId: string) {
     const buffer = await this.loadAudioBuffer(song.src);
     const context = this.createContext();
-
     const source = context.createBufferSource();
-
-    // const gainNode = context.createGain();
-    // const analyserNode = context.createAnalyser();
-    // analyserNode.fftSize = 2048;
-
     source.connect(context.destination);
-    // source.connect(gainNode);
-    // gainNode.connect(analyserNode);
-    // analyserNode.connect(context.destination);
-
     source.buffer = buffer;
     song.source = source;
-
     this.tracks.set(trackId, { song, source, muted: false });
   }
 

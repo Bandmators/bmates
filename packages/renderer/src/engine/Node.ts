@@ -12,6 +12,7 @@ export abstract class Node extends Statable {
   isDragging = false;
   dragStartX = 0;
   dragStartY = 0;
+  zIndex = 0;
 
   _lastHoveredTarget: Node | null = null;
 

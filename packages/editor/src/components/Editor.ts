@@ -1,9 +1,12 @@
 import { Stage } from '@bmates/renderer';
 
 import AudioPlayer from '@/AudioPlayer';
-import { EditorDataType, EditorStyleType } from '@/types';
+import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
 import { deepMerge } from '@/utils';
 
+import { Track } from './Track';
+import { TrackGroup } from './TrackGroup';
+import { Wave } from './Wave';
 // import { Sidebar } from './Sidebar';
 import { Workground } from './Workground';
 
@@ -29,6 +32,7 @@ export class Editor extends Stage {
       height: 45,
       borderRadius: 8,
       margin: 10,
+      snapping: 'rgb(0, 0, 0, 0.6)',
     },
   };
   private _workground: Workground;
@@ -45,6 +49,7 @@ export class Editor extends Stage {
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     (window as any).editor = this;
+    (window as any).style = style;
 
     this._resizeListener = () => this._onResize();
     window.addEventListener('resize', this._resizeListener);
@@ -112,10 +117,28 @@ export class Editor extends Stage {
     this._audioPlayer.stop();
   }
 
+  async addWave(song: SongDataType) {
+    const trackId = `${song.group}-${song.instrument}`;
+    await this._audioPlayer.prepareTrack(song, trackId);
+
+    const trackGroup = this._workground.children[0] as TrackGroup;
+    const track = trackGroup.children[0] as Track;
+    const wave = new Wave(song, this.style);
+    track.add(wave);
+  }
+
   override destroy() {
     this.stop();
     super.destroy();
 
     window.removeEventListener('resize', this._resizeListener);
+  }
+
+  addEditorData(data: EditorDataType) {
+    this.data.push(data);
+  }
+
+  export() {
+    return this.data;
   }
 }

@@ -7,6 +7,8 @@ export class Wave extends Node {
 
   private waveform: Float32Array;
 
+  private _isDragging = false;
+
   constructor(
     private data: SongDataType,
     private style: EditorStyleType,
@@ -64,6 +66,8 @@ export class Wave extends Node {
     // ctx.clip();
     if (this.waveform) this.drawSmoothWave(ctx);
 
+    if (this._isDragging) this._waveSanpping(ctx);
+
     ctx.restore();
   }
 
@@ -118,8 +122,17 @@ export class Wave extends Node {
     ctx.stroke();
   }
 
+  private _waveSanpping(ctx: CanvasRenderingContext2D) {
+    ctx.strokeStyle = this.style.wave.snapping;
+    ctx.beginPath();
+    ctx.moveTo(this.x, 0);
+    ctx.lineTo(this.x, ctx.canvas.height);
+    ctx.lineWidth = 1;
+    ctx.setLineDash([10]);
+    ctx.stroke();
+  }
+
   private _initEvent() {
-    let isDragging = false;
     let moveX = 0;
 
     this.on('mouseover', () => {
@@ -127,22 +140,22 @@ export class Wave extends Node {
     });
     this.on('mouseout', (evt: EventData) => {
       if (getCursor() === 'pointer') setCursor('default');
-      if (isDragging) {
+      if (this._isDragging) {
         evt.bubble = false;
-        isDragging = false;
+        this._isDragging = false;
       }
     });
 
     this.on('mousedown', (evt: EventData) => {
       if (evt.originalEvent.button !== 0) return;
 
-      isDragging = true;
+      this._isDragging = true;
       moveX = evt.originalEvent.clientX;
       evt.bubble = false;
     });
 
     this.on('mousemove', (evt: EventData) => {
-      if (isDragging) {
+      if (this._isDragging) {
         evt.bubble = false;
         const deltaX = evt.originalEvent.clientX - moveX;
         this.x = this.x + deltaX;
@@ -152,16 +165,16 @@ export class Wave extends Node {
     });
 
     this.on('mouseup', (evt: EventData) => {
-      if (isDragging) {
+      if (this._isDragging) {
         evt.bubble = false;
-        isDragging = false;
+        this._isDragging = false;
       }
     });
 
     this.on('mouseleave', (evt: EventData) => {
-      if (isDragging) {
+      if (this._isDragging) {
         evt.bubble = false;
-        isDragging = false;
+        this._isDragging = false;
       }
     });
   }

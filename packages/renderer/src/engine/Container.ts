@@ -28,6 +28,9 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
 
   override _tick(dT: number, ctx: CanvasRenderingContext2D) {
     super._tick(dT, ctx);
-    this.children.forEach(child => child._tick(dT, ctx));
+    // this.children.forEach(child => child._tick(dT, ctx));
+
+    const sortedChildren = this.children.slice().sort((a, b) => a.zIndex - b.zIndex);
+    sortedChildren.forEach(child => child._tick(dT, ctx));
   }
 }

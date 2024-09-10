@@ -120,4 +120,8 @@ export class Timeline extends Node {
     this.pause();
     this._timeRedLinePosX = 0;
   }
+
+  getCurrentTime(): number {
+    return this._timeRedLinePosX / (this.style.timeline.gapWidth * this.style.timeline.timeDivde);
+  }
 }

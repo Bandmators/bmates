@@ -35,14 +35,30 @@ class AudioPlayer {
     this.tracks.set(trackId, { song, source, muted: false });
   }
 
-  play(): void {
+  play(startTime: number = 0): void {
+    console.log('start', startTime);
     if (!this.audioContext) throw new Error('AudioContext not initialized');
-    const startTime = this.audioContext.currentTime;
+    const currentTime = this.audioContext.currentTime;
 
-    this.tracks.forEach(track => {
+    this.tracks.forEach((track, trackId) => {
       if (track.source) {
-        track.source.start(startTime + track.song.start);
+        try {
+          track.source.stop();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+          /* */
+        }
       }
+      const newSource = this.audioContext!.createBufferSource();
+      newSource.buffer = track.source.buffer;
+      newSource.connect(this.audioContext!.destination);
+
+      const trackStartTime = Math.max(0, track.song.start - startTime);
+      const sourceStartTime = Math.max(0, startTime - track.song.start);
+
+      newSource.start(currentTime + trackStartTime, sourceStartTime);
+
+      this.tracks.set(trackId, { ...track, source: newSource });
     });
   }
 
@@ -59,7 +75,15 @@ class AudioPlayer {
 
   stop(): void {
     this.tracks.forEach(track => {
-      if (track.source) track.source.stop();
+      if (track.source) {
+        try {
+          track.source.stop();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          /* */
+        }
+        track.source.disconnect();
+      }
     });
   }
 

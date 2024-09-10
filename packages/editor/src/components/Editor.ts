@@ -103,8 +103,9 @@ export class Editor extends Stage {
   }
 
   async play() {
+    const currentTime = this._workground.getCurrentTime();
     this._workground.play();
-    this._audioPlayer.play();
+    this._audioPlayer.play(currentTime);
   }
 
   pause() {

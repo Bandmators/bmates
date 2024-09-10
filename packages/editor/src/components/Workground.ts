@@ -116,6 +116,10 @@ export class Workground extends Group {
     this.timeline?.stop();
   }
 
+  getCurrentTime() {
+    return this.timeline?.getCurrentTime() || 0;
+  }
+
   /* eslint-disable @typescript-eslint/no-unused-vars */
   override update(dT: number) {}
 

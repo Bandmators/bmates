@@ -1,10 +1,10 @@
 import { EventData, EventHandler, EventType } from '@/types';
 
-import { Node } from './Node';
+import { Container } from './Container';
 
 export class Statable {
   events: Map<EventType, Set<EventHandler>> = new Map();
-  parent: Node | null = null;
+  parent: Container | null = null;
 
   on(eventType: EventType, handler: EventHandler) {
     if (!this.events.has(eventType)) {

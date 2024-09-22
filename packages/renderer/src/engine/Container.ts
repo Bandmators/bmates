@@ -1,3 +1,5 @@
+import { Vector2 } from '@/types';
+
 import { Node } from './Node';
 
 export abstract class Container<ChildType extends Node = Node> extends Node {
@@ -17,13 +19,12 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
     }
   }
 
-  hitTest(x: number, y: number): Node | null {
+  hitTest(point: Vector2, e: MouseEvent) {
     for (let i = this.children.length - 1; i >= 0; i--) {
-      const hitChild = this.children[i].hitTest(x, y);
+      const hitChild = this.children[i].hitTest(point, e);
       if (hitChild) return hitChild;
     }
-    if (this.isIntersection(x, y)) return this;
-    return null;
+    return super.hitTest(point, e);
   }
 
   override _tick(dT: number, ctx: CanvasRenderingContext2D) {

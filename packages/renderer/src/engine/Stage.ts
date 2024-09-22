@@ -4,9 +4,9 @@ import { getRelativeMousePosition } from '@/utils';
 import { EVENT_LIST } from '@/constants/event';
 import { dispatchEventData } from '@/utils/event';
 
-import { Container, Group, Node } from './';
+import { Container, Layer, Node } from './';
 
-export abstract class Stage extends Container<Group> {
+export abstract class Stage extends Container<Layer> {
   override name = 'Stage';
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -68,26 +68,12 @@ export abstract class Stage extends Container<Group> {
 
   private _dispatchEvent(eventType: EventType, e: MouseEvent): void {
     const point = getRelativeMousePosition(e, this.canvas, this.scroll);
-    const target = this.hitTest(point.x, point.y);
 
-    if (eventType === 'mousedown') {
-      console.log(target);
-    }
+    this.children.forEach(layer => {
+      const target = layer.hitTest(point, e);
 
-    dispatchEventData(eventType, this, point, e);
-    if (target) dispatchEventData(eventType, target, point, e);
-
-    if (eventType === 'mousemove') {
-      if (target !== this._lastHoveredTarget) {
-        if (this._lastHoveredTarget) {
-          dispatchEventData('mouseout', this._lastHoveredTarget, point, e);
-        }
-        if (target) {
-          dispatchEventData('mouseover', target, point, e);
-        }
-        this._lastHoveredTarget = target;
-      }
-    }
+      if (target) dispatchEventData(eventType, target, point, e);
+    });
   }
 
   handleEvent(e: MouseEvent) {
@@ -103,7 +89,7 @@ export abstract class Stage extends Container<Group> {
     if (e.type === 'mouseleave' || e.type === 'mouseout') {
       const point = getRelativeMousePosition(e, this.canvas, this.scroll);
       this._dispatchEventToAll(eventType, point, e);
-      this._lastHoveredTarget = null;
+      // this._lastHoveredTarget = [];
     }
     if (eventType === 'mousedown' && e.button === 1) {
       e.preventDefault();

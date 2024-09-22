@@ -1,11 +1,11 @@
-import { EventData, Group, setCursor } from '@bmates/renderer';
+import { EventData, Layer, setCursor } from '@bmates/renderer';
 
 import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
 import { Timeline, Track, TrackGroup, Wave } from './';
 import { TimeIndicator } from './TimeIndicator';
 
-export class Workground extends Group {
+export class Workground extends Layer {
   override name = 'Workground';
 
   private timeline: Timeline | undefined;
@@ -73,8 +73,7 @@ export class Workground extends Group {
       isDragging = false;
 
       const endX = evt.originalEvent.clientX;
-
-      if (startX === endX && this.timeIndicator && evt.originalEvent.button !== 1) {
+      if (startX === endX && this.timeIndicator && evt.originalEvent.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
         const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
         this.timeIndicator.setPosition(clickX - this.x);

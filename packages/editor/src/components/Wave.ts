@@ -136,9 +136,9 @@ export class Wave extends Node {
 
   private _timeIndicator(ctx) {
     const timeString = this.formatTime(this.data.start);
-    ctx.fillStyle = '#000'; // 텍스트 색상
-    ctx.font = '12px Arial'; // 텍스트 폰트
-    ctx.fillText(timeString, this.x, this.y + this.height + 15); // 텍스트 위치
+    ctx.fillStyle = '#000';
+    ctx.font = '12px Arial';
+    ctx.fillText(timeString, this.x, this.y + this.height + 15);
   }
 
   private formatTime(start: number): string {
@@ -165,7 +165,9 @@ export class Wave extends Node {
     });
 
     this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button !== 0) return;
+      if (evt.originalEvent.button === 1) {
+        // context menu
+      } else if (evt.originalEvent.button !== 0) return;
 
       this._isDragging = true;
       moveX = evt.originalEvent.clientX;
@@ -187,7 +189,6 @@ export class Wave extends Node {
         const deltaX = evt.originalEvent.clientX - moveX;
         const newX = this.x + deltaX;
 
-        // 다른 Wave와의 충돌 확인
         const isColliding = this.checkCollision(newX);
         if (!isColliding) {
           this.x = newX;
@@ -212,29 +213,14 @@ export class Wave extends Node {
     });
   }
 
-  // private checkCollision(newX: number): boolean {
-  //   const otherWaves = this.parent.children.filter(child => child instanceof Wave && child !== this);
-
-  //   for (const wave of otherWaves) {
-  //     const waveEnd = wave.data.start + wave.data.long; // 다른 Wave의 끝 위치
-  //     const newWaveEnd = newX / (this.style.timeline.gapWidth * 10) + this.data.long; // 현재 Wave의 끝 위치
-
-  //     // 좌우 충돌 확인
-  //     if (newX / (this.style.timeline.gapWidth * 10) < waveEnd && newWaveEnd > wave.data.start) {
-  //       return true; // 충돌 발생
-  //     }
-  //   }
-  //   return false; // 충돌 없음
-  // }
   private checkCollision(newX: number): boolean {
-    // 다른 Wave 객체들을 가져오는 로직 (예: this.parent.children)
     const otherWaves = this.parent.children.filter(child => child instanceof Wave && child !== this);
 
     for (const wave of otherWaves) {
       if (newX < wave.x + wave.width && newX + this.width > wave.x) {
-        return true; // 충돌 발생
+        return true;
       }
     }
-    return false; // 충돌 없음
+    return false;
   }
 }

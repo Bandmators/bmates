@@ -1,3 +1,7 @@
+import { Vector2 } from '@/types';
+
+import { dispatchEventData } from '@/utils/event';
+
 import { Statable } from './State';
 
 export abstract class Node extends Statable {
@@ -10,11 +14,12 @@ export abstract class Node extends Statable {
   eventEnabled = true;
   draggable = false;
   isDragging = false;
+  isOver = false;
   dragStartX = 0;
   dragStartY = 0;
   zIndex = 0;
 
-  _lastHoveredTarget: Node | null = null;
+  _lastHoveredTarget: Node[] = [];
 
   abstract update(dT: number): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
@@ -28,8 +33,18 @@ export abstract class Node extends Statable {
     return this.x <= x && x <= this.x + this.width && this.y <= y && y <= this.y + this.height;
   }
 
-  hitTest(x: number, y: number): Node | null {
-    if (this.isIntersection(x, y)) return this;
+  hitTest(point: Vector2, e: MouseEvent): Node | null {
+    if (this.isIntersection(point.x, point.y)) {
+      if (!this.isOver) {
+        dispatchEventData('mouseover', this, point, e);
+        this.isOver = true;
+      }
+      return this;
+    }
+    if (this.isOver) {
+      dispatchEventData('mouseout', this, point, e);
+      this.isOver = false;
+    }
     return null;
   }
 

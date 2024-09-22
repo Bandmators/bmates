@@ -4,10 +4,10 @@ import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
 import { deepMerge } from '@/utils';
 
+import { Overlay } from './Overlay';
 import { Track } from './Track';
 import { TrackGroup } from './TrackGroup';
 import { Wave } from './Wave';
-// import { Sidebar } from './Sidebar';
 import { Workground } from './Workground';
 
 export class Editor extends Stage {
@@ -36,6 +36,7 @@ export class Editor extends Stage {
     },
   };
   private _workground: Workground;
+  private _overlay: Overlay;
   private _audioPlayer: AudioPlayer = new AudioPlayer();
   private _resizeListener: () => void;
 
@@ -75,6 +76,9 @@ export class Editor extends Stage {
   private _initLayout() {
     this._workground = new Workground(this.canvas, this.style, this.data, this.scroll);
     this.add(this._workground);
+
+    this._overlay = new Overlay(this.canvas, this.style, this.scroll);
+    this.add(this._overlay);
   }
 
   private _onResize() {
@@ -141,5 +145,9 @@ export class Editor extends Stage {
 
   export() {
     return this.data;
+  }
+
+  tree() {
+    return this.children;
   }
 }

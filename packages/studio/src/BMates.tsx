@@ -15,8 +15,6 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const editor = useRef<Editor | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  console.log('sdfadsf');
-
   useEffect(() => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data, style);

@@ -16,7 +16,7 @@ export class ContextMenu extends Node {
     ctx.save();
     ctx.fillStyle = 'white';
     ctx.beginPath();
-    ctx.roundRect(this.position.x, this.position.y, 150, this._menus.length * 20 + 20, 10); // 둥근 테두리
+    ctx.roundRect(this.position.x, this.position.y, 150, this._menus.length * 20 + 20, 10);
     ctx.fill();
     ctx.strokeStyle = 'black';
     ctx.stroke();

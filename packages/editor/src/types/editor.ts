@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type SongDataType<T extends string = string> = {
+  id: string;
   start: number;
   long: number;
   src: string;
@@ -9,6 +10,7 @@ export type SongDataType<T extends string = string> = {
   [key: string]: any;
 };
 export type TrackDataType<T extends string = string> = {
+  id: string;
   category: string;
   songs: SongDataType<T>[];
 };

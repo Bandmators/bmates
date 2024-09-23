@@ -1,5 +1,7 @@
 import { EditorDataType, EditorStyleType } from '@bmates/editor';
 
+import { useState } from 'react';
+
 import { DeepPartial } from '@/types/type';
 
 import './App.css';
@@ -10,9 +12,11 @@ const data: EditorDataType[] = [
     name: 'bgm',
     tracks: [
       {
+        id: 'TEMP0',
         category: 'Category 1',
         songs: [
           {
+            id: 'BMATEST0',
             src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
             user: '',
             start: 0,
@@ -21,6 +25,7 @@ const data: EditorDataType[] = [
             instrument: 'Piano',
           },
           {
+            id: 'BMATEST1',
             src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
             user: '',
             start: 9,
@@ -36,9 +41,11 @@ const data: EditorDataType[] = [
     name: 'effect',
     tracks: [
       {
+        id: 'TEMP1',
         category: 'Category 2',
         songs: [
           {
+            id: 'BMATEST3',
             src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
             user: '',
             start: 3,
@@ -47,6 +54,7 @@ const data: EditorDataType[] = [
             instrument: 'Piano',
           },
           {
+            id: 'BMATEST4',
             src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
             user: '',
             start: 10.0,
@@ -81,17 +89,33 @@ const style: DeepPartial<EditorStyleType> = {
     margin: 10,
   },
 };
+
+const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void }) => {
+  const [isMuted, setIsMuted] = useState<boolean>(muted);
+
+  return (
+    <button
+      onClick={() => {
+        onClick();
+        setIsMuted(!isMuted);
+      }}
+    >
+      {isMuted ? 'Unmute' : 'Mute'}
+    </button>
+  );
+};
+
 const App = () => {
   return (
     <>
       <BMates
         data={data}
         style={style}
-        trackEl={({ track, muted }) => {
+        trackEl={({ track, muted, toggleMute }) => {
           return (
             <div className="track">
               <div>{track.category}</div>
-              <button>{muted ? 'Unmute' : 'Mute'}</button>
+              <ToggleMute muted={muted} onClick={toggleMute} />
             </div>
           );
         }}

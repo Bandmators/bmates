@@ -2,7 +2,7 @@ import { Stage } from '@bmates/renderer';
 
 import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
-import { deepMerge } from '@/utils';
+import { deepMerge, generateUniqueId } from '@/utils';
 
 import { Overlay } from './Overlay';
 import { Track } from './Track';
@@ -63,12 +63,11 @@ export class Editor extends Stage {
 
   private async _loadTrackBuffers(): Promise<void> {
     const loadPromises = this.data.flatMap(item =>
-      item.tracks.flatMap(track =>
-        track.songs.map(song => {
-          const trackId = `${song.group}-${song.instrument}`;
-          return this._audioPlayer.prepareTrack(song, trackId);
-        }),
-      ),
+      item.tracks.flatMap(track => {
+        return track.songs.map(song => {
+          return this._audioPlayer.prepareTrack(song, track.id);
+        });
+      }),
     );
     await Promise.all(loadPromises);
   }
@@ -122,8 +121,17 @@ export class Editor extends Stage {
     this._audioPlayer.stop();
   }
 
+  mute(trackId: string, isMuted: boolean | undefined = undefined) {
+    this._audioPlayer.mute(trackId, isMuted);
+  }
+
+  isMuted(trackId: string) {
+    return this._audioPlayer.isMuted(trackId);
+  }
+
   async addWave(song: SongDataType) {
-    const trackId = `${song.group}-${song.instrument}`;
+    const trackId = generateUniqueId();
+    const audioId = generateUniqueId();
     await this._audioPlayer.prepareTrack(song, trackId);
 
     const trackGroup = this._workground.children[0] as TrackGroup;

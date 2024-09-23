@@ -1,4 +1,4 @@
-import { Editor, EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@bmates/editor';
+import { Editor, EditorDataType, EditorStyleType, SongDataType, TrackDataType, generateUniqueId } from '@bmates/editor';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -7,7 +7,7 @@ import { DeepPartial } from '@/types/type';
 interface BMatesProps {
   data: EditorDataType[];
   style?: DeepPartial<EditorStyleType>;
-  trackEl?: ({ track, muted }: { track: TrackDataType; muted: boolean }) => JSX.Element;
+  trackEl?: ({ track, muted }: { track: TrackDataType; muted: boolean; toggleMute: () => void }) => JSX.Element;
 }
 
 const BMates = ({ data, style, trackEl }: BMatesProps) => {
@@ -41,14 +41,9 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     setIsPlaying(false);
   }, [isPlaying]);
 
-  // const toggleMute = useCallback(
-  //   (trackId: string) => {
-  //     if (isReady) {
-  //       player.mute(trackId, !player.isMuted(trackId));
-  //     }
-  //   },
-  //   [player, isReady],
-  // );
+  const toggleMute = useCallback((trackId: string) => {
+    editor.current?.mute(trackId);
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -59,6 +54,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
     const newSong: SongDataType = {
+      id: generateUniqueId(),
       src: URL.createObjectURL(file),
       user: 'BMates',
       start: 0,
@@ -70,6 +66,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
       },
     };
     const newTrack: TrackDataType = {
+      id: generateUniqueId(),
       category: 'New Track',
       songs: [newSong],
     };
@@ -117,10 +114,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
                   className="bmates-track"
                   style={{ height: `${style.wave.height + style.wave.margin}px` }}
                 >
-                  {trackEl({ track, muted: false })}
-                  {/* {track.songs.map(song => (
-                  <div key={song.instrument}>{song.instrument}</div>
-                ))} */}
+                  {trackEl({ track, muted: false, toggleMute: () => toggleMute(track.id) })}
                 </div>
               )),
             )}

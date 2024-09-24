@@ -18,7 +18,7 @@ export class Statable {
   }
 
   call(eventType: string, eventData: EventData, eventBubble = true) {
-    const handlers = this.events.get(eventData.type);
+    const handlers = this.events.get(eventType);
     handlers?.forEach(handler => handler(eventData));
 
     if (eventBubble && eventData.bubble) this.parent?.call(eventType, eventData, eventBubble);

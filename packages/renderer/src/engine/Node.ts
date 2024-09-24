@@ -1,8 +1,17 @@
-import { Vector2 } from '@/types';
+ 
+import { EventData, Vector2 } from '@/types';
 
-import { dispatchEventData } from '@/utils/event';
+import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '@/utils/event';
 
 import { Statable } from './State';
+
+interface NodeAttributes {
+  x: number;
+  y: number;
+  draggable: boolean;
+  zIndex: number;
+  visible: boolean;
+}
 
 export abstract class Node extends Statable {
   name = 'node';
@@ -11,6 +20,7 @@ export abstract class Node extends Statable {
   width = 0;
   height = 0;
 
+  visible = true;
   eventEnabled = true;
   draggable = false;
   isDragging = false;
@@ -21,10 +31,21 @@ export abstract class Node extends Statable {
 
   _lastHoveredTarget: Node[] = [];
 
+   
+  constructor(attrs: Partial<NodeAttributes> = {}) {
+    super();
+    if (attrs) {
+      this.draggable = attrs.draggable || false;
+      this.visible = attrs.visible || true;
+    }
+    if (this.draggable) this._initDragEvent();
+  }
+
   abstract update(dT: number): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
 
   _tick(dT: number, ctx: CanvasRenderingContext2D) {
+    if (!this.visible) return;
     this.update(dT);
     this.draw(ctx);
   }
@@ -48,22 +69,64 @@ export abstract class Node extends Statable {
     return null;
   }
 
-  startDrag(x: number, y: number) {
-    if (this.draggable) {
+  private _initDragEvent() {
+    let moveX = 0;
+    let moveY = 0;
+
+    this.on('mouseout', (evt: EventData) => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.call('dragend', replaceEventDataType('dragend', evt), false);
+      }
+    });
+
+    this.on('mousedown', (evt: EventData) => {
+      if (evt.originalEvent.button !== 0) return;
+
       this.isDragging = true;
-      this.dragStartX = x - this.x;
-      this.dragStartY = y - this.y;
-    }
-  }
+      moveX = evt.originalEvent.clientX;
+      moveY = evt.originalEvent.clientY;
+      this.call('dragstart', replaceEventDataType('dragstart', evt), false);
+    });
 
-  drag(x: number, y: number) {
-    if (this.isDragging) {
-      this.x = x - this.dragStartX;
-      this.y = y - this.dragStartY;
-    }
-  }
+    this.on('mousemove', (evt: EventData) => {
+      if (this.isDragging) {
+        const prevX = this.x;
+        const prevY = this.y;
+        const newX = this.x + evt.originalEvent.clientX - moveX;
+        const newY = this.y + evt.originalEvent.clientY - moveY;
 
-  endDrag() {
-    this.isDragging = false;
+        this.x = newX;
+        this.y = newY;
+
+        moveX = evt.originalEvent.clientX;
+        moveY = evt.originalEvent.clientY;
+
+        this.call(
+          'draging',
+          appendDataAtEventData(replaceEventDataType('draging', evt), {
+            prevX,
+            prevY,
+            newX,
+            newY,
+          }),
+          false,
+        );
+      }
+    });
+
+    this.on('mouseup', (evt: EventData) => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.call('dragend', replaceEventDataType('dragend', evt));
+      }
+    });
+
+    this.on('mouseleave', (evt: EventData) => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.call('dragend', replaceEventDataType('dragend', evt));
+      }
+    });
   }
 }

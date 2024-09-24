@@ -1,9 +1,20 @@
 import { Node } from '@/engine';
 
-export type EventType = 'click' | 'mousemove' | 'mousedown' | 'mouseup' | 'mouseleave' | 'mouseover' | 'mouseout';
+export type EventType =
+  | 'click'
+  | 'mousemove'
+  | 'mousedown'
+  | 'mouseup'
+  | 'mouseleave'
+  | 'mouseover'
+  | 'mouseout'
+  | 'dragstart'
+  | 'draging'
+  | 'dragend'
+  | 'wave-dragstart'
+  | string;
 
 export interface EventData {
-  type: EventType;
   target: Node;
   point: {
     x: number;
@@ -11,6 +22,8 @@ export interface EventData {
   };
   originalEvent: MouseEvent;
   bubble: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any;
 }
 
 export type EventHandler = (event: EventData) => void;

@@ -3,13 +3,18 @@ import { EventData, Layer, setCursor } from '@bmates/renderer';
 import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
 import { Timeline, Track, TrackGroup, Wave } from './';
+import { Playhead } from './Playhead';
+import { Snapping } from './Snapping';
 import { TimeIndicator } from './TimeIndicator';
 
 export class Workground extends Layer {
   override name = 'Workground';
 
-  private timeline: Timeline | undefined;
+  private timeline: Timeline;
+  private playhead: Playhead;
   private timeIndicator: TimeIndicator;
+  private snapping: Snapping;
+
   private _minScrollX = 0;
 
   constructor(
@@ -30,6 +35,7 @@ export class Workground extends Layer {
 
     this._initLayout(data);
     this._initEvent();
+    this._initWaveEvent();
   }
 
   private _initLayout(data: EditorDataType[]) {
@@ -40,9 +46,16 @@ export class Workground extends Layer {
     this.timeline = new Timeline(this.style, 100, 0);
     this.timeline.zIndex = -1;
     this.add(this.timeline);
+
+    this.playhead = new Playhead(this.style);
+    this.playhead.zIndex = 100;
+    this.add(this.playhead);
+
     this.timeIndicator = new TimeIndicator(this.style);
-    this.timeIndicator.zIndex = 100;
     this.add(this.timeIndicator);
+
+    this.snapping = new Snapping(this.style);
+    this.add(this.snapping);
   }
 
   private _initEvent() {
@@ -51,7 +64,10 @@ export class Workground extends Layer {
     let moveX = 0;
 
     this.on('mousedown', (evt: EventData) => {
+      if (evt.target.name === 'Wave') return;
+
       startX = evt.originalEvent.clientX;
+
       if (evt.originalEvent.button !== 1) return;
       setCursor('all-scroll');
 
@@ -68,20 +84,45 @@ export class Workground extends Layer {
     });
 
     this.on('mouseup', (evt: EventData) => {
-      setCursor('default');
+      if (evt.originalEvent.button === 1) setCursor('default');
 
       isDragging = false;
 
       const endX = evt.originalEvent.clientX;
-      if (startX === endX && this.timeIndicator && evt.originalEvent.button === 0) {
+      if (startX === endX && this.playhead && evt.originalEvent.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
         const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
-        this.timeIndicator.setPosition(clickX - this.x);
+        this.playhead.setPosition(clickX - this.x);
       }
     });
 
     this.on('mouseleave', () => {
       isDragging = false;
+    });
+  }
+
+  private _initWaveEvent() {
+    this.on('wave-dragstart', (evt: EventData) => {
+      this.timeIndicator.visible = true;
+      this.timeIndicator.setTime(evt.target.data.start);
+      this.timeIndicator.x = evt.target.x;
+      this.timeIndicator.y = evt.target.y + evt.target.height;
+
+      this.snapping.visible = true;
+      this.snapping.x = evt.target.x;
+      this.snapping.y = evt.target.y + evt.target.height;
+    });
+    this.on('wave-draging', (evt: EventData) => {
+      this.timeIndicator.setTime(evt.target.data.start);
+      this.timeIndicator.x = evt.target.x;
+      this.timeIndicator.y = evt.target.y + evt.target.height;
+
+      this.snapping.x = evt.target.x;
+      this.snapping.y = evt.target.y + evt.target.height;
+    });
+    this.on('wave-dragend', () => {
+      this.timeIndicator.visible = false;
+      this.snapping.visible = false;
     });
   }
 
@@ -106,23 +147,23 @@ export class Workground extends Layer {
   }
 
   isPlaying() {
-    return this.timeIndicator?.isPlaying();
+    return this.playhead?.isPlaying();
   }
 
   play() {
-    this.timeIndicator?.play();
+    this.playhead?.play();
   }
 
   pause() {
-    this.timeIndicator?.pause();
+    this.playhead?.pause();
   }
 
   stop() {
-    this.timeIndicator?.stop();
+    this.playhead?.stop();
   }
 
   getCurrentTime() {
-    return this.timeIndicator?.getCurrentTime() || 0;
+    return this.playhead?.getCurrentTime() || 0;
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

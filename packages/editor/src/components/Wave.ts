@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventData, Node, getCursor, setCursor } from '@bmates/renderer';
 
 import { EditorStyleType, SongDataType } from '@/types';
@@ -7,13 +8,11 @@ export class Wave extends Node {
 
   private waveform: Float32Array;
 
-  private _isDragging = false;
-
   constructor(
-    private data: SongDataType,
+    public data: SongDataType,
     private style: EditorStyleType,
   ) {
-    super();
+    super({ draggable: true });
 
     this.x = this.style.timeline.gapWidth * (this.data.start * 10);
     this.y =
@@ -25,7 +24,8 @@ export class Wave extends Node {
 
     this.waveform = this.extractWaveform(this.data.source.buffer);
 
-    this._initEvent();
+    // this._initEvent();
+    this._initDrag();
   }
 
   private extractWaveform(buffer: AudioBuffer) {
@@ -51,7 +51,7 @@ export class Wave extends Node {
     return waveform;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   override update(_dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {
@@ -65,10 +65,6 @@ export class Wave extends Node {
 
     // ctx.clip();
     if (this.waveform) this.drawSmoothWave(ctx);
-
-    if (this._isDragging) this._waveSanpping(ctx);
-
-    if (this._isDragging) this._timeIndicator(ctx);
 
     ctx.restore();
   }
@@ -124,92 +120,34 @@ export class Wave extends Node {
     ctx.stroke();
   }
 
-  private _waveSanpping(ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = this.style.wave.snapping;
-    ctx.beginPath();
-    ctx.moveTo(this.x, 0);
-    ctx.lineTo(this.x, ctx.canvas.height);
-    ctx.lineWidth = 1;
-    ctx.setLineDash([10]);
-    ctx.stroke();
-  }
-
-  private _timeIndicator(ctx) {
-    const timeString = this.formatTime(this.data.start);
-    ctx.fillStyle = '#000';
-    ctx.font = '12px Arial';
-    ctx.fillText(timeString, this.x, this.y + this.height + 15);
-  }
-
-  private formatTime(start: number): string {
-    const totalMilliseconds = Math.floor(start * 1000);
-    const minutes = Math.floor(totalMilliseconds / 60000);
-    const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
-    const milliseconds = totalMilliseconds % 1000;
-
-    return `${minutes}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(3, '0')}`;
-  }
-
-  private _initEvent() {
-    let moveX = 0;
-
+  private _initDrag() {
     this.on('mouseover', () => {
       if (getCursor() === 'default' || getCursor() === '') setCursor('pointer');
     });
     this.on('mouseout', (evt: EventData) => {
       if (getCursor() === 'pointer') setCursor('default');
-      if (this._isDragging) {
-        evt.bubble = false;
-        this._isDragging = false;
-      }
     });
 
-    this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button === 1) {
-        // context menu
-      } else if (evt.originalEvent.button !== 0) return;
-
-      this._isDragging = true;
-      moveX = evt.originalEvent.clientX;
-      evt.bubble = false;
+    this.on('dragstart', (evt: EventData) => {
+      this.parent.call('wave-dragstart', evt);
     });
+    this.on('draging', (evt: EventData) => {
+      if (evt.data) {
+        // block vertical move
+        this.y = evt.data.prevY;
 
-    // this.on('mousemove', (evt: EventData) => {
-    //   if (this._isDragging) {
-    //     evt.bubble = false;
-    //     const deltaX = evt.originalEvent.clientX - moveX;
-    //     this.x = this.x + deltaX;
-    //     this.data.start = this.x / (this.style.timeline.gapWidth * 10);
-    //     moveX = evt.originalEvent.clientX;
-    //   }
-    // });
-    this.on('mousemove', (evt: EventData) => {
-      if (this._isDragging) {
-        evt.bubble = false;
-        const deltaX = evt.originalEvent.clientX - moveX;
-        const newX = this.x + deltaX;
-
-        const isColliding = this.checkCollision(newX);
-        if (!isColliding) {
-          this.x = newX;
+        const isCollision = this.checkCollision(evt.data.newX);
+        if (isCollision) {
+          // block horizontal move, if collision
+          this.x = evt.data.prevX;
+        } else {
           this.data.start = this.x / (this.style.timeline.gapWidth * 10);
+          this.parent.call('wave-draging', evt);
         }
-        moveX = evt.originalEvent.clientX;
       }
     });
-
-    this.on('mouseup', (evt: EventData) => {
-      if (this._isDragging) {
-        evt.bubble = false;
-        this._isDragging = false;
-      }
-    });
-
-    this.on('mouseleave', (evt: EventData) => {
-      if (this._isDragging) {
-        evt.bubble = false;
-        this._isDragging = false;
-      }
+    this.on('dragend', (evt: EventData) => {
+      this.parent.call('wave-dragend', evt);
     });
   }
 

@@ -1,70 +1,32 @@
 import { Node } from '@bmates/renderer';
 
 import { EditorStyleType } from '@/types';
+import { formatTime } from '@/utils';
 
 export class TimeIndicator extends Node {
   override name = 'TimeIndicator';
 
-  private _position: number = 0;
-  private _isPlaying = false;
+  private _time: number = 0;
 
-  constructor(
-    private style: EditorStyleType,
-    private _dT: number = 0,
-  ) {
-    super();
-  }
-
-  override update(dT: number) {
-    this._dT = dT;
-    if (this._isPlaying) {
-      this._position += this.style.timeline.gapWidth * this.style.timeline.timeDivde * this._dT;
-    }
+  constructor(private style: EditorStyleType) {
+    super({
+      visible: false,
+    });
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
-
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.moveTo(this._position - 6, 0);
-    ctx.lineTo(this._position - 6, this.style.timeline.height / 2);
-    ctx.lineTo(this._position, this.style.timeline.height / 2 + 10);
-    ctx.lineTo(this._position + 6, this.style.timeline.height / 2);
-    ctx.lineTo(this._position + 6, 0);
-    ctx.fill();
-
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.moveTo(this._position, 0);
-    ctx.lineTo(this._position, ctx.canvas.height);
-    ctx.stroke();
-
+    const timeString = formatTime(this._time);
+    ctx.fillStyle = '#000';
+    ctx.font = '12px Arial';
+    ctx.fillText(timeString, this.x, this.y + this.height + 15);
     ctx.restore();
   }
 
-  setPosition(x: number) {
-    this._position = x;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  update(_dT: number): void {}
 
-  isPlaying() {
-    return this._isPlaying;
-  }
-
-  play() {
-    this._isPlaying = true;
-  }
-
-  pause() {
-    this._isPlaying = false;
-  }
-
-  stop() {
-    this.pause();
-    this._position = 0;
-  }
-
-  getCurrentTime(): number {
-    return this._position / (this.style.timeline.gapWidth * this.style.timeline.timeDivde);
+  setTime(time: number) {
+    this._time = time;
   }
 }

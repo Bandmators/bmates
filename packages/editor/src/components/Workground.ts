@@ -62,6 +62,7 @@ export class Workground extends Layer {
     let isDragging = false;
     let startX = 0;
     let moveX = 0;
+    let isWaveOver = false;
 
     this.on('mousedown', (evt: EventData) => {
       if (evt.target.name === 'Wave') return;
@@ -76,6 +77,16 @@ export class Workground extends Layer {
     });
 
     this.on('mousemove', (evt: EventData) => {
+      if (evt.target.name === 'Wave') {
+        if (!isWaveOver) {
+          setCursor('pointer');
+          isWaveOver = true;
+        }
+      } else if (isWaveOver) {
+        setCursor('default');
+        isWaveOver = false;
+      }
+
       if (isDragging) {
         const deltaX = moveX - evt.originalEvent.clientX;
         this.scroll.x = Math.max(this.scroll.x + deltaX, this._minScrollX);

@@ -1,4 +1,3 @@
- 
 import { EventData, Vector2 } from '@/types';
 
 import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '@/utils/event';
@@ -31,7 +30,6 @@ export abstract class Node extends Statable {
 
   _lastHoveredTarget: Node[] = [];
 
-   
   constructor(attrs: Partial<NodeAttributes> = {}) {
     super();
     if (attrs) {
@@ -55,7 +53,8 @@ export abstract class Node extends Statable {
   }
 
   hitTest(point: Vector2, e: MouseEvent): Node | null {
-    if (this.isIntersection(point.x, point.y)) {
+    const isIntersection = this.isIntersection(point.x, point.y);
+    if (isIntersection) {
       if (!this.isOver) {
         dispatchEventData('mouseover', this, point, e);
         this.isOver = true;
@@ -76,8 +75,8 @@ export abstract class Node extends Statable {
     this.on('mouseout', (evt: EventData) => {
       if (this.isDragging) {
         this.isDragging = false;
-        this.call('dragend', replaceEventDataType('dragend', evt), false);
       }
+      this.call('dragend', replaceEventDataType('dragend', evt), false);
     });
 
     this.on('mousedown', (evt: EventData) => {

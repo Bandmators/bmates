@@ -20,10 +20,12 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
   }
 
   hitTest(point: Vector2, e: MouseEvent) {
+    let hitChild = null;
     for (let i = this.children.length - 1; i >= 0; i--) {
-      const hitChild = this.children[i].hitTest(point, e);
-      if (hitChild) return hitChild;
+      const hit = this.children[i].hitTest(point, e);
+      if (hit && !hitChild) hitChild = hit;
     }
+    if (hitChild) return hitChild;
     return super.hitTest(point, e);
   }
 

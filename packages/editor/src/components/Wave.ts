@@ -51,7 +51,6 @@ export class Wave extends Node {
     return waveform;
   }
 
-   
   override update(_dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {
@@ -121,13 +120,6 @@ export class Wave extends Node {
   }
 
   private _initDrag() {
-    this.on('mouseover', () => {
-      if (getCursor() === 'default' || getCursor() === '') setCursor('pointer');
-    });
-    this.on('mouseout', (evt: EventData) => {
-      if (getCursor() === 'pointer') setCursor('default');
-    });
-
     this.on('dragstart', (evt: EventData) => {
       this.parent.call('wave-dragstart', evt);
     });

@@ -65,8 +65,9 @@ export class Workground extends Layer {
     let isWaveOver = false;
 
     this.on('mousedown', (evt: EventData) => {
-      if (evt.target.name === 'Wave') return;
-
+      if (evt.target.name === 'Wave') {
+        return;
+      }
       startX = evt.originalEvent.clientX;
 
       if (evt.originalEvent.button !== 1) return;

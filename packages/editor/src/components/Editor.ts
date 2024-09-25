@@ -1,4 +1,4 @@
-import { Stage } from '@bmates/renderer';
+import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
@@ -34,6 +34,12 @@ export class Editor extends Stage {
       margin: 10,
       snapping: 'rgb(0, 0, 0, 0.6)',
     },
+    context: {
+      menuWidth: 200,
+      menuPadding: 10,
+      itemHeight: 40,
+      itemPadding: 10,
+    },
   };
   private _workground: Workground;
   private _overlay: Overlay;
@@ -59,6 +65,7 @@ export class Editor extends Stage {
   private async init(): Promise<void> {
     await this._loadTrackBuffers();
     this._initLayout();
+    this._initEvent();
   }
 
   private async _loadTrackBuffers(): Promise<void> {
@@ -78,6 +85,14 @@ export class Editor extends Stage {
 
     this._overlay = new Overlay(this.canvas, this.style, this.scroll);
     this.add(this._overlay);
+  }
+
+  private _initEvent() {
+    this.on('mousedown', (evt: EventData) => {
+      if (evt.originalEvent.button === 2 && !this._overlay.isOpenContextMenu()) {
+        this._overlay.openContextMenu(evt);
+      }
+    });
   }
 
   private _onResize() {

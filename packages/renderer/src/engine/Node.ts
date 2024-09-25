@@ -19,6 +19,7 @@ export abstract class Node extends Statable {
   width = 0;
   height = 0;
 
+  listening = true;
   visible = true;
   eventEnabled = true;
   draggable = false;
@@ -53,6 +54,8 @@ export abstract class Node extends Statable {
   }
 
   hitTest(point: Vector2, e: MouseEvent): Node | null {
+    if (!this.listening) return null;
+
     const isIntersection = this.isIntersection(point.x, point.y);
     if (isIntersection) {
       if (!this.isOver) {

@@ -48,4 +48,10 @@ export type EditorStyleType = {
     margin: number;
     snapping: string;
   };
+  context: {
+    menuWidth: number;
+    menuPadding: number;
+    itemHeight: number;
+    itemPadding: number;
+  };
 };

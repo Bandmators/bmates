@@ -69,11 +69,12 @@ export abstract class Stage extends Container<Layer> {
   private _dispatchEvent(eventType: EventType, e: MouseEvent): void {
     const point = getRelativeMousePosition(e, this.canvas, this.scroll);
 
-    this.children.forEach(layer => {
-      const target = layer.hitTest(point, e);
-
-      if (target) dispatchEventData(eventType, target, point, e);
-    });
+    const target = this.hitTest(point, e);
+    if (target) dispatchEventData(eventType, target, point, e);
+    // this.children.forEach(layer => {
+    //   const target = layer.hitTest(point, e);
+    //   if (target) dispatchEventData(eventType, target, point, e);
+    // });
   }
 
   handleEvent(e: MouseEvent) {

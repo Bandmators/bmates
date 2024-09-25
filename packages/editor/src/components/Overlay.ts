@@ -1,4 +1,4 @@
-import { EventData, Layer } from '@bmates/renderer';
+import { EventData, Layer, setCursor } from '@bmates/renderer';
 
 import { EditorStyleType } from '@/types';
 
@@ -15,6 +15,7 @@ export class Overlay extends Layer {
   ) {
     super();
 
+    this.listening = false;
     this.x = 0;
     this.y = 0;
     this.width = this.canvas.width * 1000;
@@ -25,21 +26,38 @@ export class Overlay extends Layer {
   }
 
   private _initLayout() {
-    this._contextMenu = new ContextMenu();
+    this._contextMenu = new ContextMenu(this.style);
     this.add(this._contextMenu);
   }
 
   private _initEvent() {
-    this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button === 2) {
-        const rect = this.canvas.getBoundingClientRect();
-        const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
-        const clickY = evt.originalEvent.clientY - rect.top + this.scroll.y;
-
-        this._contextMenu.showMenu(clickX, clickY, evt.target);
-      } else {
-        this._contextMenu.closeMenu();
-      }
+    this.on('mousemove', (evt: EventData) => {
+      const isHoverItem = this._contextMenu.handleHover(evt.point.x, evt.point.y);
+      setCursor(isHoverItem ? 'pointer' : 'default');
     });
+    this.on('mousedown', (evt: EventData) => {
+      this._contextMenu.handleClick(evt.point.x, evt.point.y);
+      this.closeContextMenu();
+    });
+  }
+
+  openContextMenu(evt: EventData) {
+    const rect = this.canvas.getBoundingClientRect();
+    const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
+    const clickY = evt.originalEvent.clientY - rect.top + this.scroll.y;
+
+    this._contextMenu.openMenu(clickX, clickY, evt.target);
+    // setCursor('default');
+    this.listening = true;
+  }
+
+  closeContextMenu() {
+    this._contextMenu.closeMenu();
+    this.listening = false;
+    setCursor('default');
+  }
+
+  isOpenContextMenu() {
+    return this._contextMenu.isOpen();
   }
 }

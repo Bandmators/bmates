@@ -56,6 +56,10 @@ export class Wave extends Node {
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
+    if (this.data.mute) {
+      ctx.globalAlpha = 0.5;
+    }
+
     ctx.beginPath();
     ctx.roundRect(this.x, this.y, this.width, this.height, this.style.wave.borderRadius);
     ctx.fillStyle = '#c3c3c3';

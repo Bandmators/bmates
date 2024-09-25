@@ -3,7 +3,6 @@ import { SongDataType } from './types';
 
 type Audio = {
   song: SongDataType;
-  muted: boolean;
   source: AudioBufferSourceNode;
   gain: GainNode;
 };
@@ -40,7 +39,7 @@ class AudioPlayer {
     if (!this.tracks.has(trackId)) {
       this.tracks.set(trackId, new Map());
     }
-    this.tracks.get(trackId)!.set(song.id, { song, source, muted: false, gain: gainNode });
+    this.tracks.get(trackId)!.set(song.id, { song, source, gain: gainNode });
   }
 
   play(startTime: number = 0): void {
@@ -90,9 +89,9 @@ class AudioPlayer {
     if (track) {
       track.forEach(audio => {
         if (isMuted === undefined) {
-          isMuted = !audio.muted;
+          isMuted = !audio.song.mute;
         }
-        audio.muted = isMuted;
+        audio.song.mute = isMuted;
         audio.gain.gain.value = isMuted ? 0 : 1;
       });
     }
@@ -101,7 +100,7 @@ class AudioPlayer {
   isMuted(trackId: string) {
     const track = this.tracks.get(trackId);
     if (!track) return false;
-    return Array.from(track.values()).some(audio => audio.muted);
+    return Array.from(track.values()).some(audio => audio.song.mute);
   }
 
   stop(): void {

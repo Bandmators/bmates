@@ -45,6 +45,7 @@ export class Editor extends Stage {
   private _overlay: Overlay;
   private _audioPlayer: AudioPlayer = new AudioPlayer();
   private _resizeListener: () => void;
+  private _selectedNodes: Wave[] = [];
 
   constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
     super(element);
@@ -89,9 +90,18 @@ export class Editor extends Stage {
 
   private _initEvent() {
     this.on('mousedown', (evt: EventData) => {
+      if (evt.originalEvent.button === 0 && evt.target.name === 'Wave') {
+        this._selectedNodes = [evt.target];
+      }
       if (evt.originalEvent.button === 2 && !this._overlay.isOpenContextMenu()) {
+        this._selectedNodes = [evt.target];
         this._overlay.openContextMenu(evt);
       }
+    });
+
+    this.on('contextmenu-select', (evt: EventData) => {
+      const { item } = evt.data;
+      this._act(item);
     });
   }
 
@@ -160,6 +170,31 @@ export class Editor extends Stage {
     super.destroy();
 
     window.removeEventListener('resize', this._resizeListener);
+  }
+
+  private _act(act: string) {
+    switch (act) {
+      case 'Mute':
+        this._selectedNodes.forEach(node => {
+          node.data.mute = true;
+        });
+        break;
+      case 'Unmute':
+        this._selectedNodes.forEach(node => {
+          node.data.mute = false;
+        });
+        break;
+      case 'Lock':
+        this._selectedNodes.forEach(node => {
+          node.data.lock = true;
+        });
+        break;
+      case 'Unlock':
+        this._selectedNodes.forEach(node => {
+          node.data.lock = false;
+        });
+        break;
+    }
   }
 
   addEditorData(data: EditorDataType) {

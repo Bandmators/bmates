@@ -2,11 +2,13 @@ import { Node } from '@bmates/renderer';
 
 import { EditorStyleType } from '@/types';
 
+import { Wave } from './Wave';
+
 export class ContextMenu extends Node {
   private open = false;
   private menuItems = ['Add Track', 'Mute Track', 'Paste'];
-  private additionalMenuItems = ['Mute', 'Lock', 'Duplicate', 'Cut', 'Copy', 'Delete'];
-  private _menus;
+  private additionalMenuItems = ['Duplicate', 'Cut', 'Copy', 'Delete'];
+  private _menus: string[] = [];
   private position = { x: 0, y: 0 };
   private hoveredIndex = -1;
 
@@ -84,14 +86,25 @@ export class ContextMenu extends Node {
       const menuIndex = Math.floor((y - this.position.y - menuPadding) / itemHeight);
       if (menuIndex >= 0 && menuIndex < this._menus.length) {
         const selectedItem = this._menus[menuIndex];
+
         console.log(`Selected menu item: ${selectedItem}`);
+        return selectedItem;
       }
     }
+    return null;
   }
 
-  openMenu(x: number, y: number, target: { name: string }) {
+  openMenu(x: number, y: number, target: Node) {
     this.position = { x, y };
-    this._menus = target.name === 'Wave' ? [...this.menuItems, ...this.additionalMenuItems] : this.menuItems;
+    this._menus =
+      target instanceof Wave
+        ? [
+            ...this.menuItems,
+            ...this.additionalMenuItems,
+            target.data.mute ? 'Unmute' : 'Mute',
+            target.data.lock ? 'Unlock' : 'Lock',
+          ]
+        : this.menuItems;
     this.open = true;
   }
 

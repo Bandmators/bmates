@@ -133,7 +133,7 @@ export class Wave extends Node {
         this.y = evt.data.prevY;
 
         const isCollision = this.checkCollision(evt.data.newX);
-        if (isCollision) {
+        if (isCollision || this.data.lock) {
           // block horizontal move, if collision
           this.x = evt.data.prevX;
         } else {

@@ -66,6 +66,7 @@ export class Workground extends Layer {
 
     this.on('mousedown', (evt: EventData) => {
       if (evt.target.name === 'Wave') {
+        console.log('wow');
         return;
       }
       startX = evt.originalEvent.clientX;

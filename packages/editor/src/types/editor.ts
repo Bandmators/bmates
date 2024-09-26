@@ -8,6 +8,7 @@ export type SongDataType<T extends string = string> = {
   group: number;
   instrument: T;
   mute?: boolean;
+  lock?: boolean;
   [key: string]: any;
 };
 export type TrackDataType<T extends string = string> = {

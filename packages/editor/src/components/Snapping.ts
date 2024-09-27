@@ -6,7 +6,9 @@ export class Snapping extends Node {
   override name = 'Snapping';
 
   constructor(private style: EditorStyleType) {
-    super();
+    super({
+      visible: false,
+    });
   }
 
   override draw(ctx: CanvasRenderingContext2D) {

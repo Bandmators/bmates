@@ -1,5 +1,6 @@
 import { Editor, EditorDataType, EditorStyleType, SongDataType, TrackDataType, generateUniqueId } from '@bmates/editor';
 
+import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { DeepPartial } from '@/types/type';
@@ -11,6 +12,7 @@ interface BMatesProps {
 }
 
 const BMates = ({ data, style, trackEl }: BMatesProps) => {
+  const [_data, setData] = useState<EditorDataType[]>(data);
   const ref = useRef<HTMLCanvasElement | null>(null);
   const editor = useRef<Editor | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,6 +20,9 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   useEffect(() => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data, style);
+      editor.current.on('data-change', () => {
+        setData(editor.current?.data ? [...editor.current.data] : []);
+      });
     }
     return () => {
       if (editor.current) {
@@ -65,17 +70,17 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
         buffer: audioBuffer,
       },
     };
-    const newTrack: TrackDataType = {
-      id: generateUniqueId(),
-      category: 'New Track',
-      songs: [newSong],
-    };
-    const newEditorData: EditorDataType = {
-      name: 'New Track',
-      tracks: [newTrack],
-    };
+    // const newTrack: TrackDataType = {
+    //   id: generateUniqueId(),
+    //   category: 'New Track',
+    //   songs: [newSong],
+    // };
+    // const newEditorData: EditorDataType = {
+    //   name: 'New Track',
+    //   tracks: [newTrack],
+    // };
 
-    data.push(newEditorData);
+    // data.push(newEditorData);
 
     if (editor.current) {
       await editor.current.addWave(newSong);
@@ -85,16 +90,16 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   return (
     <>
       <div>
-        <button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</button>
-        <button onClick={toggleStopPlay}>Stop</button>
+        <Button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</Button>
+        <Button onClick={toggleStopPlay}>Stop</Button>
         <input type="file" accept="audio/*" onChange={handleFileUpload} />
-        <button
+        <Button
           onClick={() => {
             console.log(editor.current.export());
           }}
         >
           Export
-        </button>
+        </Button>
       </div>
       <div id="bmates" className="bmates" style={{ display: 'flex', height: '100vh' }}>
         <div
@@ -107,7 +112,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
             style={{ height: `${style.timeline.height + style.wave.margin / 2}px` }}
           ></div>
           <div className="bmates-sidebar-body">
-            {data.map(item =>
+            {_data.map(item =>
               item.tracks.map(track => (
                 <div
                   key={`${item.name}_${track.category}`}

@@ -1,12 +1,10 @@
-import { EventData, Stage } from '@bmates/renderer';
+import { EventData, Stage, dispatchEventData, getRelativeMousePosition } from '@bmates/renderer';
 
 import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
 import { deepMerge, generateUniqueId } from '@/utils';
 
 import { Overlay } from './Overlay';
-import { Track } from './Track';
-import { TrackGroup } from './TrackGroup';
 import { Wave } from './Wave';
 import { Workground } from './Workground';
 
@@ -46,6 +44,7 @@ export class Editor extends Stage {
   private _audioPlayer: AudioPlayer = new AudioPlayer();
   private _resizeListener: () => void;
   private _selectedNodes: Wave[] = [];
+  private _clipboard: SongDataType[] = [];
 
   constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
     super(element);
@@ -159,10 +158,21 @@ export class Editor extends Stage {
     const audioId = generateUniqueId();
     await this._audioPlayer.prepareTrack(song, trackId);
 
-    const trackGroup = this._workground.children[0] as TrackGroup;
-    const track = trackGroup.children[0] as Track;
-    const wave = new Wave(song, this.style);
-    track.add(wave);
+    const newTrackGroup = {
+      id: trackId,
+      category: 'New Category',
+      songs: [song],
+    };
+
+    this._workground.addTrackGroup([newTrackGroup]);
+    this.data.push({
+      name: 'New Track',
+      tracks: [newTrackGroup],
+    });
+    // const trackGroup = this._workground.children[0] as TrackGroup;
+    // const track = trackGroup.children[0] as Track;
+    // const wave = new Wave(song, this.style);
+    // track.add(wave);
   }
 
   override destroy() {
@@ -172,7 +182,7 @@ export class Editor extends Stage {
     window.removeEventListener('resize', this._resizeListener);
   }
 
-  private _act(act: string) {
+  private async _act(act: string) {
     switch (act) {
       case 'Mute':
         this._selectedNodes.forEach(node => {
@@ -194,11 +204,55 @@ export class Editor extends Stage {
           node.data.lock = false;
         });
         break;
+      case 'Delete':
+        this._selectedNodes.forEach(node => {
+          node.destroy();
+        });
+        break;
+      case 'Copy':
+        this._clipboard = this._selectedNodes.map(node => ({ ...node.data }));
+        break;
+      case 'Paste':
+        this.paste();
+        break;
+      case 'Duplicate':
+        this.duplicate();
+        break;
+      case 'Cut':
+        this._clipboard = this._selectedNodes.map(node => ({ ...node.data }));
+        this._selectedNodes.forEach(node => {
+          node.destroy();
+        });
+        break;
     }
   }
 
   addEditorData(data: EditorDataType) {
     this.data.push(data);
+  }
+
+  async paste(nodes: SongDataType[] = this._clipboard) {
+    if (nodes.length > 0) {
+      await Promise.all(
+        nodes.map(async node => {
+          const newData: SongDataType = { ...node, start: node.start, group: this.data.length };
+          return this.addWave(newData);
+        }),
+      );
+
+      const m = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+      });
+      const point = getRelativeMousePosition(m, this.canvas, this.scroll);
+      dispatchEventData('data-change', this, point, m);
+    }
+  }
+
+  async duplicate() {
+    await this.paste(this._selectedNodes.map(node => ({ ...node.data })));
   }
 
   export() {

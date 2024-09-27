@@ -34,8 +34,8 @@ export abstract class Node extends Statable {
   constructor(attrs: Partial<NodeAttributes> = {}) {
     super();
     if (attrs) {
-      this.draggable = attrs.draggable || false;
-      this.visible = attrs.visible || true;
+      this.draggable = attrs.draggable ?? false;
+      this.visible = attrs.visible ?? true;
     }
     if (this.draggable) this._initDragEvent();
   }
@@ -130,5 +130,11 @@ export abstract class Node extends Statable {
         this.call('dragend', replaceEventDataType('dragend', evt));
       }
     });
+  }
+
+  destroy() {
+    if (this.parent) {
+      this.parent.remove(this);
+    }
   }
 }

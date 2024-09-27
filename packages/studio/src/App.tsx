@@ -1,5 +1,6 @@
 import { EditorDataType, EditorStyleType } from '@bmates/editor';
 
+import { BMatesProvider, Button } from 'bmates-ui';
 import { useState } from 'react';
 
 import { DeepPartial } from '@/types/type';
@@ -94,20 +95,20 @@ const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void })
   const [isMuted, setIsMuted] = useState<boolean>(muted);
 
   return (
-    <button
+    <Button
       onClick={() => {
         onClick();
         setIsMuted(!isMuted);
       }}
     >
       {isMuted ? 'Unmute' : 'Mute'}
-    </button>
+    </Button>
   );
 };
 
 const App = () => {
   return (
-    <>
+    <BMatesProvider>
       <BMates
         data={data}
         style={style}
@@ -127,7 +128,7 @@ const App = () => {
       >
         Click me
       </button>
-    </>
+    </BMatesProvider>
   );
 };
 

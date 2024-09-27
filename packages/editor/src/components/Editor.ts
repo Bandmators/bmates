@@ -111,6 +111,39 @@ export class Editor extends Stage {
       const { item } = evt.data;
       this._act(item);
     });
+
+    this._initKeyboardEvents();
+  }
+
+  private _initKeyboardEvents() {
+    this.canvas.tabIndex = 0;
+    this.canvas.style.outline = 'none';
+
+    const keyboardShortcuts = {
+      // 'ctrl+z': () => this._act('Undo'),
+      // 'ctrl+shift+z': () => this._act('Redo'),
+      // 'ctrl+y': () => this._act('Redo'),
+      'ctrl+c': () => this._act('Copy'),
+      'ctrl+v': () => this.paste(),
+      // 'ctrl+a': () => this.selectAll(),
+      'ctrl+d': () => this.duplicate(),
+      delete: () => this._act('Delete'),
+      backspace: () => this._act('Delete'),
+      'ctrl+x': () => this._act('Cut'),
+    };
+
+    this.canvas.addEventListener('keydown', e => {
+      const key = e.key.toLowerCase();
+      const ctrl = e.ctrlKey || e.metaKey;
+      const shift = e.shiftKey;
+
+      const shortcut = `${ctrl ? 'ctrl+' : ''}${shift ? 'shift+' : ''}${key}`;
+
+      if (keyboardShortcuts[shortcut]) {
+        e.preventDefault();
+        keyboardShortcuts[shortcut]();
+      }
+    });
   }
 
   private _onResize() {
@@ -229,6 +262,17 @@ export class Editor extends Stage {
         break;
       case 'Delete':
         this._selectedNodes.forEach(node => {
+          this.data = this.data
+            .map(editorData => ({
+              ...editorData,
+              tracks: editorData.tracks
+                .map(track => ({
+                  ...track,
+                  songs: track.songs.filter(song => song.id !== node.data.id),
+                }))
+                .filter(track => track.songs.length > 0),
+            }))
+            .filter(editorData => editorData.tracks.length > 0);
           node.destroy();
         });
         break;

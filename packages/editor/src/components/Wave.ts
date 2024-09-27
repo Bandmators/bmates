@@ -7,6 +7,7 @@ export class Wave extends Node {
   override name = 'Wave';
 
   private waveform: Float32Array;
+  private _selected = false;
 
   constructor(
     public data: SongDataType,
@@ -65,6 +66,12 @@ export class Wave extends Node {
     ctx.fillStyle = '#c3c3c3';
     ctx.fill();
     ctx.closePath();
+
+    if (this._selected) {
+      ctx.strokeStyle = 'rgba(123, 123, 123, 0.5)'; // 선택된 색상
+      ctx.lineWidth = 2; // 테두리 두께
+      ctx.stroke(); // 테두리 그리기
+    }
 
     // ctx.clip();
     if (this.waveform) this.drawSmoothWave(ctx);
@@ -132,6 +139,11 @@ export class Wave extends Node {
         // block vertical move
         this.y = evt.data.prevY;
 
+        if (this.x < 0) {
+          this.x = 0;
+          return;
+        }
+
         const isCollision = this.checkCollision(evt.data.newX);
         if (isCollision || this.data.lock) {
           // block horizontal move, if collision
@@ -156,5 +168,9 @@ export class Wave extends Node {
       }
     }
     return false;
+  }
+
+  setSelected(selected: boolean) {
+    this._selected = selected;
   }
 }

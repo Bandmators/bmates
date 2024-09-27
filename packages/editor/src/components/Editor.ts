@@ -89,12 +89,21 @@ export class Editor extends Stage {
 
   private _initEvent() {
     this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button === 0 && evt.target.name === 'Wave') {
-        this._selectedNodes = [evt.target];
+      if (evt.originalEvent.button === 0) {
+        if (evt.target.name === 'Wave') {
+          this.select([evt.target]);
+        } else {
+          this.unselect();
+        }
       }
       if (evt.originalEvent.button === 2 && !this._overlay.isOpenContextMenu()) {
-        this._selectedNodes = [evt.target];
-        this._overlay.openContextMenu(evt);
+        if (evt.target.name === 'Wave') {
+          this.select([evt.target]);
+          this._overlay.openContextMenu(evt);
+        } else {
+          this.unselect();
+          this._overlay.openContextMenu(evt);
+        }
       }
     });
 
@@ -133,6 +142,20 @@ export class Editor extends Stage {
     const currentTime = this._workground.getCurrentTime();
     this._workground.play();
     this._audioPlayer.play(currentTime);
+  }
+
+  select(nodes: Wave[]) {
+    this.unselect();
+    this._selectedNodes = nodes;
+    this._selectedNodes.forEach(node => {
+      node.setSelected(true);
+    });
+  }
+
+  unselect() {
+    this._selectedNodes.forEach(node => {
+      node.setSelected(false);
+    });
   }
 
   pause() {

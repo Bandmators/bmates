@@ -5,7 +5,6 @@ import { EditorStyleType } from '@/types';
 export class Playhead extends Node {
   override name = 'Playhead';
 
-  private _position: number = 0;
   private _isPlaying = false;
 
   constructor(
@@ -18,7 +17,11 @@ export class Playhead extends Node {
   override update(dT: number) {
     this._dT = dT;
     if (this._isPlaying) {
-      this._position += this.style.timeline.gapWidth * this.style.timeline.timeDivde * this._dT;
+      this.x += this.style.timeline.gapWidth * this.style.timeline.timeDivde * this._dT;
+      this.parent.call('playhead-move', {
+        target: this,
+        data: this.x,
+      });
     }
   }
 
@@ -27,24 +30,20 @@ export class Playhead extends Node {
 
     ctx.fillStyle = 'red';
     ctx.beginPath();
-    ctx.moveTo(this._position - 6, 0);
-    ctx.lineTo(this._position - 6, this.style.timeline.height / 2);
-    ctx.lineTo(this._position, this.style.timeline.height / 2 + 10);
-    ctx.lineTo(this._position + 6, this.style.timeline.height / 2);
-    ctx.lineTo(this._position + 6, 0);
+    ctx.moveTo(this.x - 6, 0);
+    ctx.lineTo(this.x - 6, this.style.timeline.height / 2);
+    ctx.lineTo(this.x, this.style.timeline.height / 2 + 10);
+    ctx.lineTo(this.x + 6, this.style.timeline.height / 2);
+    ctx.lineTo(this.x + 6, 0);
     ctx.fill();
 
     ctx.strokeStyle = 'red';
     ctx.beginPath();
-    ctx.moveTo(this._position, 0);
-    ctx.lineTo(this._position, ctx.canvas.height);
+    ctx.moveTo(this.x, 0);
+    ctx.lineTo(this.x, ctx.canvas.height);
     ctx.stroke();
 
     ctx.restore();
-  }
-
-  setPosition(x: number) {
-    this._position = x;
   }
 
   isPlaying() {
@@ -61,10 +60,10 @@ export class Playhead extends Node {
 
   stop() {
     this.pause();
-    this._position = 0;
+    this.x = 0;
   }
 
   getCurrentTime(): number {
-    return this._position / (this.style.timeline.gapWidth * this.style.timeline.timeDivde);
+    return this.x / (this.style.timeline.gapWidth * this.style.timeline.timeDivde);
   }
 }

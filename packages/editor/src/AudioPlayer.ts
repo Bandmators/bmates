@@ -43,7 +43,6 @@ class AudioPlayer {
   }
 
   play(startTime: number = 0): void {
-    console.log(this.tracks);
     if (!this.audioContext) throw new Error('AudioContext not initialized');
     const currentTime = this.audioContext.currentTime;
 

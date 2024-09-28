@@ -1,5 +1,6 @@
 import { EventData, Layer, setCursor } from '@bmates/renderer';
 
+import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
 
 import { Timeline, Track, TrackGroup, Wave } from './';
@@ -21,6 +22,7 @@ export class Workground extends Layer {
     protected canvas: HTMLCanvasElement,
     protected style: EditorStyleType,
     data: EditorDataType[],
+    private audioPlayer: AudioPlayer,
     private scroll = { x: 0, y: 0 },
   ) {
     super();
@@ -105,12 +107,25 @@ export class Workground extends Layer {
       if (startX === endX && this.playhead && evt.originalEvent.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
         const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
-        this.playhead.setPosition(clickX - this.x);
+        this.playhead.x = clickX - this.x;
+
+        if (this.isPlaying()) {
+          this.audioPlayer.play(this.playhead.getCurrentTime());
+        }
       }
     });
 
     this.on('mouseleave', () => {
       isDragging = false;
+    });
+
+    this.on('playhead-move', (evt: EventData) => {
+      const playheadPosition = evt.data;
+      const canvasWidth = this.canvas.width;
+
+      if (playheadPosition < this.scroll.x || playheadPosition > this.scroll.x + canvasWidth) {
+        this.scroll.x = Math.max(this._minScrollX, Math.min(playheadPosition, this.width - canvasWidth));
+      }
     });
   }
 

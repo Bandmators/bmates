@@ -16,14 +16,15 @@ export type EventType =
 
 export interface EventData {
   target: Node;
-  point: {
+  point?: {
     x: number;
     y: number;
   };
-  originalEvent: MouseEvent;
-  bubble: boolean;
+  originalEvent?: MouseEvent;
+  bubble?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
+  [key: string]: unknown;
 }
 
 export type EventHandler = (event: EventData) => void;

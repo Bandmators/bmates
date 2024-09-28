@@ -1,4 +1,4 @@
-import { EventData, Stage, dispatchEventData, getRelativeMousePosition } from '@bmates/renderer';
+import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '@/AudioPlayer';
 import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
@@ -80,7 +80,7 @@ export class Editor extends Stage {
   }
 
   private _initLayout() {
-    this._workground = new Workground(this.canvas, this.style, this.data, this.scroll);
+    this._workground = new Workground(this.canvas, this.style, this.data, this._audioPlayer, this.scroll);
     this.add(this._workground);
 
     this._overlay = new Overlay(this.canvas, this.style, this.scroll);
@@ -306,15 +306,7 @@ export class Editor extends Stage {
           return this.addWave(newData);
         }),
       );
-
-      const m = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-      });
-      const point = getRelativeMousePosition(m, this.canvas, this.scroll);
-      dispatchEventData('data-change', this, point, m);
+      this.call('data-change', { data: this.data }, false);
     }
   }
 

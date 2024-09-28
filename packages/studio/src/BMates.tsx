@@ -70,17 +70,6 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
         buffer: audioBuffer,
       },
     };
-    // const newTrack: TrackDataType = {
-    //   id: generateUniqueId(),
-    //   category: 'New Track',
-    //   songs: [newSong],
-    // };
-    // const newEditorData: EditorDataType = {
-    //   name: 'New Track',
-    //   tracks: [newTrack],
-    // };
-
-    // data.push(newEditorData);
 
     if (editor.current) {
       await editor.current.addWave(newSong);

@@ -23,6 +23,9 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
       editor.current.on('data-change', () => {
         setData(editor.current?.data ? [...editor.current.data] : []);
       });
+      editor.current.on('pause', isPlaying => {
+        setIsPlaying(isPlaying);
+      });
     }
     return () => {
       if (editor.current) {

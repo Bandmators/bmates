@@ -2,7 +2,7 @@
 export type SongDataType<T extends string = string> = {
   id: string;
   start: number;
-  long: number;
+  long?: number;
   src: string;
   user: string;
   group: number;

@@ -130,6 +130,8 @@ export class Editor extends Stage {
       delete: () => this._act('Delete'),
       backspace: () => this._act('Delete'),
       'ctrl+x': () => this._act('Cut'),
+      arrowleft: () => this._act('ArrowLeft'),
+      arrowright: () => this._act('ArrowRight'),
     };
 
     this.canvas.addEventListener('keydown', e => {
@@ -172,7 +174,13 @@ export class Editor extends Stage {
   }
 
   async play() {
-    const currentTime = this._workground.getCurrentTime();
+    let currentTime = this._workground.getCurrentTime();
+
+    if (this._audioPlayer.getDuration() < currentTime) {
+      this.stop();
+      currentTime = this._workground.getCurrentTime();
+    }
+
     this._workground.play();
     this._audioPlayer.play(currentTime);
   }
@@ -240,6 +248,12 @@ export class Editor extends Stage {
 
   private async _act(act: string) {
     switch (act) {
+      case 'ArrowLeft':
+        this._workground.setScrollX(this.scroll.x - this.style.timeline.timeDivde);
+        break;
+      case 'ArrowRight':
+        this._workground.setScrollX(this.scroll.x + this.style.timeline.timeDivde);
+        break;
       case 'Mute':
         this._selectedNodes.forEach(node => {
           node.data.mute = true;

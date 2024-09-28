@@ -68,7 +68,6 @@ export class Workground extends Layer {
 
     this.on('mousedown', (evt: EventData) => {
       if (evt.target.name === 'Wave') {
-        console.log('wow');
         return;
       }
       startX = evt.originalEvent.clientX;
@@ -93,7 +92,7 @@ export class Workground extends Layer {
 
       if (isDragging) {
         const deltaX = moveX - evt.originalEvent.clientX;
-        this.scroll.x = Math.max(this.scroll.x + deltaX, this._minScrollX);
+        this.setScrollX(this.scroll.x + deltaX);
         moveX = evt.originalEvent.clientX;
       }
     });
@@ -126,6 +125,11 @@ export class Workground extends Layer {
       if (playheadPosition < this.scroll.x || playheadPosition > this.scroll.x + canvasWidth) {
         this.scroll.x = Math.max(this._minScrollX, Math.min(playheadPosition, this.width - canvasWidth));
       }
+      if (this.audioPlayer.getDuration() < this.getCurrentTime()) {
+        this.pause();
+        this.audioPlayer.pause();
+        this.playhead.call('pause', false);
+      }
     });
   }
 
@@ -152,6 +156,10 @@ export class Workground extends Layer {
       this.timeIndicator.visible = false;
       this.snapping.visible = false;
     });
+  }
+
+  setScrollX(x: number) {
+    this.scroll.x = Math.max(x, this._minScrollX);
   }
 
   addTrackGroup(data: TrackDataType[]) {

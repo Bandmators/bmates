@@ -10,6 +10,7 @@ type Audio = {
 class AudioPlayer {
   private audioContext: AudioContext | null = null;
   private tracks: Map<string, Map<string, Audio>> = new Map();
+  private _duration: number = 0;
 
   createContext() {
     if (!this.audioContext) {
@@ -35,6 +36,8 @@ class AudioPlayer {
     const gainNode = context.createGain();
     gainNode.connect(context.destination);
     song.source = source;
+    song.long = buffer.duration;
+    this._duration = Math.max(this._duration, song.start + song.long);
 
     if (!this.tracks.has(trackId)) {
       this.tracks.set(trackId, new Map());
@@ -119,6 +122,10 @@ class AudioPlayer {
 
   getAudioBuffer(trackId: string): AudioBuffer | undefined {
     return this.tracks.get(trackId)?.values().next().value.source.buffer;
+  }
+
+  getDuration() {
+    return this._duration;
   }
 }
 

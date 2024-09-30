@@ -26,3 +26,39 @@ dist-ssr
 # Coverage
 coverage
 .scannerwork
+
+# dependencies
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+.next
+out
+
+# production
+/build
+
+# misc
+*.pem
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Contentlayer
+.contentlayer
+
+# post
+/posts/draft
+
+.npmrc

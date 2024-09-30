@@ -1,7 +1,6 @@
 import { EventData, Layer, setCursor } from '@bmates/renderer';
 
-import { EditorStyleType } from '@/types';
-
+import { EditorStyleType } from '../types';
 import { ContextMenu } from './ContextMenu';
 
 export class Overlay extends Layer {

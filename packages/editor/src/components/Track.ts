@@ -1,6 +1,6 @@
 import { Group } from '@bmates/renderer';
 
-import { SongDataType } from '@/types';
+import { SongDataType } from '../types';
 
 export class Track extends Group {
   override name = 'Track';

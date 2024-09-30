@@ -1,0 +1,55 @@
+---
+title: Stage
+order: 8
+lastUpdatedDate: 2024-9-30
+---
+
+`Stage` is an abstract class that extends `Container` and serves as the main rendering surface for graphical elements. It manages the canvas, handles events, and orchestrates the rendering loop.
+
+> Check [Container](/docs/renderer/container) for the base class that manages child nodes.
+
+## Properties
+
+**name**: `string`
+
+The name of the stage. The default value is `Stage`.
+
+**children**: `Layer[]`
+
+An array of child Node contained within the Stage.
+
+**canvas**: `HTMLCanvasElement`
+
+The HTML canvas element used for rendering.
+
+**ctx**: `CanvasRenderingContext2D`
+
+The rendering context for the canvas.
+
+**scroll**: `{ x: number, y: number }`
+
+The current scroll position of the stage.
+
+## Constructor
+
+```typescript
+constructor(element: HTMLCanvasElement)
+```
+
+**element**: `HTMLCanvasElement`
+
+The canvas element to be used for rendering.
+
+## Methods
+
+### handleEvent (e)
+
+Handles mouse events and dispatches them accordingly.
+
+| Name | Type         | Description                |
+| ---- | ------------ | -------------------------- |
+| e    | `MouseEvent` | The mouse event to handle. |
+
+### destroy ()
+
+Cleans up event listeners and stops the rendering loop.

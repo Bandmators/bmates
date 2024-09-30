@@ -1,0 +1,80 @@
+---
+title: Container
+order: 6
+lastUpdatedDate: 2024-9-30
+---
+
+`Container` is an abstract class that extends `Node` and serves as a base for objects that can contain child nodes.
+It provides methods to manage child nodes and handle hit testing.
+
+> Check [Node](/docs/renderer/node) for the basic graphics class.
+
+## Properties
+
+**name**: `string`
+
+The name of the container. The default value is `container`.
+
+**children**: `ChildType[]`
+
+An array of child Node contained within the Container.
+
+## Constructor
+
+```typescript
+constructor (attrs: Partial<NodeAttributes> = {})
+```
+
+**attrs**: `Partial<NodeAttributes>`
+
+Sets the initial properties of the Node.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the Node.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+Called before draw().
+
+### draw (ctx)
+
+Draws the Node.
+
+| Name | Type                       | Description                               |
+| ---- | -------------------------- | ----------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | Rendering context for the drawing surface |
+
+Called after update().
+
+### add (child)
+
+Adds a child node to the container.
+
+| Name  | Type        | Description                             |
+| ----- | ----------- | --------------------------------------- |
+| child | `ChildType` | The child node to add to the container. |
+
+### remove (child)
+
+Removes a child node from the container.
+
+| Name  | Type        | Description                                  |
+| ----- | ----------- | -------------------------------------------- |
+| child | `ChildType` | The child node to remove from the container. |
+
+### hitTest (point, e)
+
+Checks if the given point collides with any child nodes in the container.
+
+| Name  | Type         | Description                                   |
+| ----- | ------------ | --------------------------------------------- |
+| point | `Vector2`    | The point to check for collision.             |
+| e     | `MouseEvent` | The mouse event associated with the hit test. |
+
+- Return: `Node | null`
+  - The first child node that collides, or `null` if no collision occurs.

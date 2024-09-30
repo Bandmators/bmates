@@ -1,6 +1,6 @@
 import { Group, Node } from '@bmates/renderer';
 
-import { EditorDataType, EditorStyleType, TrackDataType } from '@/types';
+import { EditorDataType, EditorStyleType, TrackDataType } from '../types';
 
 class SideTrack extends Node {
   constructor(

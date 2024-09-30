@@ -1,0 +1,131 @@
+---
+title: Event
+order: 5
+lastUpdatedDate: 2024-9-30
+---
+
+You can track the situation by receiving events for specific situations.
+
+The `Event` module provides a way to manage events in your application. It includes methods for subscribing to, unsubscribing from, and triggering events.
+
+## Event Types
+
+The following `EventType` are supported:
+
+- `click`
+- `mousemove`
+- `mousedown`
+- `mouseup`
+- `mouseleave`
+- `mouseover`
+- `mouseout`
+- `dragstart`
+- `draging`
+- `dragend`
+- `wave-dragstart`
+- `wave-draging`
+- `wave-dragend`
+- `pause`
+- and custom event types
+
+## EventData
+
+`EventData` is the parameter type of the callback function that is called with event issuance.
+It can include various properties depending on the type of event.
+Here are some common properties that may be included in `EventData`:
+
+- **target**: `Node`
+
+  - The element that triggered the event.
+
+- **originalEvent**: `MouseEvent`
+
+  - Information about the original mouse event that occurred, including details such as click, movement, etc.
+
+- **bubble**: `boolean`
+
+  - Indicates whether the event bubbles.
+    If `true`, the event propagates to parent elements.
+  - default is true.
+
+- **position**: `{ x: number, y: number }`
+
+  - The coordinates of the event, useful for mouse-related events.
+
+- **data**: `any`
+
+  - Additional data related to the event, which can be useful in custom events.
+
+### EventData Structure
+
+```typescript
+interface EventData {
+  target: Node;
+  point?: {
+    x: number;
+    y: number;
+  };
+  originalEvent?: MouseEvent;
+  bubble?: boolean;
+  data?: any;
+  [key: string]: unknown;
+}
+```
+
+This structure allows event handlers to access relevant information about the event, enabling more dynamic and responsive event handling in your application.
+
+```ts
+type EventHandler = (event: EventData) => void;
+```
+
+## Methods
+
+### on (eventType, handler)
+
+Subscribes a handler function to the specified event type.
+
+| Name      | Type           | Description                                      |
+| --------- | -------------- | ------------------------------------------------ |
+| eventType | `EventType`    | The type of event to listen for.                 |
+| handler   | `EventHandler` | The function to be called when the event occurs. |
+
+```ts
+const handleClick: EventHandler = (event: EventData) => {
+  console.log('Click event triggered:', event);
+};
+
+//
+editor.on('custom-click', handleClick);
+```
+
+### off (eventType, handler)
+
+Unsubscribes a handler function from the specified event type.
+
+| Name      | Type           | Description                                         |
+| --------- | -------------- | --------------------------------------------------- |
+| eventType | `EventType`    | The type of event to stop listening for.            |
+| handler   | `EventHandler` | The function to be removed from the event listener. |
+
+```ts
+editor.off('custom-click', handleClick);
+```
+
+### call (eventType, eventData)
+
+Triggers the specified event type, calling all subscribed handlers with the provided event data.
+
+| Name      | Type        | Description                                  |
+| --------- | ----------- | -------------------------------------------- |
+| eventType | `EventType` | The type of event to trigger.                |
+| eventData | `EventData` | The data to be passed to the event handlers. |
+
+```ts
+editor.call('custom-click', {
+  target: null,
+  originalEvent: new MouseEvent('click'),
+  bubble: true,
+  position: { x: 100, y: 200 },
+  data: 'custom-click',
+});
+```

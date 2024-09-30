@@ -1,5 +1,4 @@
-import { Vector2 } from '@/types';
-
+import { Vector2 } from '../types';
 import { Node } from './Node';
 
 export abstract class Container<ChildType extends Node = Node> extends Node {

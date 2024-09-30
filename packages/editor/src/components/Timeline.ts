@@ -1,6 +1,6 @@
 import { Node } from '@bmates/renderer';
 
-import { EditorStyleType } from '@/types';
+import { EditorStyleType } from '../types';
 
 export class Timeline extends Node {
   override name = 'Timeline';

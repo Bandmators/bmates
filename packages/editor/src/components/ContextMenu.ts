@@ -1,7 +1,6 @@
 import { Node } from '@bmates/renderer';
 
-import { EditorStyleType } from '@/types';
-
+import { EditorStyleType } from '../types';
 import { Wave } from './Wave';
 
 export class ContextMenu extends Node {

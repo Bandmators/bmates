@@ -1,0 +1,115 @@
+---
+title: Node
+order: 5
+lastUpdatedDate: 2024-9-30
+---
+
+`Node` is the most basic graphics class in Renderer.
+
+All objects that contain basic functions and have no children belong to Node.
+
+> Check [Container](/docs/renderer/container) and [Group] (/docs/renderer/group) for objects that act like Node and have children.
+
+## Properties
+
+**name**: `string`
+
+The name of the Node. The default value is `Node`.
+
+**x**: `number`
+
+The x-coordinate of the Node.
+
+**y**: `number`
+
+The y-coordinate of the Node.
+
+**width**: `number`
+
+The width of the Node.
+
+**height**: `number`
+
+The height of the Node.
+
+**parent**: `Container` | `null`
+
+Parent container with Node as a child.
+
+Default value is `null`.
+
+Automatically assigned through add().
+For `Stage`, the top node, it is a `null` value.
+
+**visible**: `boolean`
+
+The visibility state of the Node.
+
+**draggable**: `boolean`
+
+Indicates whether the Node is draggable.
+
+**zIndex**: `number`
+
+The z-index of the Node.
+
+They are reordered compared to other Nodes at the same level.
+
+## Constructor
+
+```typescript
+constructor (attrs: Partial<NodeAttributes> = {})
+```
+
+**attrs**: `Partial<NodeAttributes>`
+
+Sets the initial properties of the Node.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the Node.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+Called before draw().
+
+### draw (ctx)
+
+Draws the Node.
+
+| Name | Type                       | Description                               |
+| ---- | -------------------------- | ----------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | Rendering context for the drawing surface |
+
+Called after update().
+
+### isIntersection (x, y)
+
+Checks if the given coordinates intersect with the Node.
+
+| Name | Type     | Description                                 |
+| ---- | -------- | ------------------------------------------- |
+| x    | `number` | The x-coordinate to check for intersection. |
+| y    | `number` | The y-coordinate to check for intersection. |
+
+- Return: `boolean`
+
+### hitTest (point, e)
+
+Checks if the given point collides with the Node.
+
+| Name  | Type       | Description                                   |
+| ----- | ---------- | --------------------------------------------- |
+| point | Vector2    | The point to check for collision.             |
+| e     | MouseEvent | The mouse event associated with the hit test. |
+
+- Return: `Node | null`
+  - The Node if a collision occurs, otherwise `null`.
+
+### destroy ()
+
+Safely removes the Node.

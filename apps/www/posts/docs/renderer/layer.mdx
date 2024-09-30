@@ -1,0 +1,56 @@
+---
+title: Layer
+order: 7
+lastUpdatedDate: 2024-9-30
+---
+
+`Layer` is a class that extends `Container` and represents a layer in the rendering system. It is used to manage and render child nodes in a specific order, allowing for complex scene management.
+
+> Check [Container](/docs/renderer/container) for the base class that manages child nodes.
+
+## Properties
+
+**name**: `string`
+
+The name of the layer.
+The default value is `layer`.
+
+**opacity**: `number`
+
+The opacity of the layer, ranging from `0` (fully transparent) to `1` (fully opaque).
+
+**visible**: `boolean`
+
+Indicates whether the layer is visible.
+
+## Constructor
+
+```typescript
+constructor (attrs: Partial<NodeAttributes> = {})
+```
+
+**attrs**: `Partial<NodeAttributes>`
+
+Sets the initial properties of the Node.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the Node.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+Called before draw().
+
+### draw (ctx)
+
+Draws the Node.
+
+| Name | Type                       | Description                               |
+| ---- | -------------------------- | ----------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | Rendering context for the drawing surface |
+
+Called after update().

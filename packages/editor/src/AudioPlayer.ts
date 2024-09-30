@@ -21,7 +21,7 @@ class AudioPlayer {
 
   async loadAudioBuffer(src: string) {
     const context = this.createContext();
-    const proxyUrl = src.startsWith('http') ? `/audio${new URL(src).pathname}` : src;
+    const proxyUrl = src;
     const response = await fetch(proxyUrl);
     const arrayBuffer = await response.arrayBuffer();
     return await context.decodeAudioData(arrayBuffer);

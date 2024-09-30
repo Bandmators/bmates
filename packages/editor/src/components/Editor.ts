@@ -1,9 +1,8 @@
 import { EventData, Stage } from '@bmates/renderer';
 
-import AudioPlayer from '@/AudioPlayer';
-import { EditorDataType, EditorStyleType, SongDataType } from '@/types';
-import { deepMerge, generateUniqueId } from '@/utils';
-
+import AudioPlayer from '../AudioPlayer';
+import { EditorDataType, EditorStyleType, SongDataType } from '../types';
+import { deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';
 import { Wave } from './Wave';
 import { Workground } from './Workground';
@@ -90,14 +89,18 @@ export class Editor extends Stage {
   private _initEvent() {
     this.on('mousedown', (evt: EventData) => {
       if (evt.originalEvent.button === 0) {
-        if (evt.target.name === 'Wave') {
-          this.select([evt.target]);
+        if (evt.target instanceof Wave) {
+          if (evt.originalEvent.shiftKey) {
+            this.select([...this._selectedNodes, evt.target]);
+          } else {
+            this.select([evt.target]);
+          }
         } else {
           this.unselect();
         }
       }
       if (evt.originalEvent.button === 2 && !this._overlay.isOpenContextMenu()) {
-        if (evt.target.name === 'Wave') {
+        if (evt.target instanceof Wave) {
           this.select([evt.target]);
           this._overlay.openContextMenu(evt);
         } else {
@@ -174,15 +177,15 @@ export class Editor extends Stage {
   }
 
   async play() {
-    let currentTime = this._workground.getCurrentTime();
+    let currentTime = this._workground?.getCurrentTime();
 
     if (this._audioPlayer.getDuration() < currentTime) {
       this.stop();
       currentTime = this._workground.getCurrentTime();
     }
 
-    this._workground.play();
-    this._audioPlayer.play(currentTime);
+    this._workground?.play();
+    this._audioPlayer?.play(currentTime);
   }
 
   select(nodes: Wave[]) {
@@ -200,13 +203,13 @@ export class Editor extends Stage {
   }
 
   pause() {
-    this._workground.pause();
-    this._audioPlayer.pause();
+    this._workground?.pause();
+    this._audioPlayer?.pause();
   }
 
   stop() {
-    this._workground.stop();
-    this._audioPlayer.stop();
+    this._workground?.stop();
+    this._audioPlayer?.stop();
   }
 
   mute(trackId: string, isMuted: boolean | undefined = undefined) {
@@ -320,7 +323,7 @@ export class Editor extends Stage {
           return this.addWave(newData);
         }),
       );
-      this.call('data-change', { data: this.data }, false);
+      this.call('data-change', { data: this.data, target: this }, false);
     }
   }
 

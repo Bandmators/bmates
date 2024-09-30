@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { EventData, Node, getCursor, setCursor } from '@bmates/renderer';
+import { EventData, Node } from '@bmates/renderer';
 
-import { EditorStyleType, SongDataType } from '@/types';
+import { EditorStyleType, SongDataType } from '../types';
 
 export class Wave extends Node {
   override name = 'Wave';
@@ -168,6 +168,11 @@ export class Wave extends Node {
       }
     }
     return false;
+  }
+
+  setX(x: number) {
+    this.x = x;
+    this.data.start = x / (this.style.timeline.gapWidth * 10);
   }
 
   setSelected(selected: boolean) {

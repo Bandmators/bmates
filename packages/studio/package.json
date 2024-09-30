@@ -1,11 +1,19 @@
 {
   "name": "@bmates/studio",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "main": "src/main.tsx",
+  "main": "src/index.ts",
+  "bugs": {
+    "url": "https://github.com/Bandmators/bmates/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bandmators/bmates"
+  },
+  "homepage": "https://github.com/Bandmators/bmates",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "vite build && tsc  && tsc-alias"
   },
   "dependencies": {
     "@bmates/editor": "workspace:*",
@@ -18,7 +26,13 @@
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1"
   },
-  "keywords": [],
+  "keywords": [
+    "bmates",
+    "bandmates",
+    "audio-editor",
+    "audio",
+    "editor"
+  ],
   "author": "",
   "license": "ISC"
 }

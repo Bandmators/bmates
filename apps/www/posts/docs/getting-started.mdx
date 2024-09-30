@@ -1,0 +1,44 @@
+---
+title: Getting Started
+order: 0
+lastUpdatedDate: 2024-9-29
+---
+
+## Installation
+
+BMates is available as a package on NPM for use:
+
+```shell
+# NPM
+npm install @bmates/studio
+```
+
+## Create Component
+
+Please import the BMates component.
+
+```tsx
+import { BMates } from '@bmates/studio';
+```
+
+Set the appropriate props for the BMates component.
+
+```tsx
+<BMates
+  data={data}
+  style={style}
+  trackEl={({ track, muted, toggleMute }) => {
+    return (
+      <div className="track">
+        <div>{track.category}</div>
+        <ToggleMute muted={muted} onClick={toggleMute} />
+      </div>
+    );
+  }}
+/>
+```
+
+Other frameworks besides React are currently in preparation.
+
+`@bmates/studio` is a library built for React based on `@bmates/editor`.
+If you want to use it in other frameworks, please utilize `@bmates/editor`.

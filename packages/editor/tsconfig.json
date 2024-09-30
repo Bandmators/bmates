@@ -1,10 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    "outDir": "dist", // 출력 디렉토리
+    "rootDir": "src", // 소스 파일의 루트 디렉토리
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "downlevelIteration": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+    "allowJs": false,
+    "moduleResolution": "node",
+
+    "baseUrl": "."
+  },
+  "include": ["src/**/*"],
+  // "include": ["src", "../neo-studio/src/util/svg.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "src/__tests__"]
 }

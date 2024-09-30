@@ -1,9 +1,8 @@
-import { EventData, EventHandler, EventType } from '@/types';
-
+import { EventData, EventHandler, EventType } from '../types';
 import { Container } from './Container';
 
 export class Statable {
-  events: Map<EventType, Set<EventHandler>> = new Map();
+  private events: Map<EventType, Set<EventHandler>> = new Map();
   parent: Container | null = null;
 
   on(eventType: EventType, handler: EventHandler) {

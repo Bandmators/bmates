@@ -1,9 +1,7 @@
-import { EventType } from '@/types';
-import { getRelativeMousePosition } from '@/utils';
-
-import { EVENT_LIST } from '@/constants/event';
-import { dispatchEventData } from '@/utils/event';
-
+import { EVENT_LIST } from '../constants/event';
+import { EventType } from '../types';
+import { getRelativeMousePosition } from '../utils';
+import { dispatchEventData } from '../utils/event';
 import { Container, Layer, Node } from './';
 
 export abstract class Stage extends Container<Layer> {

@@ -1,7 +1,7 @@
 import { Node } from '@bmates/renderer';
 
-import { EditorStyleType } from '@/types';
-import { formatTime } from '@/utils';
+import { EditorStyleType } from '../types';
+import { formatTime } from '../utils';
 
 export class TimeIndicator extends Node {
   override name = 'TimeIndicator';

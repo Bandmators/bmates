@@ -1,4 +1,4 @@
-import { Node } from '@/engine';
+import { Node } from '../engine';
 
 export type EventType =
   | 'click'
@@ -12,6 +12,9 @@ export type EventType =
   | 'draging'
   | 'dragend'
   | 'wave-dragstart'
+  | 'wave-draging'
+  | 'wave-dragend'
+  | 'pause'
   | string;
 
 export interface EventData {

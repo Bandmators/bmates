@@ -3,7 +3,7 @@ import { Editor, EditorDataType, EditorStyleType, SongDataType, TrackDataType, g
 import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { DeepPartial } from '@/types/type';
+import { DeepPartial } from './types/type';
 
 interface BMatesProps {
   data: EditorDataType[];
@@ -19,11 +19,13 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   useEffect(() => {
     if (ref.current && !editor.current) {
+      // @ts-ignore
       editor.current = new Editor(ref.current, data, style);
       editor.current.on('data-change', () => {
         setData(editor.current?.data ? [...editor.current.data] : []);
       });
       editor.current.on('pause', isPlaying => {
+        // @ts-ignore
         setIsPlaying(isPlaying);
       });
     }
@@ -93,7 +95,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
           Export
         </Button>
       </div>
-      <div id="bmates" className="bmates" style={{ display: 'flex', height: '100vh' }}>
+      <div id="bmates" className="bmates" style={{ display: 'flex', height: '100%' }}>
         <div
           id="bmates-sidebar"
           className="bmates-sidebar"

@@ -1,7 +1,5 @@
-import { EventData, Vector2 } from '@/types';
-
-import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '@/utils/event';
-
+import { EventData, Vector2 } from '../types';
+import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '../utils/event';
 import { Statable } from './State';
 
 interface NodeAttributes {
@@ -83,11 +81,11 @@ export abstract class Node extends Statable {
     });
 
     this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent.button !== 0) return;
+      if (evt.originalEvent?.button !== 0) return;
 
       this.isDragging = true;
-      moveX = evt.originalEvent.clientX;
-      moveY = evt.originalEvent.clientY;
+      moveX = evt.originalEvent?.clientX;
+      moveY = evt.originalEvent?.clientY;
       this.call('dragstart', replaceEventDataType('dragstart', evt), false);
     });
 
@@ -95,14 +93,14 @@ export abstract class Node extends Statable {
       if (this.isDragging) {
         const prevX = this.x;
         const prevY = this.y;
-        const newX = this.x + evt.originalEvent.clientX - moveX;
-        const newY = this.y + evt.originalEvent.clientY - moveY;
+        const newX = this.x + (evt.originalEvent?.clientX || 0) - moveX;
+        const newY = this.y + (evt.originalEvent?.clientY || 0) - moveY;
 
         this.x = newX;
         this.y = newY;
 
-        moveX = evt.originalEvent.clientX;
-        moveY = evt.originalEvent.clientY;
+        moveX = evt.originalEvent?.clientX ?? 0;
+        moveY = evt.originalEvent?.clientY ?? 0;
 
         this.call(
           'draging',

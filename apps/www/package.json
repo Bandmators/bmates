@@ -1,0 +1,39 @@
+{
+  "name": "bmates-docs",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://Bandmators.github.io/",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@bmates/studio": "workspace:^",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "bmates-ui": "^1.0.1",
+    "clsx": "^2.1.1",
+    "contentlayer": "^0.3.4",
+    "cookies-next": "^4.1.0",
+    "date-fns": "^2.30.0",
+    "next": "14.0.4",
+    "next-contentlayer": "^0.3.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "recoil": "^0.7.7"
+  },
+  "devDependencies": {
+    "@emotion/babel-plugin": "^11.12.0",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "github-slugger": "^2.0.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-code-titles": "^1.2.0",
+    "rehype-img-size": "^1.0.1",
+    "rehype-prism-plus": "^2.0.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^3.0.1"
+  }
+}

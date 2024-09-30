@@ -1,5 +1,5 @@
-import { type Node } from '@/engine';
-import { EventData, EventType } from '@/types';
+import { type Node } from '../engine';
+import { EventData, EventType } from '../types';
 
 export const dispatchEventData = (
   type: EventType,

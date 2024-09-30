@@ -1,0 +1,96 @@
+---
+title: Configuration
+order: 2
+lastUpdatedDate: 2024-9-29
+---
+
+## Data Configuration
+
+This is the data configuration that serves as the foundation for the editor.
+
+```tsx
+export type SongDataType<T extends string = string> = {
+  id: string;
+  start: number;
+  long?: number;
+  src: string;
+  user: string;
+  group: number;
+  instrument: T;
+  mute?: boolean;
+  lock?: boolean;
+  [key: string]: any;
+};
+export type TrackDataType<T extends string = string> = {
+  id: string;
+  category: string;
+  songs: SongDataType<T>[];
+};
+export type EditorDataType<T extends string = string> = {
+  name: string;
+  tracks: TrackDataType<T>[];
+};
+```
+
+By providing values to the data props of the `<BMates />` component,
+you can set the initial data for the editor.
+
+The import and export functionalities also operate based on this type.
+
+```tsx
+const data: EditorDataType[] = [];
+
+<BMates
+  //...
+  data={data}
+/>;
+```
+
+## style
+
+This is the style configuration that serves as the foundation for the editor.
+
+```tsx
+export type EditorStyleType = {
+  theme: {
+    background: string;
+    lineColor: string;
+    strokeLineColor: string;
+  };
+  timeline: {
+    gapHeight: number;
+    gapWidth: number;
+    timeDivde: number; // 5 or 10
+    height: number; // 45 or 60;
+  };
+  sidebar: {
+    width: number;
+  };
+  wave: {
+    height: number;
+    borderRadius: number;
+    margin: number;
+    snapping: string;
+  };
+  context: {
+    menuWidth: number;
+    menuPadding: number;
+    itemHeight: number;
+    itemPadding: number;
+  };
+};
+```
+
+By providing values to the style props of the `<BMates />` component,
+you can set the overall design of the editor.
+
+The values passed will override the default values to apply styles.
+
+```tsx
+const style: EditorStyleType = {};
+
+<BMates
+  //...
+  style={style}
+/>;
+```

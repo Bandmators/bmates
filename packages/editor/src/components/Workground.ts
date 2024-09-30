@@ -1,8 +1,7 @@
-import { EventData, Layer, setCursor } from '@bmates/renderer';
+import { Container, EventData, Layer, Node, setCursor } from '@bmates/renderer';
 
-import AudioPlayer from '@/AudioPlayer';
-import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '@/types';
-
+import AudioPlayer from '../AudioPlayer';
+import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '../types';
 import { Timeline, Track, TrackGroup, Wave } from './';
 import { Playhead } from './Playhead';
 import { Snapping } from './Snapping';
@@ -11,10 +10,10 @@ import { TimeIndicator } from './TimeIndicator';
 export class Workground extends Layer {
   override name = 'Workground';
 
-  private timeline: Timeline;
-  private playhead: Playhead;
-  private timeIndicator: TimeIndicator;
-  private snapping: Snapping;
+  private timeline!: Timeline;
+  private playhead!: Playhead;
+  private timeIndicator!: TimeIndicator;
+  private snapping!: Snapping;
 
   private _minScrollX = 0;
 
@@ -70,13 +69,13 @@ export class Workground extends Layer {
       if (evt.target.name === 'Wave') {
         return;
       }
-      startX = evt.originalEvent.clientX;
+      startX = evt.originalEvent!.clientX;
 
-      if (evt.originalEvent.button !== 1) return;
+      if (evt.originalEvent!.button !== 1) return;
       setCursor('all-scroll');
 
       isDragging = true;
-      moveX = evt.originalEvent.clientX;
+      moveX = evt.originalEvent!.clientX;
     });
 
     this.on('mousemove', (evt: EventData) => {
@@ -91,21 +90,21 @@ export class Workground extends Layer {
       }
 
       if (isDragging) {
-        const deltaX = moveX - evt.originalEvent.clientX;
+        const deltaX = moveX - evt.originalEvent!.clientX;
         this.setScrollX(this.scroll.x + deltaX);
-        moveX = evt.originalEvent.clientX;
+        moveX = evt.originalEvent!.clientX;
       }
     });
 
     this.on('mouseup', (evt: EventData) => {
-      if (evt.originalEvent.button === 1) setCursor('default');
+      if (evt.originalEvent!.button === 1) setCursor('default');
 
       isDragging = false;
 
-      const endX = evt.originalEvent.clientX;
-      if (startX === endX && this.playhead && evt.originalEvent.button === 0) {
+      const endX = evt.originalEvent!.clientX;
+      if (startX === endX && this.playhead && evt.originalEvent!.button === 0) {
         const rect = this.canvas.getBoundingClientRect();
-        const clickX = evt.originalEvent.clientX - rect.left + this.scroll.x;
+        const clickX = evt.originalEvent!.clientX - rect.left + this.scroll.x;
         this.playhead.x = clickX - this.x;
 
         if (this.isPlaying()) {
@@ -128,29 +127,68 @@ export class Workground extends Layer {
       if (this.audioPlayer.getDuration() < this.getCurrentTime()) {
         this.pause();
         this.audioPlayer.pause();
+        //@ts-ignore
         this.playhead.call('pause', false);
       }
     });
   }
 
   private _initWaveEvent() {
+    let snappingClientX = -1;
+    const SNAPPING_THRESHOLD = 10;
+
+    const checkSnapping = (evt: EventData) => {
+      const wave = evt.target as Wave;
+      const otherWaves = this.getWaves().filter(child => child !== evt.target && child.data.group !== wave.data.group);
+      const curX = wave.x;
+
+      const snappingPosX = otherWaves.reduce((acc, wave) => {
+        const waveStart = wave.x;
+        const waveEnd = waveStart + wave.width;
+
+        if (Math.abs(curX - waveStart) < SNAPPING_THRESHOLD) {
+          return waveStart;
+        } else if (Math.abs(curX - waveEnd) < SNAPPING_THRESHOLD) {
+          return waveEnd;
+        }
+        return acc;
+      }, -1);
+
+      if (snappingPosX > 0 && snappingClientX < 0) {
+        snappingClientX = evt.originalEvent!.clientX;
+      }
+
+      if (snappingPosX > 0) {
+        if (Math.abs(snappingClientX - evt.originalEvent!.clientX) < SNAPPING_THRESHOLD) {
+          wave.setX(snappingPosX);
+          this.snapping.visible = true;
+          this.snapping.x = wave.x;
+        } else {
+          wave.x -= snappingClientX - evt.originalEvent!.clientX;
+          snappingClientX = -1;
+        }
+      } else {
+        this.snapping.visible = false;
+      }
+    };
+
     this.on('wave-dragstart', (evt: EventData) => {
       this.timeIndicator.visible = true;
-      this.timeIndicator.setTime(evt.target.data.start);
-      this.timeIndicator.x = evt.target.x;
-      this.timeIndicator.y = evt.target.y + evt.target.height;
+      if (evt.target instanceof Wave) {
+        this.timeIndicator.setTime(evt.target.data.start);
+        this.timeIndicator.x = evt.target.x;
+        this.timeIndicator.y = evt.target.y + evt.target.height;
+      }
 
-      this.snapping.visible = true;
-      this.snapping.x = evt.target.x;
-      this.snapping.y = evt.target.y + evt.target.height;
+      checkSnapping(evt);
     });
     this.on('wave-draging', (evt: EventData) => {
-      this.timeIndicator.setTime(evt.target.data.start);
-      this.timeIndicator.x = evt.target.x;
-      this.timeIndicator.y = evt.target.y + evt.target.height;
-
-      this.snapping.x = evt.target.x;
-      this.snapping.y = evt.target.y + evt.target.height;
+      checkSnapping(evt);
+      if (evt.target instanceof Wave) {
+        this.timeIndicator.setTime(evt.target.data.start);
+        this.timeIndicator.x = evt.target.x;
+        this.timeIndicator.y = evt.target.y + evt.target.height;
+      }
     });
     this.on('wave-dragend', () => {
       this.timeIndicator.visible = false;
@@ -200,6 +238,21 @@ export class Workground extends Layer {
 
   getCurrentTime() {
     return this.playhead?.getCurrentTime() || 0;
+  }
+
+  getWaves() {
+    const findWaves = (children: (Node | Container)[]): Wave[] => {
+      let waves: Wave[] = [];
+      children.forEach(child => {
+        if (child instanceof Wave) {
+          waves.push(child);
+        } else if (child instanceof Container && child.children) {
+          waves = waves.concat(findWaves(child.children)); // 재귀 호출
+        }
+      });
+      return waves;
+    };
+    return findWaves(this.children);
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

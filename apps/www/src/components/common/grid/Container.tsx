@@ -24,6 +24,8 @@ export const PostSidebar = styled.aside`
   position: sticky;
   top: var(--layoutHeader);
   padding: 2rem;
+  overflow-y: auto;
+  height: calc(100vh - var(--layoutHeader));
   ${maxMedia.mobile} {
     padding: 1rem;
   }
@@ -33,8 +35,22 @@ export const PostSidebarItemList = styled.ul`
   padding-left: 0px;
   list-style: none;
 `;
-export const PostSidebarItem = styled.li`
+
+export const PostSidebarTitle = styled.div`
   margin: 0.25rem 0rem;
+  padding: 8px 8px;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  button:hover {
+    background-color: var(--gray-100);
+  }
+`;
+
+export const PostSidebarItem = styled.li`
+  margin: 0.125rem 0rem;
   a {
     color: var(--black);
     font-weight: 500;
@@ -50,6 +66,9 @@ export const PostSidebarItem = styled.li`
   a.active {
     color: var(--white);
     background: var(--gray-900);
+  }
+  &.section {
+    margin-bottom: 1rem;
   }
 `;
 

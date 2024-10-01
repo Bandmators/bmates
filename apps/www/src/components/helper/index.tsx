@@ -1,7 +1,7 @@
 'use client';
 
 import styled from '@emotion/styled';
-import { Button } from 'bmates-ui';
+import { Button, useToast } from 'bmates-ui';
 import { Post } from 'contentlayer/generated';
 
 import { maxMedia } from '@/libs/media';
@@ -9,6 +9,7 @@ import { maxMedia } from '@/libs/media';
 import Toc from './Toc';
 
 export default function Helper({ post }: { post: Post }) {
+  const { toast } = useToast();
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -16,15 +17,14 @@ export default function Helper({ post }: { post: Post }) {
   const handleCopyUrl = () => {
     const currentUrl = window.location.href;
 
-    navigator.clipboard.writeText(currentUrl).then(
-      () => {
-        // setCopySuccess('주소가 성공적으로 복사되었습니다.');
-      },
-      err => {
-        console.error('주소 복사 실패:', err);
-        // setCopySuccess('주소 복사 실패');
-      },
-    );
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      toast({
+        title: 'Copy Url !',
+        description: currentUrl,
+        variant: 'primary',
+        time: 3000,
+      });
+    });
   };
 
   return (

@@ -17,8 +17,6 @@ export const lightColors = {
   hr: '#e1e1e1',
   blockquoteBG: '#efefef',
   asideBG: '#ededed',
-  activeBG: '#f6f3f9', // primary 와 같이 사용할때 사용
-  header: '#222', //! h1 와 같이 강력히 강조해야할 헤더는 테마가 바뀌어도 강조해야함
   highlight: '#d0d1ff',
 };
 
@@ -30,8 +28,6 @@ export const darkColors = {
   hr: '#3C3C3E',
   blockquoteBG: '#2b2b2b',
   asideBG: '#272727',
-  activeBG: '#323035', // primary 와 같이 사용할때 사용
-  header: '#fdfdfd', //! h1 와 같이 강력히 강조해야할 헤더는 테마가 바뀌어도 강조해야함
   highlight: '##d0d1ff',
 };
 

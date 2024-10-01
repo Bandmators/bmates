@@ -1,0 +1,121 @@
+---
+title: AudioPlayer
+order: 104
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`AudioPlayer` is a class that manages audio playback and editing functionalities. It handles loading audio tracks, controlling playback, and managing audio effects.
+
+## Properties
+
+**name**: `string`
+
+The name of the audio player. The default value is `'AudioPlayer'`.
+
+**tracks**: `Map<string, Map<string, Audio>>`
+
+A map that stores audio tracks, organized by track IDs and audio IDs.
+
+**\_duration**: `number`
+
+The total duration of all loaded tracks.
+
+**audioContext**: `AudioContext | null`
+
+The audio context used for audio processing.
+
+## Constructor
+
+```typescript
+constructor();
+```
+
+Initializes a new instance of the `AudioPlayer`.
+
+## Methods
+
+### createContext ()
+
+Creates and initializes the audio context.
+
+- Return: `AudioContext`
+
+### loadAudioBuffer (src)
+
+Loads an audio buffer from the specified source URL.
+
+| Name | Type     | Description                  |
+| ---- | -------- | ---------------------------- |
+| src  | `string` | The URL of the audio source. |
+
+- Return: `Promise<AudioBuffer>`
+
+### prepareTrack (song, trackId)
+
+Prepares an audio track for playback.
+
+| Name    | Type           | Description               |
+| ------- | -------------- | ------------------------- |
+| song    | `SongDataType` | The song data to prepare. |
+| trackId | `string`       | The ID of the track.      |
+
+### play (startTime)
+
+Starts playback of the audio tracks.
+
+| Name      | Type     | Description                                         |
+| --------- | -------- | --------------------------------------------------- |
+| startTime | `number` | The time to start playback.<br/>Default value is 0. |
+
+### pause ()
+
+Pauses the currently playing tracks.
+
+### stop ()
+
+Stops all currently playing tracks.
+
+### mute (trackId, isMuted)
+
+Mutes or unmutes the specified track.
+
+| Name    | Type                      | Description                  |
+| ------- | ------------------------- | ---------------------------- |
+| trackId | `string`                  | The ID of the track to mute. |
+| isMuted | `boolean`<br/>`undefined` | The mute state to set.       |
+
+### isMuted (trackId)
+
+Checks if the specified track is muted.
+
+| Name    | Type     | Description                   |
+| ------- | -------- | ----------------------------- |
+| trackId | `string` | The ID of the track to check. |
+
+- Return: `boolean`
+
+### getAudioBuffer (trackId)
+
+Retrieves the audio buffer for the specified track.
+
+| Name    | Type     | Description          |
+| ------- | -------- | -------------------- |
+| trackId | `string` | The ID of the track. |
+
+- Return: `AudioBuffer | undefined`
+
+### getDuration ()
+
+Returns the total duration of all loaded tracks.
+
+- Return: `number`
+
+## Usage Example
+
+```typescript
+const audioPlayer = new AudioPlayer();
+const songData: SongDataType = {};
+await Promise.all([audioPlayer.prepareTrack(songData, 'track1')]);
+audioPlayer.play();
+```

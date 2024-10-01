@@ -113,7 +113,7 @@ export default function Home() {
           <Feature>Simple API</Feature>
         </Features>
       </IntroSection>
-      <DemoSection>
+      <DemoSection id="demo">
         <Container>
           <BMatesContainer>
             <BMatesStyled
@@ -131,6 +131,29 @@ export default function Home() {
           </BMatesContainer>
         </Container>
       </DemoSection>
+      <SupportSection>
+        <h2>Support our work</h2>
+        <p>
+          We are committed to creating high-quality, open-source icons and admin template that are accessible to
+          everyone. If you find our work valuable and would like to support us, there are several ways you can do that.
+        </p>
+        <SupportItemList>
+          <SupportItem>
+            <h3>Contribute</h3>
+            <p>
+              You can contribute in various ways, including code, documentation, and design. Share your ideas and skills
+              to help us enhance the project!
+            </p>
+          </SupportItem>
+          <SupportItem>
+            <h3>Sponsor us</h3>
+            <p>
+              Your sponsorship directly impacts the maintenance and improvement of our project. We would greatly
+              appreciate your support through GitHub Sponsors or Open Collective!
+            </p>
+          </SupportItem>
+        </SupportItemList>
+      </SupportSection>
     </Layout>
   );
 }
@@ -203,4 +226,25 @@ export const DemoSection = styled.section`
 
 const BMatesStyled = styled(BMates)`
   background: var(--background);
+`;
+
+const SupportSection = styled.section`
+  padding: 5rem;
+  background: var(--gray-100);
+  text-align: center;
+`;
+
+const SupportItemList = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4rem;
+`;
+
+const SupportItem = styled.div`
+  margin: 2rem 0;
+  flex: 1;
+  h2 {
+    margin: 1rem 0;
+  }
 `;

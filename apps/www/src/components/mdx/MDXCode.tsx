@@ -1,21 +1,24 @@
 'use client';
 
 import styled from '@emotion/styled';
+import { useToast } from 'bmates-ui';
 import { useRef } from 'react';
 
 export default function MDXCode({ children, className }: React.ComponentProps<'pre'>) {
   const ref = useRef<HTMLPreElement>(null);
+  const { toast } = useToast();
 
   const handleCopy = () => {
     const code = ref.current?.querySelector('code')?.innerText;
     if (!code) return;
 
-    navigator.clipboard.writeText(code).then(
-      () => {},
-      err => {
-        console.error('주소 복사 실패:', err);
-      },
-    );
+    navigator.clipboard.writeText(code).then(() => {
+      toast({
+        title: 'Copy Code !',
+        variant: 'primary',
+        time: 3000,
+      });
+    });
   };
 
   return (
@@ -26,8 +29,8 @@ export default function MDXCode({ children, className }: React.ComponentProps<'p
       <CopyButton className="btn-copy" aria-label="copy-button" onClick={handleCopy}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -59,7 +62,7 @@ const CodeBlock = styled.div`
   }
   &:hover {
     .btn-copy {
-      display: block;
+      display: flex;
     }
   }
 `;
@@ -71,9 +74,10 @@ const CopyButton = styled.button`
   right: 0.5rem;
   border: none;
   border-radius: 0.25rem;
-  color: ${({ theme }) => theme.colors.white};
-  background-color: ${({ theme }) => theme.colors.deepGrey};
-  opacity: 0.5;
+  color: var(--black);
+  background-color: var(--white);
+  opacity: 1;
+  padding: 0.25rem;
   &:hover {
     opacity: 0.7;
   }

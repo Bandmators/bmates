@@ -1,0 +1,144 @@
+---
+title: Workground
+order: 106
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`Workground` is a class representing a workspace for audio editing.
+This class supports complex audio editing tasks, including a timeline, playhead, time indicator, and snapping functionality.
+
+> [Node](/docs/renderer/container)
+
+## Properties
+
+**name**: `string`
+
+The name of the workspace. The default value is `'Workground'`.
+
+**timeline**: `Timeline`
+
+The timeline of the workspace.
+
+**playhead**: `Playhead`
+
+The playhead indicating the current playback position.
+
+**timeIndicator**: `TimeIndicator`
+
+The time indicator displaying the current time.
+
+**snapping**: `Snapping`
+
+A class providing snapping functionality.
+
+**scroll**: `{ x: number, y: number }`
+
+The current scroll position of the workspace.
+
+## Constructor
+
+```typescript
+constructor(
+    canvas: HTMLCanvasElement,
+    style: EditorStyleType,
+    data: EditorDataType[],
+    audioPlayer: AudioPlayer,
+    scroll?: { x: number, y: number }
+)
+```
+
+**canvas**: `HTMLCanvasElement`
+
+The HTML canvas element used to render the workspace.
+
+**style**: `EditorStyleType`
+
+The style settings for the workspace.
+
+**data**: `EditorDataType[]`
+
+The initial data to be used in the workspace.
+
+**audioPlayer**: `AudioPlayer`
+
+The audio player managing audio playback.
+
+**scroll**: `{ x: number, y: number }` (optional)
+
+The initial scroll position of the workspace.
+
+## Methods
+
+### setScrollX (x)
+
+Sets the x scroll position of the workspace.
+
+| Name | Type     | Description                |
+| ---- | -------- | -------------------------- |
+| x    | `number` | The new x scroll position. |
+
+### addTrackGroup (data)
+
+Adds a track group.
+
+| Name | Type              | Description            |
+| ---- | ----------------- | ---------------------- |
+| data | `TrackDataType[]` | The track data to add. |
+
+- Return: `TrackGroup`
+
+### addTrack (parent, data)
+
+Adds a track to the given parent track group.
+
+| Name   | Type             | Description                           |
+| ------ | ---------------- | ------------------------------------- |
+| parent | `TrackGroup`     | The parent group to add the track to. |
+| data   | `SongDataType[]` | The song data to add.                 |
+
+- Return: `Track`
+
+### addWave (parent, data)
+
+Adds a waveform to the given track.
+
+| Name   | Type           | Description                              |
+| ------ | -------------- | ---------------------------------------- |
+| parent | `Track`        | The parent track to add the waveform to. |
+| data   | `SongDataType` | The song data to add.                    |
+
+- Return: `Wave`
+
+### isPlaying ()
+
+Checks if the current track is playing.
+
+- Return: `boolean`
+
+### play ()
+
+Plays the current track.
+
+### pause ()
+
+Pauses the current track.
+
+### stop ()
+
+Stops the playback of the current track.
+
+### getCurrentTime ()
+
+Returns the current time.
+
+- Return: `number`
+
+## Usage Example
+
+```typescript
+const editor = new Editor(canvas, editorData, editorStyle);
+
+const workground = new Workground(canvas, editorStyle, editorData, audioPlayer);
+editor.add(workground);
+```

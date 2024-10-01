@@ -1,0 +1,127 @@
+---
+title: Wave
+order: 108
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`Wave` is a class that visually represents audio waveforms.
+This class generates waveforms based on audio data and provides drag and selection functionalities.
+
+> [Node](/docs/renderer/node)
+
+## Properties
+
+**name**: `string`
+
+The name of the Wave. The default value is `'Wave'`.
+
+**x**: `number`
+
+The x-coordinate of the Wave.
+
+**y**: `number`
+
+The y-coordinate of the Wave.
+
+**width**: `number`
+
+The width of the Wave.
+
+**height**: `number`
+
+The height of the Wave.
+
+**waveform**: `Float32Array`
+
+Contains the audio waveform data of the Wave.
+
+**data**: `SongDataType`
+
+The audio data associated with the Wave.
+
+**style**: `EditorStyleType`
+
+Contains the style settings for the Wave.
+
+## Constructor
+
+```typescript
+constructor(data: SongDataType, style: EditorStyleType)
+```
+
+**data**: `SongDataType`
+
+The audio data associated with the Wave.
+
+**style**: `EditorStyleType`
+
+The style settings for the Wave.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the Wave.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+### draw (ctx)
+
+Draws the Wave.
+
+| Name | Type                       | Description                                   |
+| ---- | -------------------------- | --------------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | The rendering context for the drawing surface |
+
+### setX (x)
+
+Sets the x-coordinate of the Wave.
+
+| Name | Type     | Description                       |
+| ---- | -------- | --------------------------------- |
+| x    | `number` | The new x-coordinate of the Wave. |
+
+### setSelected (selected)
+
+Sets the selection state of the Wave.
+
+| Name     | Type      | Description                      |
+| -------- | --------- | -------------------------------- |
+| selected | `boolean` | The selection state of the Wave. |
+
+### checkCollision (newX)
+
+Checks for collisions with other Waves at the given x-coordinate.
+
+| Name | Type     | Description                                   |
+| ---- | -------- | --------------------------------------------- |
+| newX | `number` | The new x-coordinate to check for collisions. |
+
+- Return: `boolean`
+
+### extractWaveform (buffer)
+
+Extracts waveform data from the given audio buffer.
+
+| Name   | Type          | Description                                     |
+| ------ | ------------- | ----------------------------------------------- |
+| buffer | `AudioBuffer` | The audio buffer to extract waveform data from. |
+
+- Return: `Float32Array`
+
+## Usage Example
+
+```typescript
+const waveData: SongDataType = {
+  /* ... */
+};
+const waveStyle: EditorStyleType = {
+  /* ... */
+};
+
+const wave = new Wave(waveData, waveStyle);
+this.add(wave);
+```

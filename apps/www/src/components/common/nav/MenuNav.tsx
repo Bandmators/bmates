@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 import { Dispatch, SetStateAction } from 'react';
 
 import { POST_CATEGORY } from '@/constants/category';
-import { maxMedia, minMedia } from '@/libs/media';
+import { maxMedia } from '@/libs/media';
 
 type MenuNavProps = {
   menu: string;
@@ -68,15 +68,10 @@ const Menu = styled.div<{ $active: boolean }>`
     props.$active
       ? css`
           color: var(--secondary);
-          background: var(--activeBG);
           font-weight: 700;
-          ${minMedia.tablet} {
-            background: var(--activeBG);
-          }
         `
       : css`
           &:hover {
-            background: var(--activeBG);
             font-weight: 500;
             box-shadow: 0px 5px 0px var(--grey);
           }

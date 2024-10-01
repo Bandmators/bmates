@@ -10,8 +10,6 @@ import remarkGfm from 'remark-gfm';
 
 import { searchTermOptimization } from './src/utils/format';
 
-// <-- 직접 경로 지정
-
 const rehypeImgSizeAny: any = rehypeImgSize;
 
 export const Post = defineDocumentType(() => ({
@@ -22,6 +20,7 @@ export const Post = defineDocumentType(() => ({
     title: { type: 'string', required: true },
     lastUpdatedDate: { type: 'date', required: true },
     order: { type: 'number', required: true },
+    group: { type: 'string', required: false, default: '' },
   },
   computedFields: {
     url: { type: 'string', resolve: (post: any) => `/${post._raw.flattenedPath}` },

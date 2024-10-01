@@ -69,7 +69,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
       user: 'BMates',
       start: 0,
       long: audioBuffer.duration,
-      group: editor.current.data.length,
+      group: Editor.current.data.length,
       instrument: file.name,
       source: {
         buffer: audioBuffer,

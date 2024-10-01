@@ -5,10 +5,6 @@ import { EditorStyleType } from '../types';
 export class Timeline extends Node {
   override name = 'Timeline';
 
-  private _dT: number = 0;
-  private _timeRedLinePosX: number = 0;
-  private _isPlaying = false;
-
   constructor(
     private style: EditorStyleType,
     private _timeEnd: number,
@@ -18,9 +14,8 @@ export class Timeline extends Node {
     super();
   }
 
-  override update(_dT: number) {
-    this._dT = _dT;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  override update(_dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {
     this.drawTime(ctx);

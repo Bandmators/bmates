@@ -5,8 +5,8 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
 
-    "outDir": "dist", // 출력 디렉토리
-    "rootDir": "src", // 소스 파일의 루트 디렉토리
+    "outDir": "dist",
+    "rootDir": "src",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

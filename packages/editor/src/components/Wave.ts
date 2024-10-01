@@ -68,9 +68,9 @@ export class Wave extends Node {
     ctx.closePath();
 
     if (this._selected) {
-      ctx.strokeStyle = 'rgba(123, 123, 123, 0.5)'; // 선택된 색상
-      ctx.lineWidth = 2; // 테두리 두께
-      ctx.stroke(); // 테두리 그리기
+      ctx.strokeStyle = 'rgba(123, 123, 123, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
     // ctx.clip();

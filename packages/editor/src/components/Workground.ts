@@ -247,7 +247,7 @@ export class Workground extends Layer {
         if (child instanceof Wave) {
           waves.push(child);
         } else if (child instanceof Container && child.children) {
-          waves = waves.concat(findWaves(child.children)); // 재귀 호출
+          waves = waves.concat(findWaves(child.children));
         }
       });
       return waves;

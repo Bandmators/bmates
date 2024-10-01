@@ -16,7 +16,7 @@ const NavWrapped = () => {
         <Image src="https://avatars.githubusercontent.com/u/157222787?s=50" alt="logo" width={32} height={32} />
         BMates
       </NavLogo>
-      <NavCollapse style={{ marginTop: '3px' }}>
+      <NavCollapse>
         <Nav>
           <NavItem>
             <NavLink href="/docs/getting-started">Docs</NavLink>

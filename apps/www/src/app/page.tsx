@@ -1,7 +1,7 @@
 'use client';
 
 import styled from '@emotion/styled';
-import { Button } from 'bmates-ui';
+import { Button, maxMedia } from 'bmates-ui';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -115,7 +115,7 @@ export default function Home() {
       </IntroSection>
       <DemoSection id="demo">
         <Container>
-          <BMatesContainer>
+          <BMatesWrapper>
             <BMatesStyled
               data={data}
               style={style}
@@ -128,29 +128,33 @@ export default function Home() {
                 );
               }}
             />
-          </BMatesContainer>
+          </BMatesWrapper>
         </Container>
       </DemoSection>
       <SupportSection>
         <h2>Support our work</h2>
-        <p>
-          We are committed to creating high-quality, open-source icons and admin template that are accessible to
-          everyone. If you find our work valuable and would like to support us, there are several ways you can do that.
-        </p>
+        <div>Any interest you have in this open source will support us.</div>
         <SupportItemList>
           <SupportItem>
             <h3>Contribute</h3>
-            <p>
+            <div>
               You can contribute in various ways, including code, documentation, and design. Share your ideas and skills
               to help us enhance the project!
-            </p>
+            </div>
+          </SupportItem>
+          <SupportItem>
+            <h3>Share</h3>
+            <div>
+              If you build a project using this open source, please share it with us. We will strive for better open
+              source.
+            </div>
           </SupportItem>
           <SupportItem>
             <h3>Sponsor us</h3>
-            <p>
+            <div>
               Your sponsorship directly impacts the maintenance and improvement of our project. We would greatly
-              appreciate your support through GitHub Sponsors or Open Collective!
-            </p>
+              appreciate your support.
+            </div>
           </SupportItem>
         </SupportItemList>
       </SupportSection>
@@ -191,24 +195,31 @@ const IntroSection = styled.section`
   button {
     box-shadow: 0px 0px 10px var(--primary);
   }
+  ${maxMedia.tablet} {
+    padding: 3rem 1rem;
+    flex-basis: calc(50% - 1rem);
+  }
 `;
 
 const Features = styled.div`
+  margin-top: 2rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 4rem;
 `;
 
 const Feature = styled.div`
-  margin: 0 1rem;
+  margin: 1rem;
   padding: 1rem;
   background: var(--gray-100);
   border-radius: 8px;
   font-weight: 300;
+  ${maxMedia.tablet} {
+    flex-basis: calc(40%);
+  }
 `;
 
-export const BMatesContainer = styled.div`
+const BMatesWrapper = styled.div`
   height: 60rem;
   border-radius: 0.5rem;
   box-shadow: 0px 0px 10px var(--gray-300);
@@ -217,8 +228,8 @@ export const BMatesContainer = styled.div`
   padding: 1rem;
 `;
 
-export const DemoSection = styled.section`
-  height: 100vh;
+const DemoSection = styled.section`
+  padding: 10rem 0rem;
   background: var(--gray-200);
   display: flex;
   align-items: center;
@@ -230,8 +241,13 @@ const BMatesStyled = styled(BMates)`
 
 const SupportSection = styled.section`
   padding: 5rem;
-  background: var(--gray-100);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  ${maxMedia.tablet} {
+    padding: 5rem 1rem;
+  }
 `;
 
 const SupportItemList = styled.div`
@@ -239,11 +255,19 @@ const SupportItemList = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 4rem;
+  gap: 1rem;
+  max-width: 70rem;
+  ${maxMedia.tablet} {
+    flex-direction: column;
+  }
 `;
 
 const SupportItem = styled.div`
   margin: 2rem 0;
   flex: 1;
+  ${maxMedia.tablet} {
+    margin: 0rem 0;
+  }
   h2 {
     margin: 1rem 0;
   }

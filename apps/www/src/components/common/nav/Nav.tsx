@@ -86,12 +86,21 @@ const NavLinkStyled = styled(Link)`
 
 export const NavItem = styled.li`
   margin-bottom: 0px;
+  ${maxMedia.mobile} {
+    button {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+  }
 `;
 
 export const NavDivider = styled.div`
   height: 1.25rem;
   margin: 0px 0.5rem;
   border-right: 1px solid var(--gray-300);
+  ${maxMedia.mobile} {
+    margin: 0px 0.5rem;
+  }
 `;
 
 export const NavBrand = styled(Link)`

@@ -48,7 +48,7 @@ export default function Footer() {
   );
 }
 const FooterStyle = styled.footer`
-  margin-top: 10rem;
+  margin-top: 8rem;
   border-top: 1px solid var(--hr);
 `;
 const FooterNavBar = styled(Container)`
@@ -56,8 +56,12 @@ const FooterNavBar = styled(Container)`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  ${maxMedia.tablet} {
+    padding: 3rem 1rem;
+  }
   ${maxMedia.mobile} {
     gap: 2rem;
+    padding: 3rem 1rem;
     flex-direction: column;
     align-items: flex-start;
   }

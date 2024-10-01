@@ -26,6 +26,6 @@ export const Navbar = styled.header`
   padding: 12px 16px;
 
   ${maxMedia.mobile} {
-    padding: 0rem;
+    padding: 0rem 1rem;
   }
 `;

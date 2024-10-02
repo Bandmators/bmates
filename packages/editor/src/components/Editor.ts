@@ -1,7 +1,7 @@
 import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
-import { EditorDataType, EditorStyleType, SongDataType } from '../types';
+import { EditorDataType, EditorStyleType, SongDataType, _EditorStyleType } from '../types';
 import { deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';
 import { Wave } from './Wave';
@@ -45,7 +45,7 @@ export class Editor extends Stage {
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
 
-  constructor(element: HTMLCanvasElement, data: EditorDataType[], style: Partial<EditorStyleType> = {}) {
+  constructor(element: HTMLCanvasElement, data: EditorDataType[], style: _EditorStyleType = {}) {
     super(element);
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;

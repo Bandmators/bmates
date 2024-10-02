@@ -1,13 +1,18 @@
-import { Editor, EditorDataType, EditorStyleType, SongDataType, TrackDataType, generateUniqueId } from '@bmates/editor';
+import {
+  Editor,
+  EditorDataType,
+  SongDataType,
+  TrackDataType,
+  _EditorStyleType,
+  generateUniqueId,
+} from '@bmates/editor';
 
 import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { DeepPartial } from './types/type';
-
 interface BMatesProps {
   data: EditorDataType[];
-  style?: DeepPartial<EditorStyleType>;
+  style?: _EditorStyleType;
   trackEl?: ({ track, muted }: { track: TrackDataType; muted: boolean; toggleMute: () => void }) => JSX.Element;
 }
 
@@ -19,15 +24,14 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   useEffect(() => {
     if (ref.current && !editor.current) {
-      // @ts-ignore
       editor.current = new Editor(ref.current, data, style);
       editor.current.on('data-change', () => {
         setData(editor.current?.data ? [...editor.current.data] : []);
       });
-      editor.current.on('pause', isPlaying => {
-        // @ts-ignore
-        setIsPlaying(isPlaying);
-      });
+      // editor.current.on('pause', isPlaying => {
+      //   // @ts-ignore
+      //   setIsPlaying(isPlaying);
+      // });
     }
     return () => {
       if (editor.current) {

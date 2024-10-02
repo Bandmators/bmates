@@ -12,6 +12,7 @@
     "editor": "pnpm -F @bmates/editor",
     "renderer": "pnpm -F @bmates/renderer",
     "studio": "pnpm -F @bmates/studio",
+    "dev:docs": "pnpm -F bmates-docs run dev",
     "prepare": "husky install"
   },
   "devDependencies": {

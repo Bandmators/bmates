@@ -148,3 +148,17 @@ editor.play();
 
 // editor.destory ();
 ```
+
+### exportTracks ()
+
+Returns the audio tracks as a Blob. This method utilizes the audio player to convert the current audio tracks into a downloadable format.
+
+- Return: `Promise<Blob>`
+
+### async downloadBlob (filename)
+
+Downloads the audio tracks as a Blob with the specified filename. This method calls the `exportTracks` function to get the Blob and then triggers the download.
+
+| Name     | Type     | Description                       |
+| -------- | -------- | --------------------------------- |
+| filename | `string` | The name of the file to download. |

@@ -111,6 +111,22 @@ Returns the total duration of all loaded tracks.
 
 - Return: `number`
 
+### async toBlob ()
+
+Converts the currently loaded audio tracks into a single Blob.
+This function merges the audio buffers of all tracks and transforms the merged audio buffer into a Blob.
+
+- Return: `Promise<Blob>`
+
+### async downloadBlob (filename)
+
+Downloads the Blob with the specified filename.
+This function calls the `toBlob` function to create the Blob and then uses the generated Blob to perform the file download.
+
+| Name     | Type     | Description                       |
+| -------- | -------- | --------------------------------- |
+| filename | `string` | The name of the file to download. |
+
 ## Usage Example
 
 ```typescript

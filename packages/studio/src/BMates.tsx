@@ -28,10 +28,10 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
       editor.current.on('data-change', () => {
         setData(editor.current?.data ? [...editor.current.data] : []);
       });
-      // editor.current.on('pause', isPlaying => {
-      //   // @ts-ignore
-      //   setIsPlaying(isPlaying);
-      // });
+      editor.current.on('pause', isPlaying => {
+        // @ts-ignore
+        setIsPlaying(isPlaying);
+      });
     }
     return () => {
       if (editor.current) {
@@ -58,6 +58,10 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const toggleMute = useCallback((trackId: string) => {
     editor.current?.mute(trackId);
   }, []);
+
+  const download = () => {
+    editor.current.downloadBlob('bmates_audio.mp3');
+  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -91,6 +95,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
         <Button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</Button>
         <Button onClick={toggleStopPlay}>Stop</Button>
         <input type="file" accept="audio/*" onChange={handleFileUpload} />
+        <Button onClick={download}>Download</Button>
         <Button
           onClick={() => {
             console.log(editor.current.export());

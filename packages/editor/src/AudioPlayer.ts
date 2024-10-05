@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SongDataType } from './types';
+import $ from './utils/$';
+import { bufferToBlob, encodeWAV, mergeAudioBuffers, writeString } from './utils/wav';
 
 type Audio = {
   song: SongDataType;
@@ -126,6 +128,29 @@ class AudioPlayer {
 
   getDuration() {
     return this._duration;
+  }
+
+  async toBlob() {
+    const audioBuffers: AudioBuffer[] = [];
+    const startTimes: number[] = [];
+
+    for (const audioMap of this.tracks.values()) {
+      for (const track of audioMap.values()) {
+        if (!track.song.mute) {
+          audioBuffers.push(track.source.buffer);
+          startTimes.push(track.song.start);
+        }
+      }
+    }
+
+    const mergedBuffer = mergeAudioBuffers(audioBuffers, startTimes);
+    const audioBlob = await bufferToBlob(mergedBuffer);
+    return audioBlob;
+  }
+
+  async downloadBlob(filename: string) {
+    const blob = await this.toBlob();
+    $.downloadObjectURL(filename, blob);
   }
 }
 

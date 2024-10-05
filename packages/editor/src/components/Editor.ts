@@ -338,4 +338,12 @@ export class Editor extends Stage {
   tree() {
     return this.children;
   }
+
+  exportTracks() {
+    return this._audioPlayer.toBlob();
+  }
+
+  async downloadBlob(filename: string) {
+    await this._audioPlayer.downloadBlob(filename);
+  }
 }

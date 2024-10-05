@@ -12,7 +12,7 @@ export class ContextMenu extends Node {
   private hoveredIndex = -1;
 
   constructor(protected style: EditorStyleType) {
-    super();
+    super({ listening: true });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

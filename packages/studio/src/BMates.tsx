@@ -1,23 +1,16 @@
-import {
-  Editor,
-  EditorDataType,
-  SongDataType,
-  TrackDataType,
-  _EditorStyleType,
-  generateUniqueId,
-} from '@bmates/editor';
+import { Editor, SongDataType, TrackDataType, _EditorStyleType, generateUniqueId } from '@bmates/editor';
 
 import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface BMatesProps {
-  data: EditorDataType[];
+  data: TrackDataType[];
   style?: _EditorStyleType;
   trackEl?: ({ track, muted }: { track: TrackDataType; muted: boolean; toggleMute: () => void }) => JSX.Element;
 }
 
 const BMates = ({ data, style, trackEl }: BMatesProps) => {
-  const [_data, setData] = useState<EditorDataType[]>(data);
+  const [_data, setData] = useState<TrackDataType[]>(data);
   const ref = useRef<HTMLCanvasElement | null>(null);
   const editor = useRef<Editor | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -26,7 +19,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     if (ref.current && !editor.current) {
       editor.current = new Editor(ref.current, data, style);
       editor.current.on('data-change', () => {
-        setData(editor.current?.data ? [...editor.current.data] : []);
+        setData(editor.current?.export());
       });
       editor.current.on('pause', isPlaying => {
         // @ts-ignore
@@ -55,8 +48,8 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     setIsPlaying(false);
   }, [isPlaying]);
 
-  const toggleMute = useCallback((trackId: string) => {
-    editor.current?.mute(trackId);
+  const toggleMuteTrack = useCallback((trackId: string) => {
+    editor.current?.muteTrack(trackId);
   }, []);
 
   const download = () => {
@@ -115,17 +108,15 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
             style={{ height: `${style.timeline.height + style.wave.margin / 2}px` }}
           ></div>
           <div className="bmates-sidebar-body">
-            {_data.map(item =>
-              item.tracks.map(track => (
-                <div
-                  key={`${item.name}_${track.category}`}
-                  className="bmates-track"
-                  style={{ height: `${style.wave.height + style.wave.margin}px` }}
-                >
-                  {trackEl({ track, muted: false, toggleMute: () => toggleMute(track.id) })}
-                </div>
-              )),
-            )}
+            {_data.map(track => (
+              <div
+                key={`${track.id}`}
+                className="bmates-track"
+                style={{ height: `${style.wave.height + style.wave.margin}px` }}
+              >
+                {trackEl({ track, muted: false, toggleMute: () => toggleMuteTrack(track.id) })}
+              </div>
+            ))}
           </div>
         </div>
         <canvas id="bmates-editor" className="bmates-editor" ref={ref} style={{ flexGrow: 1 }}></canvas>

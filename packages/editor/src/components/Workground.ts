@@ -1,7 +1,7 @@
 import { Container, EventData, Layer, Node, setCursor } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
-import { EditorDataType, EditorStyleType, SongDataType, TrackDataType } from '../types';
+import { EditorStyleType, SongDataType, TrackDataType } from '../types';
 import { Timeline, Track, TrackGroup, Wave } from './';
 import { Playhead } from './Playhead';
 import { Snapping } from './Snapping';
@@ -14,17 +14,18 @@ export class Workground extends Layer {
   private playhead!: Playhead;
   private timeIndicator!: TimeIndicator;
   private snapping!: Snapping;
+  private _trackGroup: TrackGroup;
 
   private _minScrollX = 0;
 
   constructor(
     protected canvas: HTMLCanvasElement,
     protected style: EditorStyleType,
-    data: EditorDataType[],
+    public data: TrackDataType[],
     private audioPlayer: AudioPlayer,
     private scroll = { x: 0, y: 0 },
   ) {
-    super();
+    super({ listening: true });
 
     this.x = 0;
     this.y = 0;
@@ -39,10 +40,11 @@ export class Workground extends Layer {
     this._initWaveEvent();
   }
 
-  private _initLayout(data: EditorDataType[]) {
-    data.forEach(tGroup => {
-      this.addTrackGroup(tGroup.tracks);
-    });
+  private _initLayout(data: TrackDataType[]) {
+    // this.addTrackGroup(data);
+    this._trackGroup = new TrackGroup();
+    this.add(this._trackGroup);
+    data.forEach(d => this.addTrack(d));
 
     this.timeline = new Timeline(this.style, 100, 0);
     this.timeline.zIndex = -1;
@@ -183,12 +185,12 @@ export class Workground extends Layer {
       checkSnapping(evt);
     });
     this.on('wave-draging', (evt: EventData) => {
-      checkSnapping(evt);
       if (evt.target instanceof Wave) {
         this.timeIndicator.setTime(evt.target.data.start);
         this.timeIndicator.x = evt.target.x;
         this.timeIndicator.y = evt.target.y + evt.target.height;
       }
+      checkSnapping(evt);
     });
     this.on('wave-dragend', () => {
       this.timeIndicator.visible = false;
@@ -200,17 +202,17 @@ export class Workground extends Layer {
     this.scroll.x = Math.max(x, this._minScrollX);
   }
 
-  addTrackGroup(data: TrackDataType[]) {
-    const group = new TrackGroup(data);
-    this.add(group);
-    data.forEach(d => this.addTrack(group, d.songs));
-    return group;
-  }
+  // addTrackGroup(data: TrackDataType[]) {
+  //   const group = new TrackGroup(data);
+  //   this.add(group);
+  //   data.forEach(d => this.addTrack(d.songs));
+  //   return group;
+  // }
 
-  addTrack(parent: TrackGroup, data: SongDataType[]) {
+  addTrack(data: TrackDataType) {
     const track = new Track(data);
-    parent.add(track);
-    data.forEach(d => this.addWave(track, d));
+    this._trackGroup.add(track);
+    data.songs.forEach(song => this.addWave(track, song));
     return track;
   }
 
@@ -240,6 +242,10 @@ export class Workground extends Layer {
     return this.playhead?.getCurrentTime() || 0;
   }
 
+  getTracks() {
+    return this._trackGroup.children.filter(child => child instanceof Track) as Track[];
+  }
+
   getWaves() {
     const findWaves = (children: (Node | Container)[]): Wave[] => {
       let waves: Wave[] = [];
@@ -252,7 +258,7 @@ export class Workground extends Layer {
       });
       return waves;
     };
-    return findWaves(this.children);
+    return findWaves(this._trackGroup.children);
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

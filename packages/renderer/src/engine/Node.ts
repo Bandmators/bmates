@@ -6,6 +6,7 @@ interface NodeAttributes {
   x: number;
   y: number;
   draggable: boolean;
+  listening: boolean;
   zIndex: number;
   visible: boolean;
 }
@@ -17,7 +18,7 @@ export abstract class Node extends Statable {
   width = 0;
   height = 0;
 
-  listening = true;
+  listening = false;
   visible = true;
   eventEnabled = true;
   draggable = false;
@@ -27,11 +28,10 @@ export abstract class Node extends Statable {
   dragStartY = 0;
   zIndex = 0;
 
-  _lastHoveredTarget: Node[] = [];
-
   constructor(attrs: Partial<NodeAttributes> = {}) {
     super();
     if (attrs) {
+      this.listening = attrs.listening ?? false;
       this.draggable = attrs.draggable ?? false;
       this.visible = attrs.visible ?? true;
     }
@@ -76,14 +76,18 @@ export abstract class Node extends Statable {
     this.on('mouseout', (evt: EventData) => {
       if (this.isDragging) {
         this.isDragging = false;
+        this.getStage().isDragging = false;
+        this.call('dragend', replaceEventDataType('dragend', evt), false);
       }
-      this.call('dragend', replaceEventDataType('dragend', evt), false);
     });
 
     this.on('mousedown', (evt: EventData) => {
       if (evt.originalEvent?.button !== 0) return;
+      const stage = this.getStage();
+      if (stage.isDragging) return;
 
       this.isDragging = true;
+      stage.isDragging = true;
       moveX = evt.originalEvent?.clientX;
       moveY = evt.originalEvent?.clientY;
       this.call('dragstart', replaceEventDataType('dragstart', evt), false);
@@ -118,6 +122,7 @@ export abstract class Node extends Statable {
     this.on('mouseup', (evt: EventData) => {
       if (this.isDragging) {
         this.isDragging = false;
+        this.getStage().isDragging = false;
         this.call('dragend', replaceEventDataType('dragend', evt));
       }
     });
@@ -125,6 +130,7 @@ export abstract class Node extends Statable {
     this.on('mouseleave', (evt: EventData) => {
       if (this.isDragging) {
         this.isDragging = false;
+        this.getStage().isDragging = false;
         this.call('dragend', replaceEventDataType('dragend', evt));
       }
     });
@@ -134,5 +140,13 @@ export abstract class Node extends Statable {
     if (this.parent) {
       this.parent.remove(this);
     }
+  }
+
+  getStage() {
+    let current = this.parent;
+    while (current && current.parent) {
+      current = current.parent;
+    }
+    return current;
   }
 }

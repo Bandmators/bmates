@@ -14,12 +14,13 @@ export type SongDataType<T extends string = string> = {
 export type TrackDataType<T extends string = string> = {
   id: string;
   category: string;
+  mute?: boolean;
   songs: SongDataType<T>[];
 };
-export type EditorDataType<T extends string = string> = {
-  name: string;
-  tracks: TrackDataType<T>[];
-};
+// export type EditorDataType<T extends string = string> = {
+//   name: string;
+//   tracks: TrackDataType<T>[];
+// };
 // export type BandData = {
 //   start: number;
 //   long: number;

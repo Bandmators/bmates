@@ -1,19 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventData, Node } from '@bmates/renderer';
 
+import { generateUniqueId } from 'src/utils';
+
 import { EditorStyleType, SongDataType } from '../types';
+import { Editor } from './Editor';
+import { Track } from './Track';
+import { Workground } from './Workground';
 
 export class Wave extends Node {
   override name = 'Wave';
 
   private waveform: Float32Array;
   private _selected = false;
+  private _snappingY: number | null = null; // 스내핑될 y 위치를 저장하는 변수 추가
 
   constructor(
     public data: SongDataType,
     private style: EditorStyleType,
   ) {
-    super({ draggable: true });
+    super({ draggable: true, listening: true });
 
     this.x = this.style.timeline.gapWidth * (this.data.start * 10);
     this.y =
@@ -56,6 +62,16 @@ export class Wave extends Node {
 
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
+
+    // 드래그 중일 때 스내핑될 공간 표시
+    if (this.isDragging && this._snappingY !== null) {
+      ctx.beginPath();
+
+      ctx.fillStyle = '#c3c3c388'; // 회색으로 설정
+      ctx.roundRect(this.x, this._snappingY, this.width, this.height, this.style.wave.borderRadius); // 스내핑될 위치에 사각형 그리기
+      ctx.fill();
+      ctx.closePath();
+    }
 
     if (this.data.mute) {
       ctx.globalAlpha = 0.5;
@@ -132,29 +148,65 @@ export class Wave extends Node {
 
   private _initDrag() {
     this.on('dragstart', (evt: EventData) => {
+      this.zIndex = 1000;
+      this.parent.zIndex = 1000;
       this.parent.call('wave-dragstart', evt);
     });
     this.on('draging', (evt: EventData) => {
       if (evt.data) {
         // block vertical move
-        this.y = evt.data.prevY;
-
         if (this.x < 0) {
           this.x = 0;
           return;
         }
 
-        const isCollision = this.checkCollision(evt.data.newX);
-        if (isCollision || this.data.lock) {
+        if (this.data.lock) {
           // block horizontal move, if collision
-          this.x = evt.data.prevX;
+          // this.x = evt.data.prevX;
         } else {
           this.data.start = this.x / (this.style.timeline.gapWidth * 10);
           this.parent.call('wave-draging', evt);
+
+          const newGroup = Math.max(
+            0,
+            Math.floor((this.y - this.style.wave.margin) / (this.style.wave.height + this.style.wave.margin)),
+          );
+          this.data.group = newGroup;
+          this._snappingY =
+            this.style.timeline.height +
+            this.style.wave.margin +
+            newGroup * (this.style.wave.height + this.style.wave.margin);
         }
       }
     });
     this.on('dragend', (evt: EventData) => {
+      if (this._snappingY) {
+        this.zIndex = 0;
+        this.parent.zIndex = 0;
+
+        this.y = this._snappingY;
+        this._snappingY = null;
+
+        const parentTrack = this.parent as Track;
+        const parentWorkground = parentTrack.parent.parent as Workground;
+        const editor = parentWorkground.parent as Editor;
+        let newParent = parentWorkground.getTracks()[this.data.group] as Track;
+
+        const index = parentTrack.children.indexOf(this);
+        if (index !== -1) {
+          parentTrack.children.splice(index, 1);
+        }
+
+        if (!newParent) {
+          newParent = parentWorkground.addTrack({
+            id: generateUniqueId(),
+            category: 'New Category',
+            songs: [],
+          });
+          editor.call('data-change', { data: this.data, target: this }, false);
+        }
+        newParent.add(this);
+      }
       this.parent.call('wave-dragend', evt);
     });
   }
@@ -177,5 +229,9 @@ export class Wave extends Node {
 
   setSelected(selected: boolean) {
     this._selected = selected;
+  }
+
+  export() {
+    return this.data;
   }
 }

@@ -1,4 +1,4 @@
-import { EditorDataType, EditorStyleType } from '@bmates/editor';
+import { EditorStyleType, TrackDataType } from '@bmates/editor';
 
 import { BMatesProvider, Button } from 'bmates-ui';
 import { useState } from 'react';
@@ -7,58 +7,48 @@ import './App.css';
 import BMates from './BMates';
 import { DeepPartial } from './types/type';
 
-const data: EditorDataType[] = [
+const data: TrackDataType[] = [
   {
-    name: 'bgm',
-    tracks: [
+    id: 'TEMP0',
+    category: 'Category 1',
+    songs: [
       {
-        id: 'TEMP0',
-        category: 'Category 1',
-        songs: [
-          {
-            id: 'BMATEST0',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
-            user: '',
-            start: 0,
-            group: 0,
-            instrument: 'Piano',
-          },
-          {
-            id: 'BMATEST1',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
-            user: '',
-            start: 9,
-            group: 0,
-            instrument: 'Drum',
-          },
-        ],
+        id: 'BMATEST0',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
+        user: '',
+        start: 0,
+        group: 0,
+        instrument: 'Piano',
+      },
+      {
+        id: 'BMATEST1',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
+        user: '',
+        start: 9,
+        group: 0,
+        instrument: 'Drum',
       },
     ],
   },
   {
-    name: 'effect',
-    tracks: [
+    id: 'TEMP1',
+    category: 'Category 2',
+    songs: [
       {
-        id: 'TEMP1',
-        category: 'Category 2',
-        songs: [
-          {
-            id: 'BMATEST3',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
-            user: '',
-            start: 3,
-            group: 1,
-            instrument: 'Piano',
-          },
-          {
-            id: 'BMATEST4',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
-            user: '',
-            start: 10.0,
-            group: 1,
-            instrument: 'Guitar',
-          },
-        ],
+        id: 'BMATEST3',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
+        user: '',
+        start: 3,
+        group: 1,
+        instrument: 'Piano',
+      },
+      {
+        id: 'BMATEST4',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
+        user: '',
+        start: 10.0,
+        group: 1,
+        instrument: 'Guitar',
       },
     ],
   },

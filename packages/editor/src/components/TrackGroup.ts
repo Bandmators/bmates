@@ -1,11 +1,9 @@
 import { Group } from '@bmates/renderer';
 
-import { TrackDataType } from '../types';
-
 export class TrackGroup extends Group {
   override name = 'TrackGroup';
 
-  constructor(private data: TrackDataType[] = []) {
+  constructor() {
     super();
   }
 

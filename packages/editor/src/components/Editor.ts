@@ -1,15 +1,16 @@
 import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
-import { EditorDataType, EditorStyleType, SongDataType, _EditorStyleType } from '../types';
+import { EditorStyleType, SongDataType, TrackDataType, _EditorStyleType } from '../types';
 import { deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';
+import { Track } from './Track';
 import { Wave } from './Wave';
 import { Workground } from './Workground';
 
 export class Editor extends Stage {
   override name = 'BEditor';
-  data: EditorDataType[] = [];
+  data: TrackDataType[] = [];
   style: EditorStyleType = {
     theme: {
       background: 'white',
@@ -45,7 +46,7 @@ export class Editor extends Stage {
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
 
-  constructor(element: HTMLCanvasElement, data: EditorDataType[], style: _EditorStyleType = {}) {
+  constructor(element: HTMLCanvasElement, data: TrackDataType[], style: _EditorStyleType = {}) {
     super(element);
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;
@@ -61,20 +62,18 @@ export class Editor extends Stage {
     window.addEventListener('resize', this._resizeListener);
   }
 
-  private async init(): Promise<void> {
+  private async init() {
     await this._loadTrackBuffers();
     this._initLayout();
     this._initEvent();
   }
 
-  private async _loadTrackBuffers(): Promise<void> {
-    const loadPromises = this.data.flatMap(item =>
-      item.tracks.flatMap(track => {
-        return track.songs.map(song => {
-          return this._audioPlayer.prepareTrack(song, track.id);
-        });
-      }),
-    );
+  private async _loadTrackBuffers() {
+    const loadPromises = this.data.flatMap(track => {
+      return track.songs.map(song => {
+        return this._audioPlayer.prepareTrack(song, track);
+      });
+    });
     await Promise.all(loadPromises);
   }
 
@@ -212,6 +211,10 @@ export class Editor extends Stage {
     this._audioPlayer?.stop();
   }
 
+  muteTrack(trackId: string, isMuted: boolean | undefined = undefined) {
+    this._audioPlayer.muteTrack(trackId, isMuted);
+  }
+
   mute(trackId: string, isMuted: boolean | undefined = undefined) {
     this._audioPlayer.mute(trackId, isMuted);
   }
@@ -223,19 +226,17 @@ export class Editor extends Stage {
   async addWave(song: SongDataType) {
     const trackId = generateUniqueId();
     const audioId = generateUniqueId();
-    await this._audioPlayer.prepareTrack(song, trackId);
-
-    const newTrackGroup = {
+    const newTrack = {
       id: trackId,
       category: 'New Category',
+      mute: false,
       songs: [song],
     };
 
-    this._workground.addTrackGroup([newTrackGroup]);
-    this.data.push({
-      name: 'New Track',
-      tracks: [newTrackGroup],
-    });
+    await this._audioPlayer.prepareTrack(song, newTrack);
+
+    this._workground.addTrack(newTrack);
+    this.data.push(newTrack);
     // const trackGroup = this._workground.children[0] as TrackGroup;
     // const track = trackGroup.children[0] as Track;
     // const wave = new Wave(song, this.style);
@@ -280,16 +281,11 @@ export class Editor extends Stage {
       case 'Delete':
         this._selectedNodes.forEach(node => {
           this.data = this.data
-            .map(editorData => ({
-              ...editorData,
-              tracks: editorData.tracks
-                .map(track => ({
-                  ...track,
-                  songs: track.songs.filter(song => song.id !== node.data.id),
-                }))
-                .filter(track => track.songs.length > 0),
+            .map(track => ({
+              ...track,
+              songs: track.songs.filter(song => song.id !== node.data.id),
             }))
-            .filter(editorData => editorData.tracks.length > 0);
+            .filter(track => track.songs.length > 0);
           node.destroy();
         });
         break;
@@ -311,9 +307,9 @@ export class Editor extends Stage {
     }
   }
 
-  addEditorData(data: EditorDataType) {
-    this.data.push(data);
-  }
+  // addEditorData(data: TrackDataType) {
+  //   this.data.push(data);
+  // }
 
   async paste(nodes: SongDataType[] = this._clipboard) {
     if (nodes.length > 0) {
@@ -332,6 +328,18 @@ export class Editor extends Stage {
   }
 
   export() {
+    return this._workground
+      .getTracks()
+      .map(child => {
+        if (child instanceof Track) {
+          return child.export();
+        }
+        return null; // Track이 아닌 경우 null 반환
+      })
+      .filter(track => track !== null); // null 제거
+  }
+
+  oldExport() {
     return this.data;
   }
 

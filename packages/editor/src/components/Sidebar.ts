@@ -1,6 +1,6 @@
 import { Group, Node } from '@bmates/renderer';
 
-import { EditorDataType, EditorStyleType, TrackDataType } from '../types';
+import { EditorStyleType, TrackDataType } from '../types';
 
 class SideTrack extends Node {
   constructor(
@@ -35,16 +35,14 @@ export class Sidebar extends Group {
 
   constructor(
     protected style: EditorStyleType,
-    data: EditorDataType[],
+    data: TrackDataType[],
   ) {
     super();
 
     let y = 50;
-    data.forEach(editorData => {
-      editorData.tracks.forEach(track => {
-        this.add(new SideTrack(0, y, track, this.style));
-        y += this.style.wave.height;
-      });
+    data.forEach(track => {
+      this.add(new SideTrack(0, y, track, this.style));
+      y += this.style.wave.height;
     });
   }
 

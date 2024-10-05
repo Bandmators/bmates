@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { SongDataType } from './types';
+import { SongDataType, TrackDataType } from './types';
 import $ from './utils/$';
 import { bufferToBlob, encodeWAV, mergeAudioBuffers, writeString } from './utils/wav';
 
@@ -11,7 +11,7 @@ type Audio = {
 
 class AudioPlayer {
   private audioContext: AudioContext | null = null;
-  private tracks: Map<string, Map<string, Audio>> = new Map();
+  private tracks: Map<string, { mute: boolean; songs: Map<string, Audio> }> = new Map();
   private _duration: number = 0;
 
   createContext() {
@@ -29,7 +29,7 @@ class AudioPlayer {
     return await context.decodeAudioData(arrayBuffer);
   }
 
-  async prepareTrack(song: SongDataType, trackId: string) {
+  async prepareTrack(song: SongDataType, track: TrackDataType) {
     const buffer = await this.loadAudioBuffer(song.src);
     const context = this.createContext();
     const source = context.createBufferSource();
@@ -41,10 +41,10 @@ class AudioPlayer {
     song.long = buffer.duration;
     this._duration = Math.max(this._duration, song.start + song.long);
 
-    if (!this.tracks.has(trackId)) {
-      this.tracks.set(trackId, new Map());
+    if (!this.tracks.has(track.id)) {
+      this.tracks.set(track.id, { mute: false, songs: new Map() });
     }
-    this.tracks.get(trackId)!.set(song.id, { song, source, gain: gainNode });
+    this.tracks.get(track.id)!.songs.set(song.id, { song, source, gain: gainNode });
   }
 
   play(startTime: number = 0): void {
@@ -52,7 +52,7 @@ class AudioPlayer {
     const currentTime = this.audioContext.currentTime;
 
     this.tracks.forEach((audioMap, trackId) => {
-      audioMap.forEach((track, audioId) => {
+      audioMap.songs.forEach((track, audioId) => {
         if (track.source) {
           try {
             track.source.stop();
@@ -69,14 +69,14 @@ class AudioPlayer {
 
         newSource.start(currentTime + trackStartTime, sourceStartTime);
 
-        audioMap.set(audioId, { ...track, source: newSource });
+        audioMap.songs.set(audioId, { ...track, source: newSource });
       });
     });
   }
 
   pause(): void {
     this.tracks.forEach(audioMap => {
-      audioMap.forEach(track => {
+      audioMap.songs.forEach(track => {
         if (track.source) {
           try {
             track.source.stop();
@@ -88,10 +88,24 @@ class AudioPlayer {
     });
   }
 
+  muteTrack(trackId: string, isMuted: boolean | undefined = undefined) {
+    const track = this.tracks.get(trackId);
+    if (track) {
+      if (isMuted === undefined) {
+        isMuted = !track.mute;
+      }
+      track.mute = isMuted;
+
+      track.songs.forEach(audio => {
+        audio.gain.gain.value = isMuted ? 0 : 1;
+      });
+    }
+  }
+
   mute(trackId: string, isMuted: boolean | undefined = undefined) {
     const track = this.tracks.get(trackId);
     if (track) {
-      track.forEach(audio => {
+      track.songs.forEach(audio => {
         if (isMuted === undefined) {
           isMuted = !audio.song.mute;
         }
@@ -104,12 +118,12 @@ class AudioPlayer {
   isMuted(trackId: string) {
     const track = this.tracks.get(trackId);
     if (!track) return false;
-    return Array.from(track.values()).some(audio => audio.song.mute);
+    return Array.from(track.songs.values()).some(audio => audio.song.mute);
   }
 
   stop(): void {
     this.tracks.forEach(audioMap => {
-      audioMap.forEach(track => {
+      audioMap.songs.forEach(track => {
         if (track.source) {
           try {
             track.source.stop();
@@ -123,7 +137,7 @@ class AudioPlayer {
   }
 
   getAudioBuffer(trackId: string): AudioBuffer | undefined {
-    return this.tracks.get(trackId)?.values().next().value.source.buffer;
+    return this.tracks.get(trackId)?.songs.values().next().value.source.buffer;
   }
 
   getDuration() {
@@ -135,7 +149,7 @@ class AudioPlayer {
     const startTimes: number[] = [];
 
     for (const audioMap of this.tracks.values()) {
-      for (const track of audioMap.values()) {
+      for (const track of audioMap.songs.values()) {
         if (!track.song.mute) {
           audioBuffers.push(track.source.buffer);
           startTimes.push(track.song.start);

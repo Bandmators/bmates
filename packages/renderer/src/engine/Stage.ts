@@ -2,7 +2,9 @@ import { EVENT_LIST } from '../constants/event';
 import { EventType } from '../types';
 import { getRelativeMousePosition } from '../utils';
 import { dispatchEventData } from '../utils/event';
-import { Container, Layer, Node } from './';
+import { Container } from './Container';
+import { Layer } from './Layer';
+import { Node } from './Node';
 
 export abstract class Stage extends Container<Layer> {
   override name = 'Stage';
@@ -21,7 +23,7 @@ export abstract class Stage extends Container<Layer> {
   protected prevTime = performance.now();
 
   constructor(element: HTMLCanvasElement) {
-    super();
+    super({ listening: true });
 
     this.canvas = element;
     this.ctx = this.canvas.getContext('2d')!;

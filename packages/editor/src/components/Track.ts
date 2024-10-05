@@ -1,11 +1,12 @@
-import { Group } from '@bmates/renderer';
+import { Container } from '@bmates/renderer';
 
-import { SongDataType } from '../types';
+import { TrackDataType } from '../types';
+import { Wave } from './Wave';
 
-export class Track extends Group {
+export class Track extends Container<Wave> {
   override name = 'Track';
 
-  constructor(private data: SongDataType[]) {
+  constructor(public data: TrackDataType) {
     super();
     // this.data.forEach(child => this.add(new Wave(child)));
   }
@@ -14,4 +15,11 @@ export class Track extends Group {
   override update(_dT: number) {}
 
   override draw(_ctx: CanvasRenderingContext2D) {}
+
+  export() {
+    return {
+      ...this.data,
+      songs: this.children.map(wave => wave.export()),
+    };
+  }
 }

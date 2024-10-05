@@ -22,7 +22,7 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
     let hitChild = null;
     for (let i = this.children.length - 1; i >= 0; i--) {
       const hit = this.children[i].hitTest(point, e);
-      if (hit && !hitChild) hitChild = hit;
+      if ((hit && !hitChild) || (hit && hit.isDragging)) hitChild = hit;
     }
     if (hitChild) return hitChild;
     return super.hitTest(point, e);
@@ -32,7 +32,7 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
     super._tick(dT, ctx);
     // this.children.forEach(child => child._tick(dT, ctx));
 
-    const sortedChildren = this.children.slice().sort((a, b) => a.zIndex - b.zIndex);
+    const sortedChildren = [...this.children].sort((a, b) => a.zIndex - b.zIndex);
     sortedChildren.forEach(child => child._tick(dT, ctx));
   }
 }

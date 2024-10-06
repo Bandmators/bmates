@@ -1,5 +1,7 @@
 import { Container, EventData, Layer, Node, setCursor } from '@bmates/renderer';
 
+import { generateUniqueId } from 'src/utils';
+
 import AudioPlayer from '../AudioPlayer';
 import { EditorStyleType, SongDataType, TrackDataType } from '../types';
 import { Timeline, Track, TrackGroup, Wave } from './';
@@ -181,8 +183,8 @@ export class Workground extends Layer {
         this.timeIndicator.x = evt.target.x;
         this.timeIndicator.y = evt.target.y + evt.target.height;
       }
-
-      checkSnapping(evt);
+      snappingClientX = -1;
+      if (!evt.originalEvent.shiftKey) checkSnapping(evt);
     });
     this.on('wave-draging', (evt: EventData) => {
       if (evt.target instanceof Wave) {
@@ -190,7 +192,7 @@ export class Workground extends Layer {
         this.timeIndicator.x = evt.target.x;
         this.timeIndicator.y = evt.target.y + evt.target.height;
       }
-      checkSnapping(evt);
+      if (!evt.originalEvent.shiftKey) checkSnapping(evt);
     });
     this.on('wave-dragend', () => {
       this.timeIndicator.visible = false;
@@ -209,7 +211,13 @@ export class Workground extends Layer {
   //   return group;
   // }
 
-  addTrack(data: TrackDataType) {
+  addTrack(
+    data: TrackDataType = {
+      id: generateUniqueId(),
+      category: 'New Category',
+      songs: [],
+    },
+  ) {
     const track = new Track(data);
     this._trackGroup.add(track);
     data.songs.forEach(song => this.addWave(track, song));

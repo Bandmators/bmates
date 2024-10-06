@@ -69,10 +69,8 @@ export class Editor extends Stage {
   }
 
   private async _loadTrackBuffers() {
-    const loadPromises = this.data.flatMap(track => {
-      return track.songs.map(song => {
-        return this._audioPlayer.prepareTrack(song, track);
-      });
+    const loadPromises = this.data.map(track => {
+      return this._audioPlayer.prepareTrack(track);
     });
     await Promise.all(loadPromises);
   }
@@ -215,8 +213,8 @@ export class Editor extends Stage {
     this._audioPlayer.muteTrack(trackId, isMuted);
   }
 
-  mute(trackId: string, isMuted: boolean | undefined = undefined) {
-    this._audioPlayer.mute(trackId, isMuted);
+  mute(trackId: string, songId: string, isMuted: boolean | undefined = undefined) {
+    this._audioPlayer.mute(trackId, songId, isMuted);
   }
 
   isMuted(trackId: string) {
@@ -233,7 +231,7 @@ export class Editor extends Stage {
       songs: [song],
     };
 
-    await this._audioPlayer.prepareTrack(song, newTrack);
+    await this._audioPlayer.prepareTrack(newTrack);
 
     this._workground.addTrack(newTrack);
     this.data.push(newTrack);
@@ -261,11 +259,13 @@ export class Editor extends Stage {
       case 'Mute':
         this._selectedNodes.forEach(node => {
           node.data.mute = true;
+          this.mute((node.parent as Track).data.id, node.data.id, true);
         });
         break;
       case 'Unmute':
         this._selectedNodes.forEach(node => {
           node.data.mute = false;
+          this.mute((node.parent as Track).data.id, node.data.id, false);
         });
         break;
       case 'Lock':

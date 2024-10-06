@@ -11,7 +11,7 @@ type Audio = {
 
 class AudioPlayer {
   private audioContext: AudioContext | null = null;
-  private tracks: Map<string, { mute: boolean; songs: Map<string, Audio> }> = new Map();
+  private tracks: Map<string, { data: TrackDataType; songs: Map<string, Audio> }> = new Map();
   private _duration: number = 0;
 
   createContext() {
@@ -29,22 +29,26 @@ class AudioPlayer {
     return await context.decodeAudioData(arrayBuffer);
   }
 
-  async prepareTrack(song: SongDataType, track: TrackDataType) {
-    const buffer = await this.loadAudioBuffer(song.src);
-    const context = this.createContext();
-    const source = context.createBufferSource();
-    source.buffer = buffer;
+  async prepareTrack(track: TrackDataType) {
+    const loadPromises = track.songs.map(async song => {
+      const buffer = await this.loadAudioBuffer(song.src);
+      const context = this.createContext();
+      const source = context.createBufferSource();
+      source.buffer = buffer;
 
-    const gainNode = context.createGain();
-    gainNode.connect(context.destination);
-    song.source = source;
-    song.long = buffer.duration;
-    this._duration = Math.max(this._duration, song.start + song.long);
+      const gainNode = context.createGain();
+      gainNode.connect(context.destination);
+      song.source = source;
+      song.long = buffer.duration;
+      this._duration = Math.max(this._duration, song.start + song.long);
 
-    if (!this.tracks.has(track.id)) {
-      this.tracks.set(track.id, { mute: false, songs: new Map() });
-    }
-    this.tracks.get(track.id)!.songs.set(song.id, { song, source, gain: gainNode });
+      if (!this.tracks.has(track.id)) {
+        this.tracks.set(track.id, { data: track, songs: new Map() });
+      }
+      this.tracks.get(track.id)!.songs.set(song.id, { song, source, gain: gainNode });
+    });
+
+    await Promise.all(loadPromises);
   }
 
   play(startTime: number = 0): void {
@@ -92,9 +96,9 @@ class AudioPlayer {
     const track = this.tracks.get(trackId);
     if (track) {
       if (isMuted === undefined) {
-        isMuted = !track.mute;
+        isMuted = !track.data.mute;
       }
-      track.mute = isMuted;
+      track.data.mute = isMuted;
 
       track.songs.forEach(audio => {
         audio.gain.gain.value = isMuted ? 0 : 1;
@@ -102,16 +106,17 @@ class AudioPlayer {
     }
   }
 
-  mute(trackId: string, isMuted: boolean | undefined = undefined) {
+  mute(trackId: string, songId: string, isMuted: boolean | undefined = undefined) {
     const track = this.tracks.get(trackId);
     if (track) {
-      track.songs.forEach(audio => {
+      const audio = track.songs.get(songId);
+      if (audio) {
         if (isMuted === undefined) {
           isMuted = !audio.song.mute;
         }
         audio.song.mute = isMuted;
         audio.gain.gain.value = isMuted ? 0 : 1;
-      });
+      }
     }
   }
 

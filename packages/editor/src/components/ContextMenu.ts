@@ -5,7 +5,7 @@ import { Wave } from './Wave';
 
 export class ContextMenu extends Node {
   private open = false;
-  private menuItems = ['Add Track', 'Mute Track', 'Paste'];
+  private menuItems = ['Add Track', 'Paste'];
   private additionalMenuItems = ['Duplicate', 'Cut', 'Copy', 'Delete'];
   private _menus: string[] = [];
   private position = { x: 0, y: 0 };

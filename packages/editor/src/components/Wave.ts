@@ -13,7 +13,8 @@ export class Wave extends Node {
 
   private waveform: Float32Array;
   private _selected = false;
-  private _snappingY: number | null = null; // 스내핑될 y 위치를 저장하는 변수 추가
+  private _snappingY: number | null = null;
+  private _isCollision = false;
 
   constructor(
     public data: SongDataType,
@@ -29,13 +30,13 @@ export class Wave extends Node {
     this.width = this.style.timeline.gapWidth * (this.data.long * 10);
     this.height = this.style.wave.height;
 
-    this.waveform = this.extractWaveform(this.data.source.buffer);
+    this.waveform = this._extractWaveform(this.data.source.buffer);
 
     // this._initEvent();
     this._initDrag();
   }
 
-  private extractWaveform(buffer: AudioBuffer) {
+  private _extractWaveform(buffer: AudioBuffer) {
     if (!buffer || !buffer.length) return new Float32Array();
     const channelData = buffer.getChannelData(0);
     const sampleMount = Math.min(channelData.length, 100);
@@ -63,17 +64,9 @@ export class Wave extends Node {
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
-    // 드래그 중일 때 스내핑될 공간 표시
-    if (this.isDragging && this._snappingY !== null) {
-      ctx.beginPath();
+    if (this.isDragging) this._drawPrediction(ctx);
 
-      ctx.fillStyle = '#c3c3c388'; // 회색으로 설정
-      ctx.roundRect(this.x, this._snappingY, this.width, this.height, this.style.wave.borderRadius); // 스내핑될 위치에 사각형 그리기
-      ctx.fill();
-      ctx.closePath();
-    }
-
-    if (this.data.mute) {
+    if (this.data.mute || (this.parent as Track).data.mute) {
       ctx.globalAlpha = 0.5;
     }
 
@@ -88,14 +81,35 @@ export class Wave extends Node {
       ctx.lineWidth = 2;
       ctx.stroke();
     }
-
-    // ctx.clip();
-    if (this.waveform) this.drawSmoothWave(ctx);
+    if (this.waveform) this._drawSmoothWave(ctx);
 
     ctx.restore();
   }
 
-  private drawSmoothWave(ctx: CanvasRenderingContext2D) {
+  private _drawPrediction(ctx: CanvasRenderingContext2D) {
+    if (this._isCollision || this.data.group < 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      const lineY =
+        this.style.timeline.height +
+        (this.style.wave.height + this.style.wave.margin) * (this.data.group + 1) +
+        this.style.wave.margin / 2;
+      ctx.moveTo(0, lineY);
+      ctx.lineTo(10000, lineY);
+      ctx.stroke();
+      ctx.closePath();
+    } else if (this._snappingY !== null) {
+      ctx.beginPath();
+
+      ctx.fillStyle = '#c3c3c388';
+      ctx.roundRect(this.x, this._snappingY, this.width, this.height, this.style.wave.borderRadius);
+      ctx.fill();
+      ctx.closePath();
+    }
+  }
+
+  private _drawSmoothWave(ctx: CanvasRenderingContext2D) {
     const marginHeight = 8;
     const middleY = this.y + this.height / 2;
     const scaleY = this.height / 2 - marginHeight;
@@ -154,29 +168,40 @@ export class Wave extends Node {
     });
     this.on('draging', (evt: EventData) => {
       if (evt.data) {
-        // block vertical move
+        if (this.data.lock) return;
         if (this.x < 0) {
           this.x = 0;
           return;
         }
-
-        if (this.data.lock) {
-          // block horizontal move, if collision
-          // this.x = evt.data.prevX;
-        } else {
-          this.data.start = this.x / (this.style.timeline.gapWidth * 10);
-          this.parent.call('wave-draging', evt);
-
-          const newGroup = Math.max(
-            0,
-            Math.floor((this.y - this.style.wave.margin) / (this.style.wave.height + this.style.wave.margin)),
-          );
-          this.data.group = newGroup;
-          this._snappingY =
-            this.style.timeline.height +
-            this.style.wave.margin +
-            newGroup * (this.style.wave.height + this.style.wave.margin);
+        if (evt.originalEvent.shiftKey) {
+          this.x = evt.data.prevX;
         }
+
+        const parentTrack = this.parent as Track;
+        const parentWorkground = parentTrack.parent.parent as Workground;
+
+        this.data.start = this.x / (this.style.timeline.gapWidth * 10);
+        parentTrack.call('wave-draging', evt);
+
+        const newGroup = Math.min(
+          Math.max(
+            -1,
+            Math.floor((this.y - this.style.wave.margin) / (this.style.wave.height + this.style.wave.margin)),
+          ),
+          parentWorkground.getTracks().length,
+        );
+        this.data.group = newGroup;
+        this._snappingY =
+          this.style.timeline.height +
+          this.style.wave.margin +
+          newGroup * (this.style.wave.height + this.style.wave.margin);
+
+        const otherWaves = parentWorkground
+          .getWaves()
+          .filter(child => child !== evt.target && child.data.group === newGroup);
+        this._isCollision = otherWaves.some(wave => {
+          return this.x < wave.x + wave.width && this.x + this.width > wave.x;
+        });
       }
     });
     this.on('dragend', (evt: EventData) => {
@@ -190,41 +215,50 @@ export class Wave extends Node {
         const parentTrack = this.parent as Track;
         const parentWorkground = parentTrack.parent.parent as Workground;
         const editor = parentWorkground.parent as Editor;
-        let newParent = parentWorkground.getTracks()[this.data.group] as Track;
 
         const index = parentTrack.children.indexOf(this);
         if (index !== -1) {
           parentTrack.children.splice(index, 1);
         }
 
-        if (!newParent) {
-          newParent = parentWorkground.addTrack({
-            id: generateUniqueId(),
-            category: 'New Category',
-            songs: [],
+        if (this._isCollision || this.data.group < 0) {
+          const otherWaves = parentWorkground.getWaves();
+          otherWaves.forEach(wave => {
+            if (wave.data.group > this.data.group) {
+              wave.data.group++;
+              wave.repositioning();
+            }
           });
+          this.data.group++;
+          this.repositioning();
+
+          const newParent = parentWorkground.addTrack();
           editor.call('data-change', { data: this.data, target: this }, false);
+          newParent.add(this);
+        } else {
+          let newParent = parentWorkground.getTracks()[this.data.group] as Track;
+          if (!newParent) {
+            newParent = parentWorkground.addTrack();
+            editor.call('data-change', { data: this.data, target: this }, false);
+          }
+          newParent.add(this);
         }
-        newParent.add(this);
       }
+      this._isCollision = false;
       this.parent.call('wave-dragend', evt);
     });
-  }
-
-  private checkCollision(newX: number): boolean {
-    const otherWaves = this.parent.children.filter(child => child instanceof Wave && child !== this);
-
-    for (const wave of otherWaves) {
-      if (newX < wave.x + wave.width && newX + this.width > wave.x) {
-        return true;
-      }
-    }
-    return false;
   }
 
   setX(x: number) {
     this.x = x;
     this.data.start = x / (this.style.timeline.gapWidth * 10);
+  }
+
+  repositioning() {
+    this.y =
+      this.style.timeline.height +
+      (this.style.wave.height + this.style.wave.margin) * this.data.group +
+      this.style.wave.margin;
   }
 
   setSelected(selected: boolean) {

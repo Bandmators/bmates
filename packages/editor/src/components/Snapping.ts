@@ -18,7 +18,6 @@ export class Snapping extends Node {
     ctx.moveTo(this.x, 0);
     ctx.lineTo(this.x, ctx.canvas.height);
     ctx.lineWidth = 1;
-    ctx.setLineDash([10]);
     ctx.stroke();
     ctx.restore();
   }

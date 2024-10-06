@@ -1,4 +1,4 @@
-import { Container, EventData, Layer, Node, setCursor } from '@bmates/renderer';
+import { EventData, Layer, setCursor } from '@bmates/renderer';
 
 import { generateUniqueId } from 'src/utils';
 
@@ -16,7 +16,7 @@ export class Workground extends Layer {
   private playhead!: Playhead;
   private timeIndicator!: TimeIndicator;
   private snapping!: Snapping;
-  private _trackGroup: TrackGroup;
+  _trackGroup: TrackGroup;
 
   private _minScrollX = 0;
 
@@ -204,13 +204,6 @@ export class Workground extends Layer {
     this.scroll.x = Math.max(x, this._minScrollX);
   }
 
-  // addTrackGroup(data: TrackDataType[]) {
-  //   const group = new TrackGroup(data);
-  //   this.add(group);
-  //   data.forEach(d => this.addTrack(d.songs));
-  //   return group;
-  // }
-
   addTrack(
     data: TrackDataType = {
       id: generateUniqueId(),
@@ -251,22 +244,11 @@ export class Workground extends Layer {
   }
 
   getTracks() {
-    return this._trackGroup.children.filter(child => child instanceof Track) as Track[];
+    return this._trackGroup.getTracks();
   }
 
   getWaves() {
-    const findWaves = (children: (Node | Container)[]): Wave[] => {
-      let waves: Wave[] = [];
-      children.forEach(child => {
-        if (child instanceof Wave) {
-          waves.push(child);
-        } else if (child instanceof Container && child.children) {
-          waves = waves.concat(findWaves(child.children));
-        }
-      });
-      return waves;
-    };
-    return findWaves(this._trackGroup.children);
+    return this._trackGroup.getWaves();
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

@@ -10,8 +10,6 @@ export abstract class Stage extends Container<Layer> {
   override name = 'Stage';
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  // scrollX = 0;
-  // scrollY = 0;
   scroll = {
     x: 0,
     y: 0,
@@ -71,10 +69,6 @@ export abstract class Stage extends Container<Layer> {
 
     const target = this.hitTest(point, e);
     if (target) dispatchEventData(eventType, target, point, e);
-    // this.children.forEach(layer => {
-    //   const target = layer.hitTest(point, e);
-    //   if (target) dispatchEventData(eventType, target, point, e);
-    // });
   }
 
   handleEvent(e: MouseEvent) {
@@ -90,7 +84,6 @@ export abstract class Stage extends Container<Layer> {
     if (e.type === 'mouseleave' || e.type === 'mouseout') {
       const point = getRelativeMousePosition(e, this.canvas, this.scroll);
       this._dispatchEventToAll(eventType, point, e);
-      // this._lastHoveredTarget = [];
     }
     if (eventType === 'mousedown' && e.button === 1) {
       e.preventDefault();

@@ -17,18 +17,7 @@ export type TrackDataType<T extends string = string> = {
   mute?: boolean;
   songs: SongDataType<T>[];
 };
-// export type EditorDataType<T extends string = string> = {
-//   name: string;
-//   tracks: TrackDataType<T>[];
-// };
-// export type BandData = {
-//   start: number;
-//   long: number;
-//   src: string;
-//   group: number;
-//   user: string;
-//   instrument: InstrumentType;
-// };
+
 export type EditorStyleType = {
   theme: {
     background: string;

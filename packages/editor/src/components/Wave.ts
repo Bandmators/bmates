@@ -3,7 +3,7 @@ import { EventData, Node } from '@bmates/renderer';
 
 import { generateUniqueId } from 'src/utils';
 
-import { EditorStyleType, SongDataType } from '../types';
+import { EditorStyleType, SongDataType, TrackDataType } from '../types';
 import { Editor } from './Editor';
 import { Track } from './Track';
 import { Workground } from './Workground';
@@ -11,10 +11,21 @@ import { Workground } from './Workground';
 export class Wave extends Node {
   override name = 'Wave';
 
+  gain: GainNode;
+  private _source: AudioBufferSourceNode;
   private waveform: Float32Array;
   private _selected = false;
   private _snappingY: number | null = null;
   private _isCollision = false;
+
+  set source(val) {
+    this._source = val;
+    this.waveform = this._extractWaveform(this.source.buffer);
+    this.width = this.style.timeline.gapWidth * (this.data.long * 10);
+  }
+  get source() {
+    return this._source;
+  }
 
   constructor(
     public data: SongDataType,
@@ -29,8 +40,6 @@ export class Wave extends Node {
       this.style.wave.margin;
     this.width = this.style.timeline.gapWidth * (this.data.long * 10);
     this.height = this.style.wave.height;
-
-    this.waveform = this._extractWaveform(this.data.source.buffer);
 
     // this._initEvent();
     this._initDrag();
@@ -96,7 +105,7 @@ export class Wave extends Node {
         (this.style.wave.height + this.style.wave.margin) * (this.data.group + 1) +
         this.style.wave.margin / 2;
       ctx.moveTo(0, lineY);
-      ctx.lineTo(10000, lineY);
+      ctx.lineTo(this.x + ctx.canvas.width, lineY);
       ctx.stroke();
       ctx.closePath();
     } else if (this._snappingY !== null) {
@@ -148,11 +157,7 @@ export class Wave extends Node {
       prevY = y;
     }
     ctx.closePath();
-
-    const gradient = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = 'rgb(122, 122, 122)';
     ctx.fill();
 
     ctx.strokeStyle = 'rgb(0, 0, 0, 0.6)';
@@ -215,7 +220,7 @@ export class Wave extends Node {
         const parentTrack = this.parent as Track;
         const parentWorkground = parentTrack.parent.parent as Workground;
         const editor = parentWorkground.parent as Editor;
-
+        const audioPlayer = editor._audioPlayer;
         const index = parentTrack.children.indexOf(this);
         if (index !== -1) {
           parentTrack.children.splice(index, 1);
@@ -235,6 +240,7 @@ export class Wave extends Node {
           const newParent = parentWorkground.addTrack();
           editor.call('data-change', { data: this.data, target: this }, false);
           newParent.add(this);
+          audioPlayer.moveAudioTrack(this.data.id, newParent.data);
         } else {
           let newParent = parentWorkground.getTracks()[this.data.group] as Track;
           if (!newParent) {
@@ -242,6 +248,8 @@ export class Wave extends Node {
             editor.call('data-change', { data: this.data, target: this }, false);
           }
           newParent.add(this);
+
+          audioPlayer.moveAudioTrack(this.data.id, newParent.data);
         }
       }
       this._isCollision = false;

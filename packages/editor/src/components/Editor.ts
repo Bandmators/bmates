@@ -41,7 +41,7 @@ export class Editor extends Stage {
   };
   private _workground: Workground;
   private _overlay: Overlay;
-  private _audioPlayer: AudioPlayer = new AudioPlayer();
+  _audioPlayer: AudioPlayer;
   private _resizeListener: () => void;
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
@@ -63,21 +63,20 @@ export class Editor extends Stage {
   }
 
   private async init() {
-    await this._loadTrackBuffers();
     this._initLayout();
     this._initEvent();
+    await this._loadTrackBuffers();
   }
 
   private async _loadTrackBuffers() {
-    const loadPromises = this.data.map(track => {
-      return this._audioPlayer.prepareTrack(track);
-    });
-    await Promise.all(loadPromises);
+    await this._audioPlayer.prepareTrackAll(this._workground.getWaves());
   }
 
   private _initLayout() {
+    this._audioPlayer = new AudioPlayer();
     this._workground = new Workground(this.canvas, this.style, this.data, this._audioPlayer, this.scroll);
     this.add(this._workground);
+    this._audioPlayer.setTrackGroup(this._workground._trackGroup);
 
     this._overlay = new Overlay(this.canvas, this.style, this.scroll);
     this.add(this._overlay);
@@ -213,8 +212,8 @@ export class Editor extends Stage {
     this._audioPlayer.muteTrack(trackId, isMuted);
   }
 
-  mute(trackId: string, songId: string, isMuted: boolean | undefined = undefined) {
-    this._audioPlayer.mute(trackId, songId, isMuted);
+  mute(songId: string, isMuted: boolean | undefined = undefined) {
+    this._audioPlayer.mute(songId, isMuted);
   }
 
   isMuted(trackId: string) {
@@ -223,7 +222,6 @@ export class Editor extends Stage {
 
   async addWave(song: SongDataType) {
     const trackId = generateUniqueId();
-    const audioId = generateUniqueId();
     const newTrack = {
       id: trackId,
       category: 'New Category',
@@ -231,14 +229,11 @@ export class Editor extends Stage {
       songs: [song],
     };
 
-    await this._audioPlayer.prepareTrack(newTrack);
-
-    this._workground.addTrack(newTrack);
+    const track = this._workground.addTrack(newTrack);
     this.data.push(newTrack);
-    // const trackGroup = this._workground.children[0] as TrackGroup;
-    // const track = trackGroup.children[0] as Track;
-    // const wave = new Wave(song, this.style);
-    // track.add(wave);
+    if (track.children.length) await this._audioPlayer.prepareWave(track.children[0]);
+
+    this.call('data-change', { data: this.data, target: this });
   }
 
   override destroy() {
@@ -259,13 +254,13 @@ export class Editor extends Stage {
       case 'Mute':
         this._selectedNodes.forEach(node => {
           node.data.mute = true;
-          this.mute((node.parent as Track).data.id, node.data.id, true);
+          this.mute(node.data.id, true);
         });
         break;
       case 'Unmute':
         this._selectedNodes.forEach(node => {
           node.data.mute = false;
-          this.mute((node.parent as Track).data.id, node.data.id, false);
+          this.mute(node.data.id, false);
         });
         break;
       case 'Lock':
@@ -319,7 +314,6 @@ export class Editor extends Stage {
           return this.addWave(newData);
         }),
       );
-      this.call('data-change', { data: this.data, target: this }, false);
     }
   }
 
@@ -334,9 +328,9 @@ export class Editor extends Stage {
         if (child instanceof Track) {
           return child.export();
         }
-        return null; // Track이 아닌 경우 null 반환
+        return null;
       })
-      .filter(track => track !== null); // null 제거
+      .filter(track => track !== null);
   }
 
   oldExport() {

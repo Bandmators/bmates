@@ -1,18 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { SongDataType, TrackDataType } from './types';
+import { Track, TrackGroup, Wave } from './components';
+import { TrackDataType } from './types';
 import $ from './utils/$';
-import { bufferToBlob, encodeWAV, mergeAudioBuffers, writeString } from './utils/wav';
-
-type Audio = {
-  song: SongDataType;
-  source: AudioBufferSourceNode;
-  gain: GainNode;
-};
+import { bufferToBlob, mergeAudioBuffers, writeString } from './utils/wav';
 
 class AudioPlayer {
   private audioContext: AudioContext | null = null;
-  private tracks: Map<string, { data: TrackDataType; songs: Map<string, Audio> }> = new Map();
   private _duration: number = 0;
+  private trackGroup: TrackGroup;
 
   createContext() {
     if (!this.audioContext) {
@@ -29,61 +24,70 @@ class AudioPlayer {
     return await context.decodeAudioData(arrayBuffer);
   }
 
-  async prepareTrack(track: TrackDataType) {
-    const loadPromises = track.songs.map(async song => {
-      const buffer = await this.loadAudioBuffer(song.src);
-      const context = this.createContext();
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-
-      const gainNode = context.createGain();
-      gainNode.connect(context.destination);
-      song.source = source;
-      song.long = buffer.duration;
-      this._duration = Math.max(this._duration, song.start + song.long);
-
-      if (!this.tracks.has(track.id)) {
-        this.tracks.set(track.id, { data: track, songs: new Map() });
+  moveAudioTrack(audioId: string, newTrack: TrackDataType) {
+    const tracks = this.getTracks();
+    tracks.forEach(track => {
+      const audio = track.children.find(child => child.data.id === audioId);
+      if (audio) {
+        track.remove(audio);
+        const newTrackInstance = tracks.find(t => t.data.id === newTrack.id);
+        newTrackInstance?.add(audio);
       }
-      this.tracks.get(track.id)!.songs.set(song.id, { song, source, gain: gainNode });
     });
+  }
 
+  async prepareTrackAll(waves: Wave[]) {
+    const loadPromises = waves.map(song => this.prepareWave(song));
     await Promise.all(loadPromises);
   }
 
-  play(startTime: number = 0): void {
-    if (!this.audioContext) throw new Error('AudioContext not initialized');
-    const currentTime = this.audioContext.currentTime;
+  async prepareWave(wave: Wave) {
+    const buffer = await this.loadAudioBuffer(wave.data.src);
+    const context = this.createContext();
+    const source = context.createBufferSource();
+    source.buffer = buffer;
 
-    this.tracks.forEach((audioMap, trackId) => {
-      audioMap.songs.forEach((track, audioId) => {
-        if (track.source) {
+    const gainNode = context.createGain();
+    gainNode.connect(context.destination);
+    wave.gain = gainNode;
+    wave.data.long = buffer.duration;
+    wave.source = source;
+    this._duration = Math.max(this._duration, wave.data.start + wave.data.long);
+  }
+
+  play(startTime: number = 0) {
+    const tracks = this.getTracks();
+    const currentTime = this.audioContext!.currentTime;
+
+    tracks.forEach(track => {
+      track.children.forEach((wave: Wave) => {
+        if (wave.source) {
           try {
-            track.source.stop();
+            wave.source.stop();
           } catch (err) {
             /* */
           }
         }
         const newSource = this.audioContext!.createBufferSource();
-        newSource.buffer = track.source.buffer;
-        newSource.connect(track.gain);
+        newSource.buffer = wave.source.buffer;
+        newSource.connect(wave.gain);
 
-        const trackStartTime = Math.max(0, track.song.start - startTime);
-        const sourceStartTime = Math.max(0, startTime - track.song.start);
+        const trackStartTime = Math.max(0, wave.data.start - startTime);
+        const sourceStartTime = Math.max(0, startTime - wave.data.start);
 
         newSource.start(currentTime + trackStartTime, sourceStartTime);
-
-        audioMap.songs.set(audioId, { ...track, source: newSource });
+        wave.source = newSource;
       });
     });
   }
 
   pause(): void {
-    this.tracks.forEach(audioMap => {
-      audioMap.songs.forEach(track => {
-        if (track.source) {
+    const tracks = this.getTracks();
+    tracks.forEach(track => {
+      track.children.forEach((wave: Wave) => {
+        if (wave.source) {
           try {
-            track.source.stop();
+            wave.source.stop();
           } catch (err) {
             /* */
           }
@@ -93,56 +97,55 @@ class AudioPlayer {
   }
 
   muteTrack(trackId: string, isMuted: boolean | undefined = undefined) {
-    const track = this.tracks.get(trackId);
+    const track = this.getTracks().find(t => t.data.id === trackId);
     if (track) {
       if (isMuted === undefined) {
         isMuted = !track.data.mute;
       }
       track.data.mute = isMuted;
 
-      track.songs.forEach(audio => {
-        audio.gain.gain.value = isMuted ? 0 : 1;
+      track.children.forEach((wave: Wave) => {
+        wave.gain.gain.value = isMuted || wave.data.mute ? 0 : 1;
       });
     }
   }
 
-  mute(trackId: string, songId: string, isMuted: boolean | undefined = undefined) {
-    const track = this.tracks.get(trackId);
-    if (track) {
-      const audio = track.songs.get(songId);
-      if (audio) {
-        if (isMuted === undefined) {
-          isMuted = !audio.song.mute;
-        }
-        audio.song.mute = isMuted;
-        audio.gain.gain.value = isMuted ? 0 : 1;
+  mute(songId: string, isMuted: boolean | undefined = undefined) {
+    const wave = this.getWaves().find(child => child.data.id === songId);
+    if (wave) {
+      if (isMuted === undefined) {
+        isMuted = !wave.data.mute;
       }
+      wave.data.mute = isMuted;
+      wave.gain.gain.value = isMuted || (wave.parent as Track).data.mute ? 0 : 1;
     }
   }
 
   isMuted(trackId: string) {
-    const track = this.tracks.get(trackId);
+    const track = this.getTracks().find(t => t.data.id === trackId);
     if (!track) return false;
-    return Array.from(track.songs.values()).some(audio => audio.song.mute);
+    return track.children.some((wave: Wave) => wave.data.mute);
   }
 
-  stop(): void {
-    this.tracks.forEach(audioMap => {
-      audioMap.songs.forEach(track => {
-        if (track.source) {
+  stop() {
+    const tracks = this.getTracks();
+    tracks.forEach(track => {
+      track.children.forEach((wave: Wave) => {
+        if (wave.source) {
           try {
-            track.source.stop();
+            wave.source.stop();
           } catch (error) {
             /* */
           }
-          track.source.disconnect();
+          wave.source.disconnect();
         }
       });
     });
   }
 
   getAudioBuffer(trackId: string): AudioBuffer | undefined {
-    return this.tracks.get(trackId)?.songs.values().next().value.source.buffer;
+    const track = this.getTracks().find(t => t.data.id === trackId);
+    return track?.children[0]?.source.buffer;
   }
 
   getDuration() {
@@ -153,14 +156,14 @@ class AudioPlayer {
     const audioBuffers: AudioBuffer[] = [];
     const startTimes: number[] = [];
 
-    for (const audioMap of this.tracks.values()) {
-      for (const track of audioMap.songs.values()) {
-        if (!track.song.mute) {
-          audioBuffers.push(track.source.buffer);
-          startTimes.push(track.song.start);
-        }
-      }
-    }
+    this.getTracks()
+      .filter(track => !track.data.mute)
+      .flatMap(track => track.children)
+      .filter(wave => !wave.data.mute)
+      .forEach(wave => {
+        audioBuffers.push(wave.source.buffer);
+        startTimes.push(wave.data.start);
+      });
 
     const mergedBuffer = mergeAudioBuffers(audioBuffers, startTimes);
     const audioBlob = await bufferToBlob(mergedBuffer);
@@ -170,6 +173,18 @@ class AudioPlayer {
   async downloadBlob(filename: string) {
     const blob = await this.toBlob();
     $.downloadObjectURL(filename, blob);
+  }
+
+  setTrackGroup(tg: TrackGroup) {
+    this.trackGroup = tg;
+  }
+
+  getTracks() {
+    return this.trackGroup.getTracks();
+  }
+
+  getWaves() {
+    return this.trackGroup.getWaves();
   }
 }
 

@@ -309,7 +309,7 @@ export class Editor extends Stage {
   async paste(nodes: SongDataType[] = this._clipboard) {
     if (nodes.length > 0) {
       await Promise.all(
-        nodes.map(async node => {
+        nodes.map(node => {
           const newData: SongDataType = { ...node, start: node.start, group: this.data.length };
           return this.addWave(newData);
         }),

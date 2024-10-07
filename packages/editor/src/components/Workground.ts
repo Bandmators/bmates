@@ -176,6 +176,7 @@ export class Workground extends Layer {
       }
     };
 
+    let isPlayingDragStart = false;
     this.on('wave-dragstart', (evt: EventData) => {
       this.timeIndicator.visible = true;
       if (evt.target instanceof Wave) {
@@ -185,6 +186,11 @@ export class Workground extends Layer {
       }
       snappingClientX = -1;
       if (!evt.originalEvent.shiftKey) checkSnapping(evt);
+      isPlayingDragStart = this.isPlaying();
+      if (isPlayingDragStart) {
+        this.pause();
+        this.audioPlayer.pause();
+      }
     });
     this.on('wave-draging', (evt: EventData) => {
       if (evt.target instanceof Wave) {
@@ -197,6 +203,11 @@ export class Workground extends Layer {
     this.on('wave-dragend', () => {
       this.timeIndicator.visible = false;
       this.snapping.visible = false;
+      if (isPlayingDragStart) {
+        this.play();
+        this.audioPlayer.play(this.playhead.getCurrentTime());
+        isPlayingDragStart = false;
+      }
     });
   }
 

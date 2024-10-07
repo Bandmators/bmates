@@ -302,18 +302,67 @@ export class Editor extends Stage {
     }
   }
 
-  // addEditorData(data: TrackDataType) {
-  //   this.data.push(data);
-  // }
-
   async paste(nodes: SongDataType[] = this._clipboard) {
+    const newWaves = [];
+    const createdWaveIds = new Set();
+
     if (nodes.length > 0) {
-      await Promise.all(
-        nodes.map(node => {
-          const newData: SongDataType = { ...node, start: node.start, group: this.data.length };
-          return this.addWave(newData);
-        }),
-      );
+      const currentTime = this._workground.getCurrentTime();
+      const minStartTime = Math.min(...nodes.map(node => node.start));
+      const newNodes = nodes
+        .sort((a, b) => a.group - b.group)
+        .map(node => {
+          const start = currentTime + node.start - minStartTime;
+          return {
+            ...node,
+            id: generateUniqueId(),
+            start,
+            x: this.style.timeline.gapWidth * (start * 10),
+          };
+        });
+
+      for (const newNode of newNodes) {
+        if (createdWaveIds.has(newNode.id)) continue;
+
+        const otherWaves = this._workground
+          .getWaves()
+          .filter(child => child.data.id !== newNode.id && child.data.group === newNode.group);
+        const isCollision = otherWaves.some(wave => {
+          const newNodeWidth = this.style.timeline.gapWidth * (newNode.long * 10);
+          return newNode.x < wave.x + wave.width && newNode.x + newNodeWidth > wave.x;
+        });
+
+        if (!isCollision) {
+          const newWave = new Wave(newNode, this.style);
+          otherWaves[0].parent.add(newWave);
+          newWaves.push(newWave);
+          createdWaveIds.add(newNode.id);
+          continue;
+        }
+
+        this._workground.getWaves().forEach(wave => {
+          if (wave.data.group > newNode.group) {
+            wave.data.group++;
+            wave.repositioning();
+          }
+        });
+
+        const friends = newNodes
+          .filter(node => node.group === newNode.group && !createdWaveIds.has(node.id))
+          .map(node => {
+            createdWaveIds.add(node.id);
+            return { ...node, group: node.group + 1 };
+          });
+        const track = this._workground.addTrack({
+          id: generateUniqueId(),
+          category: 'New Category',
+          songs: friends,
+        });
+        newWaves.push(...track.children);
+      }
+
+      await this._audioPlayer.prepareTrackAll(newWaves);
+      this.call('data-change', { data: this.data, target: this });
     }
   }
 

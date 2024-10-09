@@ -44,7 +44,7 @@ export class Workground extends Layer {
 
   private _initLayout(data: TrackDataType[]) {
     // this.addTrackGroup(data);
-    this._trackGroup = new TrackGroup();
+    this._trackGroup = new TrackGroup(this.style);
     this.add(this._trackGroup);
     data.forEach(d => this.addTrack(d));
 
@@ -112,7 +112,7 @@ export class Workground extends Layer {
         this.playhead.x = clickX - this.x;
 
         if (this.isPlaying()) {
-          this.audioPlayer.play(this.playhead.getCurrentTime());
+          this.audioPlayer.play(this.getCurrentTime());
         }
       }
     });
@@ -205,7 +205,7 @@ export class Workground extends Layer {
       this.snapping.visible = false;
       if (isPlayingDragStart) {
         this.play();
-        this.audioPlayer.play(this.playhead.getCurrentTime());
+        this.audioPlayer.play(this.getCurrentTime());
         isPlayingDragStart = false;
       }
     });

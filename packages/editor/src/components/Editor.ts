@@ -1,5 +1,7 @@
 import { EventData, Stage } from '@bmates/renderer';
 
+import { Caretaker } from 'src/HistoryManager';
+
 import AudioPlayer from '../AudioPlayer';
 import { EditorStyleType, SongDataType, TrackDataType, _EditorStyleType } from '../types';
 import { deepMerge, generateUniqueId } from '../utils';
@@ -45,9 +47,13 @@ export class Editor extends Stage {
   private _resizeListener: () => void;
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
+  private _caretaker: Caretaker;
 
   constructor(element: HTMLCanvasElement, data: TrackDataType[], style: _EditorStyleType = {}) {
     super(element);
+
+    this._caretaker = new Caretaker();
+
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;
     this._onResize();
@@ -66,6 +72,7 @@ export class Editor extends Stage {
     this._initLayout();
     this._initEvent();
     await this._loadTrackBuffers();
+    this.saveState();
   }
 
   private async _loadTrackBuffers() {
@@ -111,6 +118,10 @@ export class Editor extends Stage {
       this._act(item);
     });
 
+    this.on('data-change', () => {
+      // this.saveState();
+    });
+
     this._initKeyboardEvents();
   }
 
@@ -119,13 +130,13 @@ export class Editor extends Stage {
     this.canvas.style.outline = 'none';
 
     const keyboardShortcuts = {
-      // 'ctrl+z': () => this._act('Undo'),
-      // 'ctrl+shift+z': () => this._act('Redo'),
-      // 'ctrl+y': () => this._act('Redo'),
+      'ctrl+z': () => this._act('Undo'),
+      'ctrl+shift+z': () => this._act('Redo'),
+      'ctrl+y': () => this._act('Redo'),
       'ctrl+c': () => this._act('Copy'),
-      'ctrl+v': () => this.paste(),
+      'ctrl+v': () => this._act('Paste'),
       // 'ctrl+a': () => this.selectAll(),
-      'ctrl+d': () => this.duplicate(),
+      'ctrl+d': () => this._act('Duplicate'),
       delete: () => this._act('Delete'),
       backspace: () => this._act('Delete'),
       'ctrl+x': () => this._act('Cut'),
@@ -244,6 +255,11 @@ export class Editor extends Stage {
   }
 
   private async _act(act: string) {
+    const isPlaying = this.isPlaying();
+    console.log(this.isPlaying());
+    if (isPlaying) {
+      this.pause();
+    }
     switch (act) {
       case 'ArrowLeft':
         this._workground.setScrollX(this.scroll.x - this.style.timeline.timeDivde);
@@ -256,22 +272,26 @@ export class Editor extends Stage {
           node.data.mute = true;
           this.mute(node.data.id, true);
         });
+        this.saveState();
         break;
       case 'Unmute':
         this._selectedNodes.forEach(node => {
           node.data.mute = false;
           this.mute(node.data.id, false);
         });
+        this.saveState();
         break;
       case 'Lock':
         this._selectedNodes.forEach(node => {
           node.data.lock = true;
         });
+        this.saveState();
         break;
       case 'Unlock':
         this._selectedNodes.forEach(node => {
           node.data.lock = false;
         });
+        this.saveState();
         break;
       case 'Delete':
         this._selectedNodes.forEach(node => {
@@ -283,22 +303,35 @@ export class Editor extends Stage {
             .filter(track => track.songs.length > 0);
           node.destroy();
         });
+        this.saveState();
         break;
       case 'Copy':
         this._clipboard = this._selectedNodes.map(node => ({ ...node.data }));
         break;
       case 'Paste':
-        this.paste();
+        await this.paste();
+        this.saveState();
         break;
       case 'Duplicate':
-        this.duplicate();
+        await this.duplicate();
+        this.saveState();
         break;
       case 'Cut':
         this._clipboard = this._selectedNodes.map(node => ({ ...node.data }));
         this._selectedNodes.forEach(node => {
           node.destroy();
         });
+        this.saveState();
         break;
+      case 'Redo':
+        this.redo();
+        break;
+      case 'Undo':
+        this.undo();
+        break;
+    }
+    if (isPlaying) {
+      this.play();
     }
   }
 
@@ -370,6 +403,10 @@ export class Editor extends Stage {
     await this.paste(this._selectedNodes.map(node => ({ ...node.data })));
   }
 
+  getCurrentTime() {
+    return this._workground.getCurrentTime();
+  }
+
   export() {
     return this._workground
       .getTracks()
@@ -396,5 +433,19 @@ export class Editor extends Stage {
 
   async downloadBlob(filename: string) {
     await this._audioPlayer.downloadBlob(filename);
+  }
+
+  saveState() {
+    this._caretaker.save(this._workground._trackGroup.createMemento());
+  }
+
+  undo() {
+    const lastMemento = this._caretaker.undo();
+    if (lastMemento) this._workground._trackGroup.restore(lastMemento);
+  }
+
+  redo() {
+    const nextMemento = this._caretaker.redo();
+    if (nextMemento) this._workground._trackGroup.restore(nextMemento);
   }
 }

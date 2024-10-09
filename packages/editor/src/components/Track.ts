@@ -1,6 +1,7 @@
 import { Container } from '@bmates/renderer';
 
 import { TrackDataType } from '../types';
+import { TrackGroup } from './TrackGroup';
 import { Wave } from './Wave';
 
 export class Track extends Container<Wave> {
@@ -21,5 +22,25 @@ export class Track extends Container<Wave> {
       ...this.data,
       songs: this.children.map(wave => wave.export()),
     };
+  }
+
+  snapshot() {
+    (this.parent as TrackGroup).snapshot();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setAttrs(attrs: any) {
+    this.name = attrs.name;
+    this.data = attrs.data;
+  }
+
+  override toObject(): object {
+    return JSON.parse(
+      JSON.stringify({
+        name: this.name,
+        data: this.data,
+        children: this.children.map(child => child.toObject()),
+      }),
+    );
   }
 }

@@ -34,4 +34,15 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
     const sortedChildren = [...this.children].sort((a, b) => a.zIndex - b.zIndex);
     sortedChildren.forEach(child => child._tick(dT, ctx));
   }
+
+  override toObject(): object {
+    return {
+      name: this.name,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      children: this.children.map(child => child.toObject()),
+    };
+  }
 }

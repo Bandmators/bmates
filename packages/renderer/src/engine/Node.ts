@@ -3,8 +3,11 @@ import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '
 import { Statable } from './State';
 
 interface NodeAttributes {
+  name: string;
   x: number;
   y: number;
+  width: number;
+  height: number;
   draggable: boolean;
   listening: boolean;
   zIndex: number;
@@ -148,5 +151,19 @@ export abstract class Node extends Statable {
       current = current.parent;
     }
     return current;
+  }
+
+  toObject(): object {
+    return {
+      name: this.name,
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      zIndex: this.zIndex,
+      height: this.height,
+      listening: this.listening,
+      draggable: this.draggable,
+      visible: this.visible,
+    };
   }
 }

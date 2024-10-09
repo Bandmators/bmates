@@ -4,10 +4,16 @@ import { TrackDataType } from './types';
 import $ from './utils/$';
 import { bufferToBlob, mergeAudioBuffers, writeString } from './utils/wav';
 
+interface Cache {
+  source: AudioBufferSourceNode;
+  gain: GainNode;
+}
+
 class AudioPlayer {
   private audioContext: AudioContext | null = null;
   private _duration: number = 0;
   private trackGroup: TrackGroup;
+  private _cache = new Map<string, Cache>();
 
   createContext() {
     if (!this.audioContext) {
@@ -42,16 +48,24 @@ class AudioPlayer {
   }
 
   async prepareWave(wave: Wave) {
-    const buffer = await this.loadAudioBuffer(wave.data.src);
-    const context = this.createContext();
-    const source = context.createBufferSource();
-    source.buffer = buffer;
+    const cache = this._cache.get(wave.data.id);
 
-    const gainNode = context.createGain();
-    gainNode.connect(context.destination);
-    wave.gain = gainNode;
-    wave.data.long = buffer.duration;
-    wave.source = source;
+    if (cache) {
+      wave.gain = cache.gain;
+      wave.data.long = cache.source.buffer.duration;
+      wave.source = cache.source;
+    } else {
+      const buffer = await this.loadAudioBuffer(wave.data.src);
+      const context = this.createContext();
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      const gainNode = context.createGain();
+      gainNode.connect(context.destination);
+
+      wave.gain = gainNode;
+      wave.data.long = buffer.duration;
+      wave.source = source;
+    }
     this._duration = Math.max(this._duration, wave.data.start + wave.data.long);
   }
 

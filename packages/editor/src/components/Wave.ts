@@ -173,7 +173,11 @@ export class Wave extends Node {
     });
     this.on('draging', (evt: EventData) => {
       if (evt.data) {
-        if (this.data.lock) return;
+        if (this.data.lock) {
+          this.x = evt.data.prevX;
+          this.y = evt.data.prevY;
+          return;
+        }
         if (this.x < 0) {
           this.x = 0;
           return;
@@ -254,6 +258,7 @@ export class Wave extends Node {
       }
       this._isCollision = false;
       this.parent.call('wave-dragend', evt);
+      this.snapshot();
     });
   }
 
@@ -275,5 +280,32 @@ export class Wave extends Node {
 
   export() {
     return this.data;
+  }
+
+  snapshot() {
+    (this.parent as Track).snapshot();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setAttrs(attrs: any) {
+    this.name = attrs.name;
+    this.x = attrs.x;
+    this.y = attrs.y;
+    this.width = attrs.width;
+    this.height = attrs.height;
+    this.data = attrs.data;
+  }
+
+  override toObject(): object {
+    return JSON.parse(
+      JSON.stringify({
+        name: this.name,
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height,
+        data: this.data,
+      }),
+    );
   }
 }

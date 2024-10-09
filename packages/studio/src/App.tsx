@@ -11,6 +11,7 @@ const data: TrackDataType[] = [
   {
     id: 'TEMP0',
     category: 'Category 1',
+    group: 0,
     songs: [
       {
         id: 'BMATEST0',
@@ -33,6 +34,7 @@ const data: TrackDataType[] = [
   {
     id: 'TEMP1',
     category: 'Category 2',
+    group: 1,
     songs: [
       {
         id: 'BMATEST3',
@@ -91,28 +93,36 @@ const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void })
   );
 };
 
+const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; children?: React.ReactElement }) => {
+  return (
+    <Button
+      onClick={() => {
+        if (onClick) onClick();
+      }}
+    >
+      {children ? children : 'Remove'}
+    </Button>
+  );
+};
+
 const App = () => {
   return (
     <BMatesProvider>
       <BMates
         data={data}
         style={style}
-        trackEl={({ track, muted, toggleMute }) => {
+        trackEl={({ track, muted, toggleMute, removeTrack }) => {
           return (
             <div className="track">
-              <div>{track.category}</div>
+              <div>
+                {track.category} = {track.group}
+              </div>
               <ToggleMute muted={muted} onClick={toggleMute} />
+              <RemoveTrackButton onClick={removeTrack} />
             </div>
           );
         }}
       />
-      <button
-        onClick={() => {
-          console.log(data);
-        }}
-      >
-        Click me
-      </button>
     </BMatesProvider>
   );
 };

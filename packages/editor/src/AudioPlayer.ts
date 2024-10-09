@@ -124,6 +124,22 @@ class AudioPlayer {
     }
   }
 
+  removeTrack(trackId: string) {
+    const trackIndex = this.getTracks().findIndex(t => t.data.id === trackId);
+    if (trackIndex !== -1) {
+      this.getTracks()
+        .filter(t => t.data.group > this.getTracks()[trackIndex].data.group)
+        .forEach(track => {
+          track.data.group--;
+          track.children.forEach(wave => {
+            wave.data.group--;
+            wave.repositioning();
+          });
+        });
+      this.getTracks()[trackIndex].destroy();
+    }
+  }
+
   mute(songId: string, isMuted: boolean | undefined = undefined) {
     const wave = this.getWaves().find(child => child.data.id === songId);
     if (wave) {

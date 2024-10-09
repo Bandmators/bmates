@@ -15,6 +15,7 @@ export type TrackDataType<T extends string = string> = {
   id: string;
   category: string;
   mute?: boolean;
+  group: number;
   songs: SongDataType<T>[];
 };
 

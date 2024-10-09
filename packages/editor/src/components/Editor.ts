@@ -223,6 +223,12 @@ export class Editor extends Stage {
     this._audioPlayer.muteTrack(trackId, isMuted);
   }
 
+  removeTrack(trackId: string) {
+    this._audioPlayer.removeTrack(trackId);
+    this.saveState();
+    this.call('data-change', { data: this.data, target: this });
+  }
+
   mute(songId: string, isMuted: boolean | undefined = undefined) {
     this._audioPlayer.mute(songId, isMuted);
   }
@@ -237,6 +243,7 @@ export class Editor extends Stage {
       id: trackId,
       category: 'New Category',
       mute: false,
+      group: this._workground.getTracks().length,
       songs: [song],
     };
 
@@ -256,7 +263,6 @@ export class Editor extends Stage {
 
   private async _act(act: string) {
     const isPlaying = this.isPlaying();
-    console.log(this.isPlaying());
     if (isPlaying) {
       this.pause();
     }
@@ -389,6 +395,7 @@ export class Editor extends Stage {
         const track = this._workground.addTrack({
           id: generateUniqueId(),
           category: 'New Category',
+          group: this._workground.getTracks().length,
           songs: friends,
         });
         newWaves.push(...track.children);
@@ -440,11 +447,13 @@ export class Editor extends Stage {
   }
 
   undo() {
+    console.log('Undo');
     const lastMemento = this._caretaker.undo();
     if (lastMemento) this._workground._trackGroup.restore(lastMemento);
   }
 
   redo() {
+    console.log('redo');
     const nextMemento = this._caretaker.redo();
     if (nextMemento) this._workground._trackGroup.restore(nextMemento);
   }

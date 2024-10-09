@@ -294,6 +294,7 @@ export class Wave extends Node {
     this.width = attrs.width;
     this.height = attrs.height;
     this.data = attrs.data;
+    this.repositioning();
   }
 
   override toObject(): object {

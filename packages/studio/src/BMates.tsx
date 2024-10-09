@@ -3,10 +3,17 @@ import { Editor, SongDataType, TrackDataType, _EditorStyleType, generateUniqueId
 import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+interface TrackProps {
+  track: TrackDataType;
+  muted: boolean;
+  toggleMute: () => void;
+  removeTrack: () => void;
+}
+
 interface BMatesProps {
   data: TrackDataType[];
   style?: _EditorStyleType;
-  trackEl?: ({ track, muted }: { track: TrackDataType; muted: boolean; toggleMute: () => void }) => JSX.Element;
+  trackEl?: (props: TrackProps) => JSX.Element;
 }
 
 const BMates = ({ data, style, trackEl }: BMatesProps) => {
@@ -50,6 +57,10 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   const toggleMuteTrack = useCallback((trackId: string) => {
     editor.current?.muteTrack(trackId);
+  }, []);
+
+  const removeTrack = useCallback((trackId: string) => {
+    editor.current?.removeTrack(trackId);
   }, []);
 
   const download = () => {
@@ -114,7 +125,12 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
                 className="bmates-track"
                 style={{ height: `${style.wave.height + style.wave.margin}px` }}
               >
-                {trackEl({ track, muted: false, toggleMute: () => toggleMuteTrack(track.id) })}
+                {trackEl({
+                  track,
+                  muted: false,
+                  toggleMute: () => toggleMuteTrack(track.id),
+                  removeTrack: () => removeTrack(track.id),
+                })}
               </div>
             ))}
           </div>

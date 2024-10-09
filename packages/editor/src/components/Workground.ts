@@ -219,6 +219,7 @@ export class Workground extends Layer {
     data: TrackDataType = {
       id: generateUniqueId(),
       category: 'New Category',
+      group: this.getTracks().length,
       songs: [],
     },
   ) {

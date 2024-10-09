@@ -21,6 +21,7 @@ export class TrackGroup extends Container<Track> {
   override draw(_ctx: CanvasRenderingContext2D) {}
 
   getTracks() {
+    this.children.sort((a, b) => a.data.group - b.data.group);
     return this.children;
   }
 
@@ -33,6 +34,7 @@ export class TrackGroup extends Container<Track> {
   }
 
   restore(trackgroup: Memento) {
+    console.log('res ');
     const restoredData = trackgroup.restore();
     const existingTracks = this.getTracks();
 

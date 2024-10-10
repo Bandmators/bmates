@@ -1,8 +1,7 @@
 import { EventData, Stage } from '@bmates/renderer';
 
-import { Caretaker } from 'src/HistoryManager';
-
 import AudioPlayer from '../AudioPlayer';
+import { Caretaker } from '../HistoryManager';
 import { EditorStyleType, SongDataType, TrackDataType, _EditorStyleType } from '../types';
 import { deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';

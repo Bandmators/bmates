@@ -1,8 +1,7 @@
 import { Container } from '@bmates/renderer';
 
-import { Memento } from 'src/HistoryManager';
-import { EditorStyleType } from 'src/types';
-
+import { Memento } from '../HistoryManager';
+import { EditorStyleType } from '../types';
 import { Editor } from './Editor';
 import { Track } from './Track';
 import { Wave } from './Wave';

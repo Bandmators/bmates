@@ -15,6 +15,7 @@ export const baseColors = {
 export const lightColors = {
   grey: '#d9d9d9',
   hr: '#e1e1e1',
+  white: '#fCfCff',
   blockquoteBG: '#efefef',
   asideBG: '#ededed',
   highlight: '#d0d1ff',

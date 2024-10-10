@@ -28,7 +28,7 @@ export default function Footer() {
           </li>
         </FooterItemlist>
         <FooterItemlist>
-          <FooterItemListTitle>Tabler</FooterItemListTitle>
+          <FooterItemListTitle>BMates</FooterItemListTitle>
           <li>
             <Link href="/">FAQ</Link>
           </li>
@@ -36,7 +36,7 @@ export default function Footer() {
             <Link href="/">Sponsors</Link>
           </li>
           <li>
-            <Link href="/">Changelog</Link>
+            <Link href="/">ChangeLog</Link>
           </li>
           <li>
             <Link href="/">Releases</Link>

@@ -9,7 +9,7 @@ lastUpdatedDate: 2024-9-29
 This is the data configuration that serves as the foundation for the editor.
 
 ```tsx
-export type SongDataType<T extends string = string> = {
+type SongDataType<T extends string = string> = {
   id: string;
   start: number;
   long?: number;
@@ -21,14 +21,12 @@ export type SongDataType<T extends string = string> = {
   lock?: boolean;
   [key: string]: any;
 };
-export type TrackDataType<T extends string = string> = {
+type TrackDataType<T extends string = string> = {
   id: string;
   category: string;
+  mute?: boolean;
+  group: number;
   songs: SongDataType<T>[];
-};
-export type EditorDataType<T extends string = string> = {
-  name: string;
-  tracks: TrackDataType<T>[];
 };
 ```
 
@@ -38,7 +36,7 @@ you can set the initial data for the editor.
 The import and export functionalities also operate based on this type.
 
 ```tsx
-const data: EditorDataType[] = [];
+const data: TrackDataType[] = [];
 
 <BMates
   //...
@@ -51,7 +49,7 @@ const data: EditorDataType[] = [];
 This is the style configuration that serves as the foundation for the editor.
 
 ```tsx
-export type EditorStyleType = {
+type EditorStyleType = {
   theme: {
     background: string;
     lineColor: string;
@@ -62,6 +60,17 @@ export type EditorStyleType = {
     gapWidth: number;
     timeDivde: number; // 5 or 10
     height: number; // 45 or 60;
+    textY: number;
+  };
+  playhead: {
+    color: string;
+    width: number;
+    height: number;
+  };
+  timeIndicator: {
+    fill: string;
+    font: string;
+    top: number;
   };
   sidebar: {
     width: number;
@@ -70,7 +79,14 @@ export type EditorStyleType = {
     height: number;
     borderRadius: number;
     margin: number;
+    padding: number;
+    disableAlpha: number;
     snapping: string;
+    background: string;
+    fill: string;
+    border: string;
+    predictionFill: string;
+    selectedBorderColor: string;
   };
   context: {
     menuWidth: number;

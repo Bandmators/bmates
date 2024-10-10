@@ -1,9 +1,8 @@
 import { EventData, Layer, setCursor } from '@bmates/renderer';
 
-import { generateUniqueId } from 'src/utils';
-
 import AudioPlayer from '../AudioPlayer';
 import { EditorStyleType, SongDataType, TrackDataType } from '../types';
+import { generateUniqueId } from '../utils';
 import { Timeline, Track, TrackGroup, Wave } from './';
 import { Playhead } from './Playhead';
 import { Snapping } from './Snapping';

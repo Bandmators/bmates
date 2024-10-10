@@ -8,61 +8,53 @@ import { useState } from 'react';
 import { Container } from '@/components/common/grid/Container';
 import { Layout } from '@/components/layout';
 
-import { EditorDataType } from '../../../../packages/editor/src';
+import { TrackDataType } from '../../../../packages/editor/src';
 import BMates from '../../../../packages/studio/src/BMates';
 
-const data: EditorDataType[] = [
+const data: TrackDataType[] = [
   {
-    name: 'bgm',
-    tracks: [
+    id: 'TEMP0',
+    category: 'Category 1',
+    group: 0,
+    songs: [
       {
-        id: 'TEMP0',
-        category: 'Category 1',
-        songs: [
-          {
-            id: 'BMATEST0',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
-            user: '',
-            start: 0,
-            group: 0,
-            instrument: 'Piano',
-          },
-          {
-            id: 'BMATEST1',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
-            user: '',
-            start: 9,
-            group: 0,
-            instrument: 'Drum',
-          },
-        ],
+        id: 'BMATEST0',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
+        user: '',
+        start: 0,
+        group: 0,
+        instrument: 'Piano',
+      },
+      {
+        id: 'BMATEST1',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
+        user: '',
+        start: 9,
+        group: 0,
+        instrument: 'Drum',
       },
     ],
   },
   {
-    name: 'effect',
-    tracks: [
+    id: 'TEMP1',
+    category: 'Category 2',
+    group: 1,
+    songs: [
       {
-        id: 'TEMP1',
-        category: 'Category 2',
-        songs: [
-          {
-            id: 'BMATEST3',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
-            user: '',
-            start: 3,
-            group: 1,
-            instrument: 'Piano',
-          },
-          {
-            id: 'BMATEST4',
-            src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
-            user: '',
-            start: 10.0,
-            group: 1,
-            instrument: 'Guitar',
-          },
-        ],
+        id: 'BMATEST3',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
+        user: '',
+        start: 3,
+        group: 1,
+        instrument: 'Piano',
+      },
+      {
+        id: 'BMATEST4',
+        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
+        user: '',
+        start: 10.0,
+        group: 1,
+        instrument: 'Guitar',
       },
     ],
   },
@@ -119,12 +111,19 @@ export default function Home() {
             <BMatesStyled
               data={data}
               style={style}
-              trackEl={({ track, muted, toggleMute }) => {
+              trackEl={({ track, muted, toggleMute, removeTrack }) => {
                 return (
-                  <div className="track">
-                    <div>{track.category}</div>
-                    <ToggleMute muted={muted} onClick={toggleMute} />
-                  </div>
+                  <Track>
+                    <TrackName>{track.category}</TrackName>
+                    <TrackFeature>
+                      <ToggleMute muted={muted} onClick={toggleMute} />
+                      <RemoveTrackButton onClick={removeTrack}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                          <path d="M5.72 5.72a.75.75 0 0 1 1.06 0L12 10.94l5.22-5.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L13.06 12l5.22 5.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L12 13.06l-5.22 5.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L10.94 12 5.72 6.78a.75.75 0 0 1 0-1.06Z"></path>
+                        </svg>
+                      </RemoveTrackButton>
+                    </TrackFeature>
+                  </Track>
                 );
               }}
             />
@@ -167,12 +166,35 @@ const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void })
 
   return (
     <Button
+      size="icon"
       onClick={() => {
         onClick();
         setIsMuted(!isMuted);
       }}
     >
-      {isMuted ? 'Unmute' : 'Mute'}
+      {isMuted ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+          <path d="M12 3.75v16.5a.75.75 0 0 1-1.255.555L5.46 16H2.75A1.75 1.75 0 0 1 1 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805A.75.75 0 0 1 12 3.75ZM6.255 9.305a.748.748 0 0 1-.505.195h-3a.25.25 0 0 0-.25.25v4.5c0 .138.112.25.25.25h3c.187 0 .367.069.505.195l4.245 3.86V5.445ZM16.28 8.22a.75.75 0 1 0-1.06 1.06L17.94 12l-2.72 2.72a.75.75 0 1 0 1.06 1.06L19 13.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L20.06 12l2.72-2.72a.75.75 0 0 0-1.06-1.06L19 10.94l-2.72-2.72Z"></path>
+        </svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+          <path d="M11.553 3.064A.75.75 0 0 1 12 3.75v16.5a.75.75 0 0 1-1.255.555L5.46 16H2.75A1.75 1.75 0 0 1 1 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.752.752 0 0 1 .808-.13ZM10.5 5.445l-4.245 3.86a.748.748 0 0 1-.505.195h-3a.25.25 0 0 0-.25.25v4.5c0 .138.112.25.25.25h3c.187 0 .367.069.505.195l4.245 3.86Zm8.218-1.223a.75.75 0 0 1 1.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 0 1-1.06-1.06 9.5 9.5 0 0 0 0-13.436.75.75 0 0 1 0-1.06Z"></path>
+          <path d="M16.243 7.757a.75.75 0 1 0-1.061 1.061 4.5 4.5 0 0 1 0 6.364.75.75 0 0 0 1.06 1.06 6 6 0 0 0 0-8.485Z"></path>
+        </svg>
+      )}
+    </Button>
+  );
+};
+
+const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; children?: React.ReactElement }) => {
+  return (
+    <Button
+      size="icon"
+      onClick={() => {
+        if (onClick) onClick();
+      }}
+    >
+      {children ? children : 'Remove'}
     </Button>
   );
 };
@@ -226,6 +248,21 @@ const BMatesWrapper = styled.div`
   overflow: hidden;
   background: var(--background);
   padding: 1rem;
+  .bmates-sidebar {
+    border: 1px solid #c9c9c9;
+  }
+
+  .bmates-sidebar .bmates-track {
+    padding: 1rem;
+    border-top: 1px solid #c9c9c9;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
 `;
 
 const DemoSection = styled.section`
@@ -239,6 +276,21 @@ const BMatesStyled = styled(BMates)`
   background: var(--background);
 `;
 
+const Track = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+`;
+const TrackName = styled.div`
+  font-weight: 500;
+  font-size: 1.125rem;
+`;
+const TrackFeature = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+`;
 const SupportSection = styled.section`
   padding: 5rem;
   text-align: center;

@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventData, Node } from '@bmates/renderer';
 
-import { generateUniqueId } from 'src/utils';
-
-import { EditorStyleType, SongDataType, TrackDataType } from '../types';
+import { EditorStyleType, SongDataType } from '../types';
 import { Editor } from './Editor';
 import { Track } from './Track';
 import { Workground } from './Workground';

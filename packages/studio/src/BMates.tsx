@@ -1,6 +1,6 @@
 import { Editor, TrackDataType, _EditorStyleType } from '@bmates/editor';
 
-import { Button } from 'bmates-ui';
+import { Button, useToast } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface TrackProps {
@@ -21,6 +21,7 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const editor = useRef<Editor | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (ref.current && !editor.current) {
@@ -82,14 +83,28 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   return (
     <>
-      <div>
-        <Button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</Button>
-        <Button onClick={toggleStopPlay}>Stop</Button>
+      <div className="toolbar">
+        <Button variant="primary" onClick={togglePlay}>
+          {isPlaying ? 'Pause' : 'Play'}
+        </Button>
+        <Button variant="primary" onClick={toggleStopPlay}>
+          Stop
+        </Button>
         <input type="file" accept="audio/*" onChange={handleFileUpload} />
-        <Button onClick={download}>Download</Button>
+        <Button variant="primary" onClick={download}>
+          Download
+        </Button>
         <Button
+          variant="primary"
           onClick={() => {
-            console.log(editor.current.export());
+            toast({
+              title: 'Data extraction success!',
+              description: 'Check the Developer Console (F12)',
+              variant: 'primary',
+              time: 7000,
+            });
+            console.log(`%c[ BMates Export Data ]`, 'background: black; color: white;');
+            console.log('Result: ', editor.current.export());
           }}
         >
           Export

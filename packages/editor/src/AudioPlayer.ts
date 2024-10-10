@@ -159,7 +159,7 @@ class AudioPlayer {
 
   stop() {
     const tracks = this.getTracks();
-    tracks.forEach(track => {
+    tracks?.forEach(track => {
       track.children.forEach((wave: Wave) => {
         if (wave.source) {
           try {
@@ -210,7 +210,7 @@ class AudioPlayer {
   }
 
   getTracks() {
-    return this.trackGroup.getTracks();
+    return this.trackGroup?.getTracks();
   }
 
   getWaves() {

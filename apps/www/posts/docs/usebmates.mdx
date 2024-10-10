@@ -1,0 +1,101 @@
+---
+title: useBMates
+order: 8
+lastUpdatedDate: 2024-9-30
+---
+
+`useBMates` is a hook provided by BmatesContext, which can be used within the BmatesProvider. This hook allows access to the state and methods of the BmatesContext.
+
+## Usage
+
+To use `useBMates`, the component must be wrapped in a `BmatesProvider`. Here is an example of usage:
+
+```typescript
+import React from 'react';
+import { useBMates } from './path/to/BmatesContext';
+
+const MyComponent: React.FC = () => {
+  const { download, togglePlay, isPlaying } = useBMates();
+
+  return (
+    <div>
+      <button onClick={togglePlay}>
+        {isPlaying ? 'Pause' : 'Play'}
+      </button>
+      <button onClick={download}>Download</button>
+    </div>
+  );
+};
+```
+
+## Return Values
+
+This hook simply provides only the main functions.
+
+If you want detailed usage, access the [Editor](/docs/editor/editor) directly using `editorRef.current`.
+
+`useBMates` returns the following values:
+
+### download ()
+
+A function to download the current audio.
+
+- Return: `void`
+
+### togglePlay ()
+
+A function to toggle the play/pause state.
+
+- Return: `Promise<void>`
+
+### toggleStopPlay ()
+
+A function to stop the playback of the current track.
+
+- Return: `Promise<void>`
+
+### isPlaying
+
+A state indicating whether the audio is currently playing.
+
+- Type: `boolean`
+
+### toggleMuteTrack (trackId)
+
+A function to toggle the mute state of a specific track.
+
+| Name    | Type     | Description                  |
+| ------- | -------- | ---------------------------- |
+| trackId | `string` | The ID of the track to mute. |
+
+### removeTrack (trackId)
+
+A function to remove a specific track from the editor.
+
+| Name    | Type     | Description                    |
+| ------- | -------- | ------------------------------ |
+| trackId | `string` | The ID of the track to remove. |
+
+### handleFileUpload (event)
+
+A function to handle file uploads.
+
+| Name  | Type                                  | Description                  |
+| ----- | ------------------------------------- | ---------------------------- |
+| event | `React.ChangeEvent<HTMLInputElement>` | The file input change event. |
+
+### editorRef
+
+A reference to the Editor instance, allowing direct manipulation or access to its methods.
+
+- Type: `React.RefObject<Editor>`
+
+## Notes
+
+`useBMates` can only be used within a `BmatesProvider`, and using it outside of that context will result in an error.
+
+```typescript
+if (!context) {
+  throw new Error('useBMates must be used within a BmatesProvider');
+}
+```

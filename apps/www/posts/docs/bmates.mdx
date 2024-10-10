@@ -1,0 +1,70 @@
+---
+title: BMates
+order: 6
+lastUpdatedDate: 2024-9-30
+---
+
+`BMates` is a component that integrates the audio editing functionalities provided by the `Editor` class from the `@bmates/editor` package. It manages audio tracks and provides a user interface for editing and playback.
+
+## BMates Component
+
+### Props
+
+- **data**: `TrackDataType[]` - An array of track data to be managed by the BMates component.
+- **style**: `_EditorStyleType` (optional) - Style settings for the editor.
+- **trackEl**: `(props: TrackProps) => JSX.Element` (optional) - A function that returns a JSX element for rendering each track.
+
+### Usage Example
+
+```typescript
+import BMates from './path/to/BMates';
+
+const trackData: TrackDataType[] = [
+  // ... your track data here
+];
+
+const MyEditor: React.FC = () => {
+  return (
+    <BMates data={trackData} />
+  );
+};
+```
+
+## BMatesProvider
+
+`BMatesProvider` is a context provider that wraps the `BMates` component, allowing access to the audio editing functionalities and state management through the `useBMates` hook.
+
+### Usage
+
+To use `BMates`, it must be wrapped in a `BMatesProvider`. Here is an example:
+
+```typescript
+import React from 'react';
+import { BmatesProvider } from './path/to/BmatesContext';
+import BMates from './path/to/BMates';
+
+const App: React.FC = () => {
+  const trackData: TrackDataType[] = [
+    // ... your track data here
+  ];
+
+  return (
+    <BmatesProvider>
+        {/* Use the useBMates hook! */}
+        <BMates data={trackData} />
+        {/* Use the useBMates hook! */}
+    </BmatesProvider>
+  );
+};
+```
+
+> Related: [useBMates](/docs/usebmates)
+
+### Notes
+
+- The `BMates` component utilizes the `useBMates` hook to access methods such as `toggleMuteTrack` and `removeTrack`, allowing for interactive audio track management.
+- The `BMates` component also manages the lifecycle of the `Editor` instance, ensuring proper initialization and cleanup.
+
+```
+
+```

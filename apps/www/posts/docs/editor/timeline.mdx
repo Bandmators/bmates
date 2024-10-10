@@ -1,0 +1,94 @@
+---
+title: Timeline
+order: 116
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`Timeline` is a class that represents the timeline for audio editing. It visually displays the audio tracks and allows users to interact with them, such as selecting, dragging, and adjusting their positions.
+
+> Related: [Node](/docs/renderer/node)
+
+## Properties
+
+**name**: `string`
+
+The name of the Timeline. The default value is `'Timeline'`.
+
+**style**: `EditorStyleType`
+
+Contains the style settings for the Timeline.
+
+**\_timeEnd**: `number`
+
+The end time of the timeline, indicating how long the timeline extends.
+
+**\_scrollX**: `number`
+
+The current horizontal scroll position of the timeline.
+
+**posY**: `number`
+
+The vertical position of the timeline on the canvas.
+
+## Constructor
+
+```typescript
+constructor(style: EditorStyleType, _timeEnd: number, _scrollX: number, posY: number = 30)
+```
+
+**style**: `EditorStyleType`
+
+The style settings for the Timeline.
+
+**\_timeEnd**: `number`
+
+The end time of the timeline.
+
+**\_scrollX**: `number`
+
+The initial horizontal scroll position.
+
+**posY**: `number` (optional)
+
+The vertical position of the timeline.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the Timeline.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+### draw (ctx)
+
+Draws the Timeline on the canvas.
+
+| Name | Type                       | Description                                   |
+| ---- | -------------------------- | --------------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | The rendering context for the drawing surface |
+
+### \_drawTime (ctx)
+
+Draws the time indicators on the Timeline.
+
+| Name | Type                       | Description                                   |
+| ---- | -------------------------- | --------------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | The rendering context for the drawing surface |
+
+### set scrollX (value)
+
+Sets the horizontal scroll position of the Timeline.
+
+| Name  | Type     | Description                         |
+| ----- | -------- | ----------------------------------- |
+| value | `number` | The new horizontal scroll position. |
+
+### get scrollX ()
+
+Returns the current horizontal scroll position of the Timeline.
+
+- Return: `number`

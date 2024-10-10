@@ -1,0 +1,73 @@
+---
+title: TrackGroup
+order: 108
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`TrackGroup` is a class that manages multiple tracks by grouping them together. This class supports track sorting, restoration, and state management.
+
+> Related: [Container](/docs/renderer/container)
+
+## Properties
+
+**name**: `string`
+
+The name of the track group. The default value is `'TrackGroup'`.
+
+**style**: `EditorStyleType`
+
+Contains the style settings for the track group.
+
+## Constructor
+
+```typescript
+constructor(style: EditorStyleType)
+```
+
+**style**: `EditorStyleType`
+
+The style settings for the track group.
+
+## Methods
+
+### getTracks ()
+
+Returns the tracks within the track group.
+
+- Return: `Track[]`
+
+### getWaves ()
+
+Returns all waves within the track group.
+
+- Return: `Wave[]`
+
+### createMemento ()
+
+Creates a memento that saves the current state of the track group.
+
+- Return: `Memento`
+
+### restore (trackgroup: Memento)
+
+Restores the state of the track group using the given memento.
+
+| Name       | Type      | Description                    |
+| ---------- | --------- | ------------------------------ |
+| trackgroup | `Memento` | The memento object to restore. |
+
+### snapshot ()
+
+Saves the current state as a snapshot.
+
+## Usage Example
+
+```typescript
+const trackGroupStyle: EditorStyleType = {
+  /* ... */
+};
+
+const trackGroup = new TrackGroup(trackGroupStyle);
+this.add(trackGroup);
+```

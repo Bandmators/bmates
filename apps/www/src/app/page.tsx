@@ -1,15 +1,17 @@
 'use client';
 
+import { BmatesProvider, useBMates } from '@bmates/studio';
+
 import styled from '@emotion/styled';
-import { Button, maxMedia } from 'bmates-ui';
+import { Button, maxMedia, useToast } from 'bmates-ui';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Container } from '@/components/common/grid/Container';
 import { Layout } from '@/components/layout';
 
-import { TrackDataType } from '../../../../packages/editor/src';
-import BMates from '../../../../packages/studio/src/BMates';
+import { Editor, TrackDataType } from '../../../../packages/editor';
+import { BMates } from '../../../../packages/studio';
 
 const data: TrackDataType[] = [
   {
@@ -83,6 +85,8 @@ const style = {
 };
 
 export default function Home() {
+  const editorRef = useRef<Editor>(null);
+
   return (
     <Layout>
       <IntroSection>
@@ -108,25 +112,28 @@ export default function Home() {
       <DemoSection id="demo">
         <Container>
           <BMatesWrapper>
-            <BMatesStyled
-              data={data}
-              style={style}
-              trackEl={({ track, muted, toggleMute, removeTrack }) => {
-                return (
-                  <Track>
-                    <TrackName>{track.category}</TrackName>
-                    <TrackFeature>
-                      <ToggleMute muted={muted} onClick={toggleMute} />
-                      <RemoveTrackButton onClick={removeTrack}>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                          <path d="M5.72 5.72a.75.75 0 0 1 1.06 0L12 10.94l5.22-5.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L13.06 12l5.22 5.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L12 13.06l-5.22 5.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L10.94 12 5.72 6.78a.75.75 0 0 1 0-1.06Z"></path>
-                        </svg>
-                      </RemoveTrackButton>
-                    </TrackFeature>
-                  </Track>
-                );
-              }}
-            />
+            <BmatesProvider editorRef={editorRef}>
+              <ControlPanel />
+              <BMatesStyled
+                data={data}
+                style={style}
+                trackEl={({ track, muted, toggleMute, removeTrack }) => {
+                  return (
+                    <Track>
+                      <TrackName>{track.category}</TrackName>
+                      <TrackFeature>
+                        <ToggleMute muted={muted} onClick={toggleMute} />
+                        <RemoveTrackButton onClick={removeTrack}>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M5.72 5.72a.75.75 0 0 1 1.06 0L12 10.94l5.22-5.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L13.06 12l5.22 5.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L12 13.06l-5.22 5.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L10.94 12 5.72 6.78a.75.75 0 0 1 0-1.06Z"></path>
+                          </svg>
+                        </RemoveTrackButton>
+                      </TrackFeature>
+                    </Track>
+                  );
+                }}
+              />
+            </BmatesProvider>
           </BMatesWrapper>
         </Container>
       </DemoSection>
@@ -199,6 +206,45 @@ const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; childr
   );
 };
 
+const ControlPanel = () => {
+  const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download, editorRef } = useBMates();
+  const { toast } = useToast();
+
+  return (
+    <ControlPanelStyled>
+      <div className="collapse">
+        <Button variant="primary" onClick={togglePlay}>
+          {isPlaying ? 'Pause' : 'Play'}
+        </Button>
+        <Button variant="primary" onClick={toggleStopPlay}>
+          Stop
+        </Button>
+        <input type="file" accept="audio/*" onChange={handleFileUpload} />
+      </div>
+      <div className="collapse">
+        <Button variant="primary" onClick={download}>
+          Download
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            toast({
+              title: 'Data extraction success!',
+              description: 'Check the Developer Console (F12)',
+              variant: 'primary',
+              time: 7000,
+            });
+            console.log(`%c[ BMates Export Data ]`, 'background: black; color: white;');
+            console.log('Result: ', editorRef.current?.export());
+          }}
+        >
+          Export
+        </Button>
+      </div>
+    </ControlPanelStyled>
+  );
+};
+
 const IntroSection = styled.section`
   display: flex;
   flex-direction: column;
@@ -256,12 +302,18 @@ const BMatesWrapper = styled.div`
     padding: 1rem;
     border-top: 1px solid #c9c9c9;
   }
+`;
 
-  .toolbar {
+const ControlPanelStyled = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  justify-content: space-between;
+  .collapse {
     display: flex;
     gap: 1rem;
     align-items: center;
-    margin-bottom: 1rem;
   }
 `;
 

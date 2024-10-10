@@ -24,18 +24,61 @@ import { BMates } from '@bmates/studio';
 Set the appropriate props for the BMates component.
 
 ```tsx
-<BMates
-  data={data}
-  style={style}
-  trackEl={({ track, muted, toggleMute }) => {
-    return (
-      <div className="track">
-        <div>{track.category}</div>
-        <ToggleMute muted={muted} onClick={toggleMute} />
-      </div>
-    );
-  }}
-/>
+const App = () => {
+  const editorRef = useRef<Editor>();
+
+  return (
+    <BmatesProvider editorRef={editorRef}>
+      <ControlPanel />
+      <BMates
+        data={data}
+        style={style}
+        trackEl={({ track, muted, toggleMute, removeTrack }) => {
+          return (
+            <div className="track">
+              <div className="name">{track.category}</div>
+              <div className="feature">
+                <ToggleMute muted={muted} onClick={toggleMute} />
+                <RemoveTrackButton onClick={removeTrack}>Remove</RemoveTrackButton>
+              </div>
+            </div>
+          );
+        }}
+      />
+    </BmatesProvider>
+  );
+};
+```
+
+And feel free to manage it using the `useBMates` hook.
+
+```tsx
+const ControlPanel = () => {
+  const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download, editorRef } = useBMates();
+
+  return (
+    <div>
+      <Button variant="primary" onClick={togglePlay}>
+        {isPlaying ? 'Pause' : 'Play'}
+      </Button>
+      <Button variant="primary" onClick={toggleStopPlay}>
+        Stop
+      </Button>
+      <input type="file" accept="audio/*" onChange={handleFileUpload} />
+      <Button variant="primary" onClick={download}>
+        Download
+      </Button>
+      <Button
+        variant="primary"
+        onClick={() => {
+          console.log('Result: ', editorRef.current.export());
+        }}
+      >
+        Export
+      </Button>
+    </div>
+  );
+};
 ```
 
 Other frameworks besides React are currently in preparation.

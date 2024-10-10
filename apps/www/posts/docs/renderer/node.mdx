@@ -9,7 +9,7 @@ group: Renderer
 
 All objects that contain basic functions and have no children belong to Node.
 
-> Check [Container](/docs/renderer/container) and [Group] (/docs/renderer/group) for objects that act like Node and have children.
+> Check [Container](/docs/renderer/container) and [Group](/docs/renderer/group) for objects that act like Node and have children.
 
 ## Properties
 
@@ -110,6 +110,16 @@ Checks if the given point collides with the Node.
 
 - Return: `Node | null`
   - The Node if a collision occurs, otherwise `null`.
+
+### getStage ()
+
+- Return: `Stage | null`
+
+### toObject ()
+
+Extract key attribute data.
+
+- Return: `object`
 
 ### destroy ()
 

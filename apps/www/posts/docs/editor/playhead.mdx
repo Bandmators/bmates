@@ -1,0 +1,84 @@
+---
+title: Playhead
+order: 114
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`Playhead` is a class that represents the current playback position in the audio editing timeline. It visually indicates where the playback is occurring and allows for interaction with the timeline.
+
+> Related: [Node](/docs/renderer/node)
+
+## Properties
+
+**name**: `string`
+
+The name of the Playhead. The default value is `'Playhead'`.
+
+**x**: `number`
+
+The x-coordinate of the Playhead on the timeline.
+
+**style**: `EditorStyleType`
+
+Contains the style settings for the Playhead.
+
+**\_isPlaying**: `boolean`
+
+Indicates whether the Playhead is currently playing.
+
+## Constructor
+
+```typescript
+constructor(style: EditorStyleType, _dT: number = 0)
+```
+
+**style**: `EditorStyleType`
+
+The style settings for the Playhead.
+
+**\_dT**: `number` (optional)
+
+The delta time for the Playhead's movement.
+
+## Methods
+
+### update (dT)
+
+Updates the position of the Playhead based on the delta time.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+### draw (ctx)
+
+Draws the Playhead on the canvas.
+
+| Name | Type                       | Description                                   |
+| ---- | -------------------------- | --------------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | The rendering context for the drawing surface |
+
+### isPlaying ()
+
+Returns the current playing state of the Playhead.
+
+- Return: `boolean`
+
+### play ()
+
+Sets the Playhead to the playing state.
+
+### pause ()
+
+Sets the Playhead to the paused state.
+
+### stop ()
+
+Stops the Playhead and resets its position to the start.
+
+### getCurrentTime ()
+
+Returns the current time of the Playhead in relation to the timeline.
+
+- Return: `number`

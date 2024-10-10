@@ -1,0 +1,77 @@
+---
+title: TimeIndicator
+order: 118
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`TimeIndicator` is a class that visually represents the current time in the audio editing timeline. It indicates the playback position and helps users understand where they are in the audio track.
+
+> Related: [Node](/docs/renderer/node)
+
+## Properties
+
+**name**: `string`
+
+The name of the TimeIndicator. The default value is `'TimeIndicator'`.
+
+**\_time**: `number`
+
+The current time represented by the TimeIndicator.
+
+**style**: `EditorStyleType`
+
+Contains the style settings for the TimeIndicator.
+
+## Constructor
+
+```typescript
+constructor(style: EditorStyleType)
+```
+
+**style**: `EditorStyleType`
+
+The style settings for the TimeIndicator.
+
+## Methods
+
+### update (dT)
+
+Updates the state of the TimeIndicator.
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| dT   | `number` | Delta time  |
+
+### draw (ctx)
+
+Draws the TimeIndicator on the canvas.
+
+| Name | Type                       | Description                                   |
+| ---- | -------------------------- | --------------------------------------------- |
+| ctx  | `CanvasRenderingContext2D` | The rendering context for the drawing surface |
+
+### setTime (time)
+
+Sets the current time for the TimeIndicator.
+
+| Name | Type     | Description                            |
+| ---- | -------- | -------------------------------------- |
+| time | `number` | The new time to set for the indicator. |
+
+### getTime ()
+
+Returns the current time of the TimeIndicator.
+
+- Return: `number`
+
+## Usage Example
+
+```typescript
+const timeIndicatorStyle: EditorStyleType = {
+  /* ... */
+};
+
+const timeIndicator = new TimeIndicator(timeIndicatorStyle);
+this.add(timeIndicator);
+```

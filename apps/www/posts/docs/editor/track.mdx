@@ -1,0 +1,62 @@
+---
+title: Track
+order: 110
+lastUpdatedDate: 2024-9-30
+group: Editor
+---
+
+`Track` is a class that represents an individual audio track within the editor. It manages the audio data and provides functionalities for editing and playback.
+
+> Related: [Wave](/docs/editor/wave)
+
+## Properties
+
+**name**: `string`
+
+The name of the track. The default value is `'Track'`.
+
+**data**: `TrackDataType`
+
+The audio data associated with the track.
+
+**waves**: `Wave[]`
+
+An array of waveforms associated with the track.
+
+## Constructor
+
+```typescript
+constructor(data: TrackDataType)
+```
+
+**data**: `TrackDataType`
+
+The audio data associated with the track.
+
+## Methods
+
+### addWave (wave: Wave)
+
+Adds a waveform to the track.
+
+| Name | Type   | Description                       |
+| ---- | ------ | --------------------------------- |
+| wave | `Wave` | The waveform to add to the track. |
+
+### removeWave (wave: Wave)
+
+Removes a waveform from the track.
+
+| Name | Type   | Description                            |
+| ---- | ------ | -------------------------------------- |
+| wave | `Wave` | The waveform to remove from the track. |
+
+### getWaves ()
+
+Returns all waveforms associated with the track.
+
+- Return: `Wave[]`
+
+### export ()
+
+Exports the track

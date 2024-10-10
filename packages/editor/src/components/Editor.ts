@@ -241,9 +241,16 @@ export class Editor extends Stage {
   }
 
   removeTrack(trackId: string) {
+    const isPlaying = this.isPlaying();
+    if (isPlaying) {
+      this.pause();
+    }
     this._audioPlayer.removeTrack(trackId);
     this.saveState();
     this.call('data-change', { data: this.data, target: this });
+    if (isPlaying) {
+      this.play();
+    }
   }
 
   mute(songId: string, isMuted: boolean | undefined = undefined) {
@@ -271,7 +278,11 @@ export class Editor extends Stage {
     this.call('data-change', { data: this.data, target: this });
   }
 
-  addWaveBuffer(file: File, audioBuffer: AudioBuffer) {
+  async addWaveBuffer(file: File, audioBuffer: AudioBuffer) {
+    const isPlaying = this.isPlaying();
+    if (isPlaying) {
+      this.pause();
+    }
     const newSong: SongDataType = {
       id: generateUniqueId(),
       src: URL.createObjectURL(file),
@@ -284,7 +295,10 @@ export class Editor extends Stage {
         buffer: audioBuffer,
       },
     };
-    return this.addWave(newSong);
+    await this.addWave(newSong);
+    if (isPlaying) {
+      this.play();
+    }
   }
 
   override destroy() {

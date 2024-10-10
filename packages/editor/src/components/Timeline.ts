@@ -18,10 +18,10 @@ export class Timeline extends Node {
   override update(_dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {
-    this.drawTime(ctx);
+    this._drawTime(ctx);
   }
 
-  drawTime(ctx: CanvasRenderingContext2D) {
+  _drawTime(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
     ctx.lineWidth = 1;

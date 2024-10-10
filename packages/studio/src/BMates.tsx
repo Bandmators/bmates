@@ -1,4 +1,4 @@
-import { Editor, SongDataType, TrackDataType, _EditorStyleType, generateUniqueId } from '@bmates/editor';
+import { Editor, TrackDataType, _EditorStyleType } from '@bmates/editor';
 
 import { Button } from 'bmates-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -75,21 +75,8 @@ const BMates = ({ data, style, trackEl }: BMatesProps) => {
     const arrayBuffer = await file.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-    const newSong: SongDataType = {
-      id: generateUniqueId(),
-      src: URL.createObjectURL(file),
-      user: 'BMates',
-      start: 0,
-      long: audioBuffer.duration,
-      group: editor.current.data.length,
-      instrument: file.name,
-      source: {
-        buffer: audioBuffer,
-      },
-    };
-
     if (editor.current) {
-      await editor.current.addWave(newSong);
+      await editor.current.addWaveBuffer(file, audioBuffer);
     }
   };
 

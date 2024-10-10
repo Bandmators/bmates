@@ -24,6 +24,17 @@ export class Editor extends Stage {
       gapWidth: 10,
       timeDivde: 10,
       height: 45,
+      textY: -3,
+    },
+    playhead: {
+      color: '#FF000099',
+      width: 5,
+      height: 10,
+    },
+    timeIndicator: {
+      fill: '#000',
+      font: '12px Arial',
+      top: 15,
     },
     sidebar: {
       width: 300,
@@ -32,7 +43,14 @@ export class Editor extends Stage {
       height: 45,
       borderRadius: 8,
       margin: 10,
+      padding: 8,
+      disableAlpha: 0.5,
       snapping: 'rgb(0, 0, 0, 0.6)',
+      background: '#c3c3c3',
+      fill: 'rgb(122, 122, 122)',
+      border: 'rgb(0, 0, 0, 0.6)',
+      predictionFill: '#c3c3c388',
+      selectedBorderColor: 'rgba(123, 123, 123, 0.5)',
     },
     context: {
       menuWidth: 200,
@@ -254,6 +272,22 @@ export class Editor extends Stage {
     this.call('data-change', { data: this.data, target: this });
   }
 
+  addWaveBuffer(file: File, audioBuffer: AudioBuffer) {
+    const newSong: SongDataType = {
+      id: generateUniqueId(),
+      src: URL.createObjectURL(file),
+      user: 'BMates',
+      start: 0,
+      long: audioBuffer.duration,
+      group: this._workground.getTracks().length,
+      instrument: file.name,
+      source: {
+        buffer: audioBuffer,
+      },
+    };
+    return this.addWave(newSong);
+  }
+
   override destroy() {
     this.stop();
     super.destroy();
@@ -447,13 +481,11 @@ export class Editor extends Stage {
   }
 
   undo() {
-    console.log('Undo');
     const lastMemento = this._caretaker.undo();
     if (lastMemento) this._workground._trackGroup.restore(lastMemento);
   }
 
   redo() {
-    console.log('redo');
     const nextMemento = this._caretaker.redo();
     if (nextMemento) this._workground._trackGroup.restore(nextMemento);
   }

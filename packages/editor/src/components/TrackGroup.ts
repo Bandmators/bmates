@@ -34,7 +34,6 @@ export class TrackGroup extends Container<Track> {
   }
 
   restore(trackgroup: Memento) {
-    console.log('res ');
     const restoredData = trackgroup.restore();
     const existingTracks = this.getTracks();
 

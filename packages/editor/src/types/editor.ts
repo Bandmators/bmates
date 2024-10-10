@@ -30,6 +30,17 @@ export type EditorStyleType = {
     gapWidth: number;
     timeDivde: number; // 5 or 10
     height: number; // 45 or 60;
+    textY: number;
+  };
+  playhead: {
+    color: string;
+    width: number;
+    height: number;
+  };
+  timeIndicator: {
+    fill: string;
+    font: string;
+    top: number;
   };
   sidebar: {
     width: number;
@@ -38,7 +49,14 @@ export type EditorStyleType = {
     height: number;
     borderRadius: number;
     margin: number;
+    padding: number;
+    disableAlpha: number;
     snapping: string;
+    background: string;
+    fill: string;
+    border: string;
+    predictionFill: string;
+    selectedBorderColor: string;
   };
   context: {
     menuWidth: number;

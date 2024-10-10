@@ -43,7 +43,7 @@ export class Timeline extends Node {
 
       ctx.strokeStyle = this.style.theme.lineColor;
       ctx.textAlign = 'center';
-      ctx.fillText(`${i}s`, begin, this.posY - 3);
+      ctx.fillText(`${i}s`, begin, this.posY + this.style.timeline.textY);
 
       for (let j = 1; j < divide; j++) {
         ctx.beginPath();

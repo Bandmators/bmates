@@ -76,17 +76,17 @@ export class Wave extends Node {
     if (this.isDragging) this._drawPrediction(ctx);
 
     if (this.data.mute || (this.parent as Track).data.mute) {
-      ctx.globalAlpha = 0.5;
+      ctx.globalAlpha = this.style.wave.disableAlpha;
     }
 
     ctx.beginPath();
     ctx.roundRect(this.x, this.y, this.width, this.height, this.style.wave.borderRadius);
-    ctx.fillStyle = '#c3c3c3';
+    ctx.fillStyle = this.style.wave.background;
     ctx.fill();
     ctx.closePath();
 
     if (this._selected) {
-      ctx.strokeStyle = 'rgba(123, 123, 123, 0.5)';
+      ctx.strokeStyle = this.style.wave.selectedBorderColor;
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -111,7 +111,7 @@ export class Wave extends Node {
     } else if (this._snappingY !== null) {
       ctx.beginPath();
 
-      ctx.fillStyle = '#c3c3c388';
+      ctx.fillStyle = this.style.wave.predictionFill;
       ctx.roundRect(this.x, this._snappingY, this.width, this.height, this.style.wave.borderRadius);
       ctx.fill();
       ctx.closePath();
@@ -119,9 +119,8 @@ export class Wave extends Node {
   }
 
   private _drawSmoothWave(ctx: CanvasRenderingContext2D) {
-    const marginHeight = 8;
     const middleY = this.y + this.height / 2;
-    const scaleY = this.height / 2 - marginHeight;
+    const scaleY = this.height / 2 - this.style.wave.padding;
 
     ctx.beginPath();
     ctx.moveTo(this.x, middleY);
@@ -157,10 +156,10 @@ export class Wave extends Node {
       prevY = y;
     }
     ctx.closePath();
-    ctx.fillStyle = 'rgb(122, 122, 122)';
+    ctx.fillStyle = this.style.wave.fill;
     ctx.fill();
 
-    ctx.strokeStyle = 'rgb(0, 0, 0, 0.6)';
+    ctx.strokeStyle = this.style.wave.border;
     ctx.lineWidth = 1;
     ctx.stroke();
   }

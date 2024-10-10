@@ -26,20 +26,22 @@ export class Playhead extends Node {
   }
 
   override draw(ctx: CanvasRenderingContext2D) {
+    const { color, width, height } = this.style.playhead;
+
     ctx.save();
 
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(this.x - 6, 0);
-    ctx.lineTo(this.x - 6, this.style.timeline.height / 2);
-    ctx.lineTo(this.x, this.style.timeline.height / 2 + 10);
-    ctx.lineTo(this.x + 6, this.style.timeline.height / 2);
-    ctx.lineTo(this.x + 6, 0);
+    ctx.moveTo(this.x - width, 0);
+    ctx.lineTo(this.x - width, this.style.timeline.height / 2);
+    ctx.lineTo(this.x, this.style.timeline.height / 2 + height);
+    ctx.lineTo(this.x + width, this.style.timeline.height / 2);
+    ctx.lineTo(this.x + width, 0);
     ctx.fill();
 
-    ctx.strokeStyle = 'red';
+    ctx.strokeStyle = color;
     ctx.beginPath();
-    ctx.moveTo(this.x, 0);
+    ctx.moveTo(this.x, this.style.timeline.height / 2 + height);
     ctx.lineTo(this.x, ctx.canvas.height);
     ctx.stroke();
 

@@ -11,5 +11,17 @@
 }
 
 .track {
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+.track .name {    
+    font-weight: 500;
+    font-size: 1.125rem;
+}
+.track .feature {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
 }

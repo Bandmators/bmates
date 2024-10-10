@@ -17,9 +17,9 @@ export class TimeIndicator extends Node {
   override draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
     const timeString = formatTime(this._time);
-    ctx.fillStyle = '#000';
-    ctx.font = '12px Arial';
-    ctx.fillText(timeString, this.x, this.y + this.height + 15);
+    ctx.fillStyle = this.style.timeIndicator.fill;
+    ctx.font = this.style.timeIndicator.font;
+    ctx.fillText(timeString, this.x, this.y + this.height + this.style.timeIndicator.top);
     ctx.restore();
   }
 

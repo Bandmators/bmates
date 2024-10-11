@@ -1,6 +1,6 @@
 'use client';
 
-import { BmatesProvider, useBMates } from '@bmates/studio';
+import { BMates, BmatesProvider, Editor, EditorStyleType, TrackDataType, useBMates } from '@bmates/studio';
 
 import styled from '@emotion/styled';
 import { Button, maxMedia, useToast } from 'bmates-ui';
@@ -9,9 +9,6 @@ import { useRef, useState } from 'react';
 
 import { Container } from '@/components/common/grid/Container';
 import { Layout } from '@/components/layout';
-
-import { Editor, TrackDataType } from '../../../../packages/editor';
-import { BMates } from '../../../../packages/studio';
 
 const data: TrackDataType[] = [
   {
@@ -62,7 +59,7 @@ const data: TrackDataType[] = [
   },
 ];
 
-const style = {
+const style: EditorStyleType = {
   theme: {
     background: 'white',
     lineColor: '#e3e3e3',

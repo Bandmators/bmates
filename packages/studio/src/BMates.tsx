@@ -1,4 +1,4 @@
-import { Editor, TrackDataType, _EditorStyleType } from '@bmates/editor';
+import { Editor, EditorStyleType, TrackDataType } from '@bmates/editor';
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -13,7 +13,7 @@ interface TrackProps {
 
 interface BMatesProps {
   data: TrackDataType[];
-  style?: _EditorStyleType;
+  style?: EditorStyleType;
   trackEl?: (props: TrackProps) => JSX.Element;
 }
 

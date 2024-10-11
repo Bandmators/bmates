@@ -19,7 +19,7 @@ export type TrackDataType<T extends string = string> = {
   songs: SongDataType<T>[];
 };
 
-export type EditorStyleType = {
+export type _EditorStyleType = {
   theme: {
     background: string;
     lineColor: string;
@@ -74,4 +74,4 @@ export type DeepPartial<T> = T extends object
     }
   : T;
 
-export type _EditorStyleType = DeepPartial<EditorStyleType>;
+export type EditorStyleType = DeepPartial<_EditorStyleType>;

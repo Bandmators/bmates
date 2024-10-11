@@ -1,6 +1,6 @@
 {
   "name": "@bmates/editor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "web audio editor",
   "author": "kyechan99 <kyechan99@gmail.com>",
   "type": "module",

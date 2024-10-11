@@ -2,7 +2,7 @@ import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
 import { Caretaker } from '../HistoryManager';
-import { EditorStyleType, SongDataType, TrackDataType, _EditorStyleType } from '../types';
+import { EditorStyleType, SongDataType, TrackDataType } from '../types';
 import { deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';
 import { Track } from './Track';
@@ -68,7 +68,7 @@ export class Editor extends Stage {
   private _clipboard: SongDataType[] = [];
   private _caretaker: Caretaker;
 
-  constructor(element: HTMLCanvasElement, data: TrackDataType[], style: _EditorStyleType = {}) {
+  constructor(element: HTMLCanvasElement, data: TrackDataType[], style: EditorStyleType = {}) {
     super(element);
 
     this._caretaker = new Caretaker();

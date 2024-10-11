@@ -76,11 +76,15 @@ const style = {
   },
   sidebar: {
     width: 200,
+    mobileWidth: 60,
+    mobileViewport: 768,
   },
   wave: {
     height: 95,
     borderRadius: 8,
     margin: 10,
+    background: '#dad9db',
+    fill: '#2e2c30',
   },
 };
 
@@ -337,11 +341,20 @@ const Track = styled.div`
 const TrackName = styled.div`
   font-weight: 500;
   font-size: 1.125rem;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 const TrackFeature = styled.div`
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0px;
+    height: 100%;
+  }
 `;
 const SupportSection = styled.section`
   padding: 5rem;

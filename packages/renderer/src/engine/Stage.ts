@@ -73,6 +73,9 @@ export abstract class Stage extends Container<Layer> {
 
   handleEvent(e: MouseEvent) {
     const eventMap: { [key: string]: EventType } = {
+      touchstart: 'mousedown',
+      touchmove: 'mousemove',
+      touchend: 'mouseup',
       click: 'click',
       mousedown: 'mousedown',
       mousemove: 'mousemove',

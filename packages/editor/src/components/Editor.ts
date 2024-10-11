@@ -37,6 +37,8 @@ export class Editor extends Stage {
     },
     sidebar: {
       width: 300,
+      mobileWidth: 60,
+      mobileViewport: 768,
     },
     wave: {
       height: 45,
@@ -61,7 +63,7 @@ export class Editor extends Stage {
   private _workground: Workground;
   private _overlay: Overlay;
   _audioPlayer: AudioPlayer;
-  private _resizeListener: () => void;
+  private _resizeListener: (e) => void;
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
   private _caretaker: Caretaker;
@@ -73,7 +75,7 @@ export class Editor extends Stage {
 
     this.data = data;
     this.style = deepMerge(this.style, style) as EditorStyleType;
-    this._onResize();
+    this._onResize(null);
 
     this.init();
 
@@ -81,7 +83,7 @@ export class Editor extends Stage {
     (window as any).editor = this;
     (window as any).style = style;
 
-    this._resizeListener = () => this._onResize();
+    this._resizeListener = e => this._onResize(e);
     window.addEventListener('resize', this._resizeListener);
   }
 
@@ -176,10 +178,15 @@ export class Editor extends Stage {
     });
   }
 
-  private _onResize() {
+  private _onResize(e) {
     const dpr = 1; // || window.devicePixelRatio || 2;
 
-    const displayWidth = this.canvas.parentElement.clientWidth - this.style.sidebar.width;
+    const w = e ? e.target : window;
+
+    const sidebarWidth =
+      w.innerWidth <= this.style.sidebar.mobileViewport ? this.style.sidebar.mobileWidth : this.style.sidebar.width;
+
+    const displayWidth = this.canvas.parentElement.clientWidth - sidebarWidth;
     const displayHeight = this.canvas.parentElement.clientHeight;
 
     this.canvas.width = displayWidth * dpr;

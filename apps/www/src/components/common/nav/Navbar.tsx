@@ -27,5 +27,8 @@ export const Navbar = styled.header`
 
   ${maxMedia.mobile} {
     padding: 0rem 1rem;
+    .nav-menu {
+      display: none;
+    }
   }
 `;

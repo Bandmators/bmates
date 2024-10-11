@@ -71,11 +71,15 @@ const style: DeepPartial<EditorStyleType> = {
   },
   sidebar: {
     width: 300,
+    mobileWidth: 60,
+    mobileViewport: 768,
   },
   wave: {
     height: 95,
     borderRadius: 8,
     margin: 10,
+    background: '#dad9db',
+    fill: '#2e2c30',
   },
 };
 

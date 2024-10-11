@@ -44,6 +44,8 @@ export type EditorStyleType = {
   };
   sidebar: {
     width: number;
+    mobileWidth: number;
+    mobileViewport: number;
   };
   wave: {
     height: number;

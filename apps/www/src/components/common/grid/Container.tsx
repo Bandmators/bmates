@@ -2,6 +2,7 @@
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Button } from 'bmates-ui';
 
 import { maxMedia, minMedia } from '@/libs/media';
 
@@ -18,6 +19,27 @@ export const PostSidebarContainer = styled.div`
   ${maxMedia.tablet} {
     width: 100%;
   }
+  ${maxMedia.tablet} {
+    display: none;
+    &.show {
+      display: block;
+      position: fixed;
+      top: 0px;
+      background: white;
+      height: 100vh;
+      left: 0px;
+      z-index: 1;
+    }
+  }
+`;
+
+export const PostSidebarCloseButtonMo = styled(Button)`
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  ${minMedia.tablet} {
+    display: none;
+  }
 `;
 
 export const PostSidebar = styled.aside`
@@ -27,7 +49,7 @@ export const PostSidebar = styled.aside`
   overflow-y: auto;
   height: calc(100vh - var(--layoutHeader));
   ${maxMedia.mobile} {
-    padding: 1rem;
+    padding: 0rem 1rem 1rem 1rem;
   }
 `;
 export const PostSidebarItemList = styled.ul`

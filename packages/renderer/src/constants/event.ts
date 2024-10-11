@@ -8,4 +8,7 @@ export const EVENT_LIST: EventType[] = [
   'mouseleave',
   'mouseover',
   'mouseout',
+  'touchstart',
+  'touchmove',
+  'touchend',
 ];

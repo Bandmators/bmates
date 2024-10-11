@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 .bmates-sidebar {    
-    border: 1px solid #c9c9c9;
+    border: 1px solid #c9c9c9; 
 }
 
 .bmates-sidebar .bmates-track {
@@ -24,4 +24,16 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+    .track .name {
+        display: none;
+    }
+    .track .feature {
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0px;
+        height: 100%;
+    }
 }

@@ -12,7 +12,9 @@ import { Sidebar } from './Sidebar';
 export const Layout = (props: React.PropsWithChildren) => {
   return (
     <>
-      <HeaderContainer /> {props.children}
+      <HeaderContainer />
+      <Sidebar post={undefined} />
+      {props.children}
       <Footer />
     </>
   );

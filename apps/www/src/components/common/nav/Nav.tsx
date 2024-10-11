@@ -31,6 +31,8 @@ export const NavCollapse = styled.div`
   gap: 1rem;
   ${maxMedia.mobile} {
     gap: 0.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-300);
   }
 `;
 

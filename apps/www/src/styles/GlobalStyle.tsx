@@ -45,6 +45,9 @@ const GlobalStyle = (theme: Theme) => css`
       overflow: hidden;
       padding-right: 1rem;
     }
+    &.hidden {
+      overflow: hidden;
+    }
     @media print {
       background-color: transparent;
     }

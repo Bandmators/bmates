@@ -19,11 +19,22 @@ interface BMatesProps {
 
 export const BMates = ({ data, style, trackEl }: BMatesProps) => {
   const { editorRef, toggleMuteTrack, removeTrack, setIsPlaying } = useBMates();
-
+  const [sidebarWidth, setSidebarWidth] = useState(style.sidebar.width);
   const [_data, setData] = useState<TrackDataType[]>(data);
   const ref = useRef<HTMLCanvasElement | null>(null);
 
+  const handleResize = () => {
+    if (window) {
+      setSidebarWidth(
+        window.innerWidth <= style.sidebar.mobileViewport ? style.sidebar.mobileWidth : style.sidebar.width,
+      );
+    }
+  };
+
   useEffect(() => {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     if (ref.current && !editorRef.current) {
       // @ts-ignore
       editorRef.current = new Editor(ref.current, data, style);
@@ -36,6 +47,7 @@ export const BMates = ({ data, style, trackEl }: BMatesProps) => {
       });
     }
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (editorRef.current) {
         editorRef.current.destroy();
         // @ts-ignore
@@ -46,7 +58,7 @@ export const BMates = ({ data, style, trackEl }: BMatesProps) => {
 
   return (
     <div id="bmates" className="bmates" style={{ display: 'flex', height: '100%' }}>
-      <div id="bmates-sidebar" className="bmates-sidebar" style={{ width: `${style.sidebar.width}px`, flexShrink: 0 }}>
+      <div id="bmates-sidebar" className="bmates-sidebar" style={{ width: `${sidebarWidth}px`, flexShrink: 0 }}>
         <div
           className="bmates-sidebar-head"
           style={{ height: `${style.timeline.height + style.wave.margin / 2}px` }}

@@ -22,6 +22,9 @@
     "bmates",
     "canvas-renderer"
   ],
+  "publishConfig": {
+    "@kyechan99:registry": "https://npm.pkg.github.com/"
+  },
   "files": [
     "/dist"
   ]

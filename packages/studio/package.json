@@ -1,8 +1,11 @@
 {
   "name": "@bmates/studio",
   "version": "0.0.1",
-  "description": "",
-  "main": "src/index.ts",
+  "description": "web audio editor - react",
+  "author": "kyechan99 <kyechan99@gmail.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bugs": {
     "url": "https://github.com/Bandmators/bmates/issues"
   },
@@ -13,7 +16,7 @@
   "homepage": "https://github.com/Bandmators/bmates",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc  && tsc-alias"
+    "build": "tsc && vite build"
   },
   "dependencies": {
     "@bmates/editor": "workspace:*",
@@ -27,12 +30,14 @@
     "@vitejs/plugin-react": "^4.2.1"
   },
   "keywords": [
-    "bmates",
-    "bandmates",
-    "audio-editor",
     "audio",
-    "editor"
+    "audio-editor",
+    "music-editor",
+    "bandmate",
+    "bmates",
+    "canvas-renderer"
   ],
-  "author": "",
-  "license": "ISC"
+  "files": [
+    "/dist"
+  ]
 }

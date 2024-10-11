@@ -9,28 +9,39 @@ export default defineConfig({
     react(),
     dts({
       include: ['src/**/*'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', '__tests__'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', '__tests__', 'src/App.tsx', 'src/App.css', 'src/main.tsx'],
       outDir: 'dist',
     }),
     tsconfigPaths(),
   ],
   build: {
+    ssr: true,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      formats: ['es', 'cjs'],
-      fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      name: 'index',
+      fileName: 'index',
+      // formats: ['es', 'cjs'],
+      // fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
       output: {
-        preserveModules: true,
-        preserveModulesRoot: 'src',
-        entryFileNames: '[name].js',
+        globals: {
+          react: 'React',
+        },
       },
+      // output: {
+      //   preserveModules: true,
+      //   preserveModulesRoot: 'src',
+      //   entryFileNames: '[name].js',
+      // },
     },
-    minify: false,
-    sourcemap: true,
-    outDir: 'dist',
-    emptyOutDir: true,
+    commonjsOptions: {
+      esmExternals: ['react'],
+    },
+    // minify: false,
+    // sourcemap: true,
+    // outDir: 'dist',
+    // emptyOutDir: true,
   },
   server: {
     proxy: {

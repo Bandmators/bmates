@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventData, Node } from '@bmates/renderer';
 
 import { EditorStyleType, SongDataType } from '../types';
@@ -66,6 +65,7 @@ export class Wave extends Node {
     return waveform;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override update(_dT: number) {}
 
   override draw(ctx: CanvasRenderingContext2D) {

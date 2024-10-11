@@ -15,18 +15,21 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      formats: ['es', 'cjs'],
-      fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      name: 'index',
+      fileName: 'index',
+      // entry: path.resolve(__dirname, 'src/index.ts'),
+      // formats: ['es', 'cjs'],
+      // fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
-    rollupOptions: {
-      output: {
-        preserveModules: true,
-        preserveModulesRoot: 'src',
-        entryFileNames: '[name].js',
-      },
-    },
-    minify: false,
-    sourcemap: true,
+    // rollupOptions: {
+    //   output: {
+    //     preserveModules: true,
+    //     preserveModulesRoot: 'src',
+    //     entryFileNames: '[name].js',
+    //   },
+    // },
+    minify: true,
+    sourcemap: false,
     outDir: 'dist',
     emptyOutDir: true,
   },

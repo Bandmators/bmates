@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -30,11 +30,12 @@
     // },
     "outDir": "dist",
 
-    "sourceMap": true,
+    "sourceMap": false,
     "allowJs": true,
-    "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "./dist"
+    "declaration": true,
+    "declarationDir": "./dist",
+    "esModuleInterop": true
   },
   "include": ["src/**/*"],
   // "include": ["src", "../neo-studio/src/util/svg.ts"]

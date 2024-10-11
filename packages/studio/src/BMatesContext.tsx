@@ -8,6 +8,7 @@ export interface BmatesContextType {
   togglePlay: () => Promise<void>;
   toggleStopPlay: () => Promise<void>;
   isPlaying: boolean;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   editorRef: React.RefObject<Editor>;
   toggleMuteTrack: (trackId: string) => void;
   removeTrack: (trackId: string) => void;
@@ -89,6 +90,7 @@ export const BmatesProvider: React.FC<{ children: React.ReactNode; editorRef: Re
         toggleMuteTrack,
         removeTrack,
         isPlaying,
+        setIsPlaying,
         handleFileUpload,
         editorRef,
       }}

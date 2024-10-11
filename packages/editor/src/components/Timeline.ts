@@ -27,7 +27,7 @@ export class Timeline extends Node {
     ctx.lineWidth = 1;
 
     const divide = this.style.timeline.timeDivde;
-    for (let i = 0; i < this._timeEnd; i++) {
+    for (let i = 0; i < this._timeEnd + 30; i++) {
       const begin = this.style.timeline.gapWidth * divide * i;
 
       ctx.strokeStyle = this.style.theme.strokeLineColor;
@@ -68,5 +68,9 @@ export class Timeline extends Node {
 
   get scrollX() {
     return this._scrollX;
+  }
+
+  setTimeEnd(timeEnd: number) {
+    this._timeEnd = timeEnd;
   }
 }

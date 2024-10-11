@@ -242,6 +242,7 @@ export class Wave extends Node {
           editor.call('data-change', { data: this.data, target: this }, false);
           newParent.add(this);
           audioPlayer.moveAudioTrack(this.data.id, newParent.data);
+          this.snapshot();
         } else {
           let newParent = parentWorkground.getTracks()[this.data.group] as Track;
           if (!newParent) {
@@ -251,11 +252,11 @@ export class Wave extends Node {
           newParent.add(this);
 
           audioPlayer.moveAudioTrack(this.data.id, newParent.data);
+          this.snapshot();
         }
       }
       this._isCollision = false;
       this.parent.call('wave-dragend', evt);
-      this.snapshot();
     });
   }
 

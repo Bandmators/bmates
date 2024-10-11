@@ -13,7 +13,7 @@ export type SongDataType<T extends string = string> = {
 };
 export type TrackDataType<T extends string = string> = {
   id: string;
-  category: string;
+  name: string;
   mute?: boolean;
   group: number;
   songs: SongDataType<T>[];

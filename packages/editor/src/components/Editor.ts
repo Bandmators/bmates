@@ -136,7 +136,8 @@ export class Editor extends Stage {
     });
 
     this.on('data-change', () => {
-      // this.saveState();
+      this._audioPlayer.refreshDuration();
+      this._workground.refreshDurationTime();
     });
 
     this._initKeyboardEvents();
@@ -265,7 +266,7 @@ export class Editor extends Stage {
     const trackId = generateUniqueId();
     const newTrack = {
       id: trackId,
-      category: 'New Category',
+      name: 'New Track',
       mute: false,
       group: this._workground.getTracks().length,
       songs: [song],
@@ -441,7 +442,7 @@ export class Editor extends Stage {
           });
         const track = this._workground.addTrack({
           id: generateUniqueId(),
-          category: 'New Category',
+          name: 'New Track',
           group: this._workground.getTracks().length,
           songs: friends,
         });
@@ -491,6 +492,7 @@ export class Editor extends Stage {
 
   saveState() {
     this._caretaker.save(this._workground._trackGroup.createMemento());
+    this.call('data-change', { data: this.data, target: this });
   }
 
   undo() {

@@ -53,7 +53,7 @@ Set the appropriate props for the BMates component.
   trackEl={({ track, muted, toggleMute }) => {
     return (
       <div className="track">
-        <div>{track.category}</div>
+        <div>{track.name}</div>
         <ToggleMute muted={muted} onClick={toggleMute} />
       </div>
     );
@@ -94,7 +94,7 @@ type SongDataType<T extends string = string> = {
 };
 type TrackDataType<T extends string = string> = {
   id: string;
-  category: string;
+  name: string;
   mute?: boolean;
   group: number;
   songs: SongDataType<T>[];

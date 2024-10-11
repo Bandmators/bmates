@@ -36,7 +36,7 @@ const App = () => {
         trackEl={({ track, muted, toggleMute, removeTrack }) => {
           return (
             <div className="track">
-              <div className="name">{track.category}</div>
+              <div className="name">{track.name}</div>
               <div className="feature">
                 <ToggleMute muted={muted} onClick={toggleMute} />
                 <RemoveTrackButton onClick={removeTrack}>Remove</RemoveTrackButton>

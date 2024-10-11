@@ -4,14 +4,14 @@ import { BMatesProvider as BMatesUIProvider, Button, useToast } from 'bmates-ui'
 import { useRef, useState } from 'react';
 
 import './App.css';
-import BMates from './BMates';
+import { BMates } from './BMates';
 import { BmatesProvider, useBMates } from './BMatesContext';
 import { DeepPartial } from './types/type';
 
 const data: TrackDataType[] = [
   {
     id: 'TEMP0',
-    category: 'Category 1',
+    name: 'Track 1',
     group: 0,
     songs: [
       {
@@ -34,7 +34,7 @@ const data: TrackDataType[] = [
   },
   {
     id: 'TEMP1',
-    category: 'Category 2',
+    name: 'Track 2',
     group: 1,
     songs: [
       {
@@ -165,7 +165,7 @@ const App = () => {
           trackEl={({ track, muted, toggleMute, removeTrack }) => {
             return (
               <div className="track">
-                <div className="name">{track.category}</div>
+                <div className="name">{track.name}</div>
                 <div className="feature">
                   <ToggleMute muted={muted} onClick={toggleMute} />
                   <RemoveTrackButton onClick={removeTrack}>

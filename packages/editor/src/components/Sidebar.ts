@@ -24,7 +24,7 @@ class SideTrack extends Node {
     ctx.fillStyle = 'black';
     ctx.font = '24px Barlow';
     ctx.textBaseline = 'top';
-    ctx.fillText(this.data.category, this.x, this.y);
+    ctx.fillText(this.data.name, this.x, this.y);
 
     ctx.restore();
   }

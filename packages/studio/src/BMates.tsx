@@ -18,7 +18,7 @@ interface BMatesProps {
 }
 
 export const BMates = ({ data, style, trackEl }: BMatesProps) => {
-  const { editorRef, toggleMuteTrack, removeTrack } = useBMates();
+  const { editorRef, toggleMuteTrack, removeTrack, setIsPlaying } = useBMates();
 
   const [_data, setData] = useState<TrackDataType[]>(data);
   const ref = useRef<HTMLCanvasElement | null>(null);

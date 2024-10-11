@@ -178,6 +178,20 @@ class AudioPlayer {
     return track?.children[0]?.source.buffer;
   }
 
+  refreshDuration() {
+    const tracks = this.getTracks();
+    let maxEndTime = 0;
+
+    tracks.forEach(track => {
+      track.children.forEach((wave: Wave) => {
+        const endTime = wave.data.start + wave.data.long;
+        maxEndTime = Math.max(maxEndTime, endTime);
+      });
+    });
+
+    this._duration = maxEndTime;
+  }
+
   getDuration() {
     return this._duration;
   }
@@ -210,11 +224,11 @@ class AudioPlayer {
   }
 
   getTracks() {
-    return this.trackGroup?.getTracks();
+    return this.trackGroup?.getTracks() || [];
   }
 
   getWaves() {
-    return this.trackGroup.getWaves();
+    return this.trackGroup.getWaves() || [];
   }
 }
 

@@ -47,7 +47,7 @@ export class Workground extends Layer {
     this.add(this._trackGroup);
     data.forEach(d => this.addTrack(d));
 
-    this.timeline = new Timeline(this.style, 100, 0);
+    this.timeline = new Timeline(this.style, this.audioPlayer.getDuration(), 0);
     this.timeline.zIndex = -1;
     this.add(this.timeline);
 
@@ -125,7 +125,7 @@ export class Workground extends Layer {
       const canvasWidth = this.canvas.width;
 
       if (playheadPosition < this.scroll.x || playheadPosition > this.scroll.x + canvasWidth) {
-        this.scroll.x = Math.max(this._minScrollX, Math.min(playheadPosition, this.width - canvasWidth));
+        this.setScrollX(playheadPosition);
       }
       if (this.audioPlayer.getDuration() < this.getCurrentTime()) {
         this.pause();
@@ -211,13 +211,14 @@ export class Workground extends Layer {
   }
 
   setScrollX(x: number) {
-    this.scroll.x = Math.max(x, this._minScrollX);
+    const maxTimePosX = this.style.timeline.gapWidth * this.audioPlayer.getDuration() * this.style.timeline.timeDivde;
+    this.scroll.x = Math.min(Math.max(x, this._minScrollX), maxTimePosX);
   }
 
   addTrack(
     data: TrackDataType = {
       id: generateUniqueId(),
-      category: 'New Category',
+      name: 'New Track',
       group: this.getTracks().length,
       songs: [],
     },
@@ -260,6 +261,11 @@ export class Workground extends Layer {
 
   getWaves() {
     return this._trackGroup.getWaves();
+  }
+
+  refreshDurationTime() {
+    this.timeline.setTimeEnd(this.audioPlayer.getDuration());
+    this.setScrollX(this.scroll.x);
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */

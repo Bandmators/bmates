@@ -16,7 +16,7 @@ import { BMates } from '../../../../packages/studio';
 const data: TrackDataType[] = [
   {
     id: 'TEMP0',
-    category: 'Category 1',
+    name: 'Track 1',
     group: 0,
     songs: [
       {
@@ -39,7 +39,7 @@ const data: TrackDataType[] = [
   },
   {
     id: 'TEMP1',
-    category: 'Category 2',
+    name: 'Track 2',
     group: 1,
     songs: [
       {
@@ -120,7 +120,7 @@ export default function Home() {
                 trackEl={({ track, muted, toggleMute, removeTrack }) => {
                   return (
                     <Track>
-                      <TrackName>{track.category}</TrackName>
+                      <TrackName>{track.name}</TrackName>
                       <TrackFeature>
                         <ToggleMute muted={muted} onClick={toggleMute} />
                         <RemoveTrackButton onClick={removeTrack}>

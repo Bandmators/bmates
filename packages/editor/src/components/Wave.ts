@@ -1,4 +1,4 @@
-import { EventData, Node } from '@bmates/renderer';
+import { Node } from '@bmates/renderer';
 
 import { EditorStyleType, SongDataType } from '../types';
 import { Editor } from './Editor';
@@ -163,12 +163,12 @@ export class Wave extends Node {
   }
 
   private _initDrag() {
-    this.on('dragstart', (evt: EventData) => {
+    this.on('dragstart', evt => {
       this.zIndex = 1000;
       this.parent.zIndex = 1000;
       this.parent.call('wave-dragstart', evt);
     });
-    this.on('draging', (evt: EventData) => {
+    this.on('draging', evt => {
       if (evt.data) {
         if (this.data.lock) {
           this.x = evt.data.prevX;
@@ -210,7 +210,7 @@ export class Wave extends Node {
         });
       }
     });
-    this.on('dragend', (evt: EventData) => {
+    this.on('dragend', evt => {
       if (this._snappingY) {
         this.zIndex = 0;
         this.parent.zIndex = 0;

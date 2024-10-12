@@ -1,4 +1,4 @@
-import { EventData, Layer, setCursor } from '@bmates/renderer';
+import { EventData, Layer, getClientPosition, setCursor } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
 import { EditorStyleType, SongDataType, TrackDataType } from '../types';
@@ -68,7 +68,35 @@ export class Workground extends Layer {
     let moveX = 0;
     let isWaveOver = false;
 
-    this.on('mousedown', (evt: EventData) => {
+    this.on('touchstart', evt => {
+      if (evt.target.name === 'Wave') {
+        return;
+      }
+      startX = getClientPosition(evt.originalEvent).x;
+      isDragging = true;
+      moveX = startX;
+    });
+    this.on('touchmove', evt => {
+      if (evt.target.name === 'Wave') {
+        if (!isWaveOver) {
+          isWaveOver = true;
+        }
+        isDragging = false;
+      } else if (isWaveOver) {
+        isWaveOver = false;
+      }
+
+      if (isDragging) {
+        const deltaX = moveX - getClientPosition(evt.originalEvent).x;
+        this.setScrollX(this.scroll.x + deltaX);
+        moveX = getClientPosition(evt.originalEvent).x;
+      }
+    });
+    this.on('touchend', () => {
+      isDragging = false;
+    });
+
+    this.on('mousedown', evt => {
       if (evt.target.name === 'Wave') {
         return;
       }
@@ -81,7 +109,7 @@ export class Workground extends Layer {
       moveX = evt.originalEvent!.clientX;
     });
 
-    this.on('mousemove', (evt: EventData) => {
+    this.on('mousemove', evt => {
       if (evt.target.name === 'Wave') {
         if (!isWaveOver) {
           setCursor('pointer');
@@ -99,7 +127,7 @@ export class Workground extends Layer {
       }
     });
 
-    this.on('mouseup', (evt: EventData) => {
+    this.on('mouseup', evt => {
       if (evt.originalEvent!.button === 1) setCursor('default');
 
       isDragging = false;
@@ -120,7 +148,7 @@ export class Workground extends Layer {
       isDragging = false;
     });
 
-    this.on('playhead-move', (evt: EventData) => {
+    this.on('playhead-move', evt => {
       const playheadPosition = evt.data;
       const canvasWidth = this.canvas.width;
 
@@ -130,8 +158,7 @@ export class Workground extends Layer {
       if (this.audioPlayer.getDuration() < this.getCurrentTime()) {
         this.pause();
         this.audioPlayer.pause();
-        //@ts-ignore
-        this.playhead.call('pause', false);
+        this.playhead.call('pause', { target: this.parent, data: false });
       }
     });
   }
@@ -141,6 +168,8 @@ export class Workground extends Layer {
     const SNAPPING_THRESHOLD = 10;
 
     const checkSnapping = (evt: EventData) => {
+      if (!(evt.originalEvent instanceof MouseEvent && !evt.originalEvent.shiftKey)) return;
+
       const wave = evt.target as Wave;
       const otherWaves = this.getWaves().filter(child => child !== evt.target && child.data.group !== wave.data.group);
       const curX = wave.x;
@@ -176,7 +205,7 @@ export class Workground extends Layer {
     };
 
     let isPlayingDragStart = false;
-    this.on('wave-dragstart', (evt: EventData) => {
+    this.on('wave-dragstart', evt => {
       this.timeIndicator.visible = true;
       if (evt.target instanceof Wave) {
         this.timeIndicator.setTime(evt.target.data.start);
@@ -184,20 +213,20 @@ export class Workground extends Layer {
         this.timeIndicator.y = evt.target.y + evt.target.height;
       }
       snappingClientX = -1;
-      if (!evt.originalEvent.shiftKey) checkSnapping(evt);
+      checkSnapping(evt);
       isPlayingDragStart = this.isPlaying();
       if (isPlayingDragStart) {
         this.pause();
         this.audioPlayer.pause();
       }
     });
-    this.on('wave-draging', (evt: EventData) => {
+    this.on('wave-draging', evt => {
       if (evt.target instanceof Wave) {
         this.timeIndicator.setTime(evt.target.data.start);
         this.timeIndicator.x = evt.target.x;
         this.timeIndicator.y = evt.target.y + evt.target.height;
       }
-      if (!evt.originalEvent.shiftKey) checkSnapping(evt);
+      checkSnapping(evt);
     });
     this.on('wave-dragend', () => {
       this.timeIndicator.visible = false;

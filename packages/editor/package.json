@@ -1,6 +1,6 @@
 {
   "name": "@bmates/editor",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "web audio editor",
   "author": "kyechan99 <kyechan99@gmail.com>",
   "type": "module",
@@ -15,7 +15,7 @@
     "@bmates/renderer": "workspace:*"
   },
   "peerDependencies": {
-    "@bmates/renderer": "^0.0.3"
+    "@bmates/renderer": "^0.0.4"
   },
   "keywords": [
     "audio",

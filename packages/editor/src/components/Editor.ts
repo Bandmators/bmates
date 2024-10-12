@@ -109,7 +109,7 @@ export class Editor extends Stage {
   }
 
   private _initEvent() {
-    this.on('mousedown', (evt: EventData) => {
+    this.on('mousedown', evt => {
       if (evt.originalEvent.button === 0) {
         if (evt.target instanceof Wave) {
           if (evt.originalEvent.shiftKey) {
@@ -479,10 +479,6 @@ export class Editor extends Stage {
         return null;
       })
       .filter(track => track !== null);
-  }
-
-  oldExport() {
-    return this.data;
   }
 
   tree() {

@@ -1,7 +1,7 @@
 ---
 title: AudioPlayer
 order: 104
-lastUpdatedDate: 2024-9-30
+lastUpdatedDate: 2024-10-12
 group: Editor
 ---
 
@@ -51,14 +51,21 @@ Loads an audio buffer from the specified source URL.
 
 - Return: `Promise<AudioBuffer>`
 
-### prepareTrack (song, trackId)
+### prepareTrackAll (waves)
 
-Prepares an audio track for playback.
+Prepare an audio source from multiple wave objects.
 
-| Name    | Type           | Description               |
-| ------- | -------------- | ------------------------- |
-| song    | `SongDataType` | The song data to prepare. |
-| trackId | `string`       | The ID of the track.      |
+| Name  | Type     | Description      |
+| ----- | -------- | ---------------- |
+| waves | `Wave[]` | Wave components. |
+
+### prepareWave (waves)
+
+Prepare an audio source from a wave object.
+
+| Name  | Type   | Description      |
+| ----- | ------ | ---------------- |
+| waves | `Wave` | Wave components. |
 
 ### play (startTime)
 
@@ -126,6 +133,12 @@ This function calls the `toBlob` function to create the Blob and then uses the g
 | Name     | Type     | Description                       |
 | -------- | -------- | --------------------------------- |
 | filename | `string` | The name of the file to download. |
+
+### setTrackGroup(trackgroup)
+
+Specifies the trackgroup the AudioPlayer will track.
+
+Manages audio based on specified track groups.
 
 ## Usage Example
 

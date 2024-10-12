@@ -1,7 +1,7 @@
 ---
 title: Event
 order: 102
-lastUpdatedDate: 2024-9-30
+lastUpdatedDate: 2024-10-12
 group: Editor
 ---
 
@@ -20,6 +20,9 @@ The following `EventType` are supported:
 - `mouseleave`
 - `mouseover`
 - `mouseout`
+- `touchstart`
+- `touchmove`
+- `touchend`
 - `dragstart`
 - `draging`
 - `dragend`
@@ -39,9 +42,12 @@ Here are some common properties that may be included in `EventData`:
 
   - The element that triggered the event.
 
-- **originalEvent**: `MouseEvent`
+- **originalEvent**: `MouseEvent` | `TouchEvent` | `Event`
 
   - Information about the original mouse event that occurred, including details such as click, movement, etc.
+  - Type inference is made based on EventType.
+  - e.g.1 `mousedown` -> `MouseEvent`
+  - e.g.2 `touchmove` -> `TouchEvent`
 
 - **bubble**: `boolean`
 
@@ -60,23 +66,23 @@ Here are some common properties that may be included in `EventData`:
 ### EventData Structure
 
 ```typescript
-interface EventData {
+export type EventData<T extends EventType = EventType> = {
   target: Node;
   point?: {
     x: number;
     y: number;
   };
-  originalEvent?: MouseEvent;
+  originalEvent?: T extends keyof EventDataMap ? EventDataMap[T] : any;
   bubble?: boolean;
   data?: any;
   [key: string]: unknown;
-}
+};
 ```
 
 This structure allows event handlers to access relevant information about the event, enabling more dynamic and responsive event handling in your application.
 
 ```ts
-type EventHandler = (event: EventData) => void;
+export type EventHandler<T extends EventType = EventType> = (event: EventData<T>) => void;
 ```
 
 ## Methods
@@ -91,13 +97,16 @@ Subscribes a handler function to the specified event type.
 | handler   | `EventHandler` | The function to be called when the event occurs. |
 
 ```ts
-const handleClick: EventHandler = (event: EventData) => {
+const handleClick: EventHandler = event => {
   console.log('Click event triggered:', event);
 };
 
 //
 editor.on('custom-click', handleClick);
 ```
+
+> **There is no need to specify a type for the event parameter**, such as `event: EventData`.
+> Use built-in type inference.
 
 ### off (eventType, handler)
 

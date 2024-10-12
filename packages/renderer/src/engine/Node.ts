@@ -1,4 +1,6 @@
-import { EventData, Vector2 } from '../types';
+import { getClientPosition } from 'src/utils';
+
+import { Vector2 } from '../types';
 import { appendDataAtEventData, dispatchEventData, replaceEventDataType } from '../utils/event';
 import { Statable } from './State';
 
@@ -54,7 +56,7 @@ export abstract class Node extends Statable {
     return this.x <= x && x <= this.x + this.width && this.y <= y && y <= this.y + this.height;
   }
 
-  hitTest(point: Vector2, e: MouseEvent): Node | null {
+  hitTest(point: Vector2, e: Event): Node | null {
     if (!this.listening) return null;
 
     const isIntersection = this.isIntersection(point.x, point.y);
@@ -76,38 +78,33 @@ export abstract class Node extends Statable {
     let moveX = 0;
     let moveY = 0;
 
-    this.on('mouseout', (evt: EventData) => {
-      if (this.isDragging) {
-        this.isDragging = false;
-        this.getStage().isDragging = false;
-        this.call('dragend', replaceEventDataType('dragend', evt), false);
-      }
-    });
-
-    this.on('mousedown', (evt: EventData) => {
-      if (evt.originalEvent?.button !== 0) return;
+    const dragStart = evt => {
+      if (evt.originalEvent instanceof MouseEvent && evt.originalEvent?.button !== 0) return;
       const stage = this.getStage();
       if (stage.isDragging) return;
 
       this.isDragging = true;
       stage.isDragging = true;
-      moveX = evt.originalEvent?.clientX;
-      moveY = evt.originalEvent?.clientY;
+      moveX = getClientPosition(evt.originalEvent).x;
+      moveY = getClientPosition(evt.originalEvent).y;
       this.call('dragstart', replaceEventDataType('dragstart', evt), false);
-    });
+    };
+    this.on('mousedown', dragStart);
+    this.on('touchstart', dragStart);
 
-    this.on('mousemove', (evt: EventData) => {
+    const dragMove = evt => {
       if (this.isDragging) {
         const prevX = this.x;
         const prevY = this.y;
-        const newX = this.x + (evt.originalEvent?.clientX || 0) - moveX;
-        const newY = this.y + (evt.originalEvent?.clientY || 0) - moveY;
+        const newX = this.x + (getClientPosition(evt.originalEvent).x || 0) - moveX;
+        const newY = this.y + (getClientPosition(evt.originalEvent).y || 0) - moveY;
 
+        console.log(newX);
         this.x = newX;
         this.y = newY;
 
-        moveX = evt.originalEvent?.clientX ?? 0;
-        moveY = evt.originalEvent?.clientY ?? 0;
+        moveX = getClientPosition(evt.originalEvent).x ?? 0;
+        moveY = getClientPosition(evt.originalEvent).y ?? 0;
 
         this.call(
           'draging',
@@ -120,23 +117,21 @@ export abstract class Node extends Statable {
           false,
         );
       }
-    });
+    };
+    this.on('mousemove', dragMove);
+    this.on('touchmove', dragMove);
 
-    this.on('mouseup', (evt: EventData) => {
+    const dragEnd = evt => {
       if (this.isDragging) {
         this.isDragging = false;
         this.getStage().isDragging = false;
         this.call('dragend', replaceEventDataType('dragend', evt));
       }
-    });
-
-    this.on('mouseleave', (evt: EventData) => {
-      if (this.isDragging) {
-        this.isDragging = false;
-        this.getStage().isDragging = false;
-        this.call('dragend', replaceEventDataType('dragend', evt));
-      }
-    });
+    };
+    this.on('touchend', dragEnd);
+    this.on('mouseup', dragEnd);
+    this.on('mouseleave', dragEnd);
+    this.on('mouseout', dragEnd);
   }
 
   destroy() {

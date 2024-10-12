@@ -5,18 +5,18 @@ export class Statable {
   private events: Map<EventType, Set<EventHandler>> = new Map();
   parent: Container | null = null;
 
-  on(eventType: EventType, handler: EventHandler) {
+  on<T extends EventType>(eventType: T, handler: EventHandler<T>) {
     if (!this.events.has(eventType)) {
       this.events.set(eventType, new Set());
     }
     this.events.get(eventType)!.add(handler);
   }
 
-  off(eventType: EventType, handler: EventHandler) {
+  off<T extends EventType>(eventType: T, handler: EventHandler<T>) {
     this.events.get(eventType)?.delete(handler);
   }
 
-  call(eventType: string, eventData: EventData, eventBubble = true) {
+  call<T extends EventType>(eventType: T, eventData: EventData, eventBubble = true) {
     const handlers = this.events.get(eventType);
     handlers?.forEach(handler => handler(eventData));
 

@@ -64,18 +64,18 @@ export abstract class Stage extends Container<Layer> {
     this.ctx.restore();
   }
 
-  private _dispatchEvent(eventType: EventType, e: MouseEvent): void {
+  private _dispatchEvent(eventType: EventType, e: Event): void {
     const point = getRelativeMousePosition(e, this.canvas, this.scroll);
 
     const target = this.hitTest(point, e);
     if (target) dispatchEventData(eventType, target, point, e);
   }
 
-  handleEvent(e: MouseEvent) {
+  handleEvent(e: Event) {
     const eventMap: { [key: string]: EventType } = {
-      touchstart: 'mousedown',
-      touchmove: 'mousemove',
-      touchend: 'mouseup',
+      touchstart: 'touchstart',
+      touchmove: 'touchmove',
+      touchend: 'touchend',
       click: 'click',
       mousedown: 'mousedown',
       mousemove: 'mousemove',
@@ -88,12 +88,12 @@ export abstract class Stage extends Container<Layer> {
       const point = getRelativeMousePosition(e, this.canvas, this.scroll);
       this._dispatchEventToAll(eventType, point, e);
     }
-    if (eventType === 'mousedown' && e.button === 1) {
+    if (eventType === 'mousedown' && e instanceof MouseEvent && e.button === 1) {
       e.preventDefault();
     }
   }
 
-  private _dispatchEventToAll(eventType: EventType, point: { x: number; y: number }, e: MouseEvent) {
+  private _dispatchEventToAll(eventType: EventType, point: { x: number; y: number }, e: Event) {
     const dispatchToNode = (node: Node) => {
       dispatchEventData(eventType, node, point, e, false);
       if (node instanceof Container) {

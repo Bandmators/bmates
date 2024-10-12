@@ -2,7 +2,7 @@
 import { Track, TrackGroup, Wave } from './components';
 import { TrackDataType } from './types';
 import $ from './utils/$';
-import { bufferToBlob, mergeAudioBuffers, writeString } from './utils/wav';
+import { bufferToBlob, mergeAudioBuffers } from './utils/wav';
 
 interface Cache {
   source: AudioBufferSourceNode;
@@ -95,7 +95,7 @@ class AudioPlayer {
     });
   }
 
-  pause(): void {
+  pause() {
     const tracks = this.getTracks();
     tracks.forEach(track => {
       track.children.forEach((wave: Wave) => {

@@ -41,9 +41,8 @@ export const BMates = ({ data, style, trackEl }: BMatesProps) => {
       editorRef.current.on('data-change', () => {
         setData(editorRef.current?.export());
       });
-      editorRef.current.on('pause', isPlaying => {
-        // @ts-ignore
-        setIsPlaying(isPlaying);
+      editorRef.current.on('pause', evt => {
+        setIsPlaying(evt.data);
       });
     }
     return () => {

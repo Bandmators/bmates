@@ -30,11 +30,11 @@ export class Overlay extends Layer {
   }
 
   private _initEvent() {
-    this.on('mousemove', (evt: EventData) => {
+    this.on('mousemove', evt => {
       const isHoverItem = this._contextMenu.handleHover(evt.point.x, evt.point.y);
       setCursor(isHoverItem ? 'pointer' : 'default');
     });
-    this.on('mousedown', (evt: EventData) => {
+    this.on('mousedown', evt => {
       const selectedMenuItem = this._contextMenu.handleClick(evt.point.x, evt.point.y);
       this.closeContextMenu();
       evt.data = { item: selectedMenuItem };

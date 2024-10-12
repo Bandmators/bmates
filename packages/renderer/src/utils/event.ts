@@ -8,7 +8,7 @@ export const dispatchEventData = (
     x: number;
     y: number;
   },
-  originalEvent: MouseEvent,
+  originalEvent: Event,
   bubble: boolean = true,
   data?: object,
 ) => {

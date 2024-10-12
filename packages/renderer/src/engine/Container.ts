@@ -18,7 +18,7 @@ export abstract class Container<ChildType extends Node = Node> extends Node {
     }
   }
 
-  hitTest(point: Vector2, e: MouseEvent) {
+  hitTest(point: Vector2, e: Event) {
     let hitChild = null;
     for (let i = this.children.length - 1; i >= 0; i--) {
       const hit = this.children[i].hitTest(point, e);

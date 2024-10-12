@@ -1,7 +1,7 @@
 ---
 title: Editor
 order: 100
-lastUpdatedDate: 2024-9-30
+lastUpdatedDate: 2024-10-12
 group: Editor
 ---
 
@@ -48,6 +48,20 @@ The initial array of data.
 
 **style**: `Partial<EditorStyleType>`
 The initial style settings.
+
+## Usage Example
+
+```typescript
+const canvas: HTMLCanvasElement = document.getElementById('editorCanvas');
+const editorData: EditorDataType[] = [];
+const editorStyle: Partial<EditorStyleType> = {};
+
+const editor = new Editor(canvas, editorData, editorStyle);
+editor.init();
+editor.play();
+
+// editor.destory ();
+```
 
 ## Methods
 
@@ -129,25 +143,17 @@ Returns the current mute state of the specified track.
 
 - Return: `boolean`
 
+### getCurrentTime ()
+
+Returns the current play time.
+
+- Return: `number`
+
 ### export ()
 
 Returns the current data of the editor.
 
 - Return: `EditorDataType[]`
-
-## Usage Example
-
-```typescript
-const canvas: HTMLCanvasElement = document.getElementById('editorCanvas');
-const editorData: EditorDataType[] = [];
-const editorStyle: Partial<EditorStyleType> = {};
-
-const editor = new Editor(canvas, editorData, editorStyle);
-editor.init();
-editor.play();
-
-// editor.destory ();
-```
 
 ### exportTracks ()
 
@@ -162,3 +168,18 @@ Downloads the audio tracks as a Blob with the specified filename. This method ca
 | Name     | Type     | Description                       |
 | -------- | -------- | --------------------------------- |
 | filename | `string` | The name of the file to download. |
+
+### saveState ()
+
+Records the current status of the editor, allowing users to save their progress.
+This method captures the state of all active tracks and settings, enabling users to restore their work later.
+
+### undo ()
+
+Reverts to the previous state.
+This method allows users to undo the last action taken in the editor, restoring the state to what it was before the last change.
+
+### redo ()
+
+Reapplies the last undone action.
+This method allows users to redo an action that was previously undone, restoring the state to the most recent change.

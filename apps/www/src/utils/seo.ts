@@ -3,15 +3,15 @@ import { Metadata } from 'next';
 import { PostType } from '@/types/post';
 
 export const siteConfig = {
-  url: 'https://kyechan99.github.io',
-  title: 'kyechan99',
-  description: 'kyechan99',
+  url: 'https://Bandmators.github.io',
+  title: 'BMates',
+  description: 'Web Audio Editor',
   copyright: 'kyechan99 © All rights reserved.',
-  since: 2023,
+  since: 2024,
   googleAnalyticsId: '',
   author: 'kyechan99',
   email: 'kyechan99@gmail.com',
-  profile: 'https://kyechan99.github.io/profile.png',
+  profile: 'https://github.com/Bandmators/bmates/blob/main/apps/www/public/bmates_thumbnail.png',
 };
 
 const getRelativeUrl = (url?: string) => {
@@ -43,6 +43,18 @@ export const getBaseMetadata = ({ title, path }: { title: string; path?: string 
     alternates: {
       canonical: url,
     },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@kyechan99',
+      title,
+      description,
+      images: [
+        {
+          url: siteConfig.profile,
+          alt: title,
+        },
+      ],
+    },
   };
 };
 
@@ -62,14 +74,26 @@ export const getArticleMetadata = (post: PostType): Metadata => {
       url,
       authors: [`https://github.com/kyechan99`],
       images: [
-        // {
-        //   url: `${siteConfig.url}${headerImgPath(post.headerImg)}`,
-        //   alt: post.title,
-        // },
+        {
+          url: siteConfig.profile,
+          alt: post.title,
+        },
       ],
     },
     alternates: {
       canonical: url,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@kyechan99',
+      title: post.title,
+      description,
+      images: [
+        {
+          url: siteConfig.profile,
+          alt: post.title,
+        },
+      ],
     },
   };
 };

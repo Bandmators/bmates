@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/Bandmators/bmates/tree/master/.github/workflows">
-    <img src="https://img.shields.io/github/actions/workflow/status/Bandmators/bmates/vitest.yml" alt="Build Passing" />
+    <img src="https://img.shields.io/github/actions/workflow/status/Bandmators/bmates/deploy.yml" alt="Build Passing" />
   </a>
   <a href="https://github.com/Bandmators/bmates/blob/master/LICENSE.md">
     <img src="https://img.shields.io/github/license/Bandmators/bmates" alt="license">

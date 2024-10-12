@@ -68,6 +68,8 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: pnpm install
+      - name: Build bmates packages
+        run: pnpm run build
       - name: Build with Next.js
         run: pnpm --filter bmates-docs build
       - name: Upload artifact

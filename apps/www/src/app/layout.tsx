@@ -17,7 +17,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html data-theme="" lang="kr" suppressHydrationWarning={true}>
       <head>
         <meta name="google-site-verification" content="CPBHSXOcqx3RLJ-Pn1Vr34l30UqV46HXj7Et7LsCM7U" />
-        <meta name="naver-site-verification" content="32b3ee031edf2f6c12c44c12006d46b903de6110" />
+        <link rel="icon" href="/bmates/favicon.ico" sizes="any" />
       </head>
       <body className={notoSansKr.className}>
         <Provider>{children}</Provider>

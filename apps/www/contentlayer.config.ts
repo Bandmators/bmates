@@ -43,7 +43,7 @@ export const Post = defineDocumentType(() => ({
     },
     path: {
       type: 'string',
-      resolve: (doc: any) => doc._raw.flattenedPath.replace(/^(docs|project)\//, ''),
+      resolve: (doc: any) => doc._raw.flattenedPath,
     },
     postType: { type: 'string', resolve: (doc: any) => doc._raw.sourceFileDir.split('/')[0] },
     searchTxt: { type: 'string', resolve: (doc: any) => searchTermOptimization(doc.title) },

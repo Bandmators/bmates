@@ -19,7 +19,7 @@ const data: TrackDataType[] = [
     songs: [
       {
         id: 'BMATEST0',
-        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_0.mp3',
+        src: 'https://bandmators.github.io/bmates/audio/drum_0.mp3',
         user: '',
         start: 0,
         group: 0,
@@ -27,7 +27,7 @@ const data: TrackDataType[] = [
       },
       {
         id: 'BMATEST1',
-        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/drum_1.mp3',
+        src: 'https://bandmators.github.io/bmates/audio/drum_1.mp3',
         user: '',
         start: 9,
         group: 0,
@@ -42,7 +42,7 @@ const data: TrackDataType[] = [
     songs: [
       {
         id: 'BMATEST3',
-        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/guitar_0.mp3',
+        src: 'https://bandmators.github.io/bmates/audio/guitar_0.mp3',
         user: '',
         start: 3,
         group: 1,
@@ -50,7 +50,7 @@ const data: TrackDataType[] = [
       },
       {
         id: 'BMATEST4',
-        src: 'https://baggun.s3.ap-northeast-2.amazonaws.com/voice/piano_0.mp3',
+        src: 'https://bandmators.github.io/bmates/audio/piano_0.mp3',
         user: '',
         start: 10.0,
         group: 1,

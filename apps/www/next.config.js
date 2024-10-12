@@ -14,6 +14,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  basePath: '/bmates',
 };
 
 module.exports = withContentlayer(nextConfig);

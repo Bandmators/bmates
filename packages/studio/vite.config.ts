@@ -46,7 +46,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/audio': {
-        target: 'https://baggun.s3.ap-northeast-2.amazonaws.com',
+        target: 'https://bandmators.github.io',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/audio/, ''),
       },

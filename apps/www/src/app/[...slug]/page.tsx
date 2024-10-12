@@ -1,7 +1,7 @@
 import '@/styles/prism.css';
-import { notFound } from 'next/navigation';
 
-import { PostLayout } from '@/components/layout';
+// import { notFound } from 'next/navigation';
+// import { PostLayout } from '@/components/layout';
 import { allPosts } from '@/constants/posts';
 import { PostType } from '@/types/post';
 import { getArticleMetadata } from '@/utils/seo';
@@ -18,10 +18,18 @@ export const generateMetadata = ({ params }: { params: { slug: string[] } }) => 
 
 const PostPage = ({ params }: { params: { slug: string[] } }) => {
   const flattenedPath = params.slug.join('/');
+  console.log(flattenedPath);
   const post = allPosts.find(post => post._raw.flattenedPath === flattenedPath);
-  if (!post) notFound();
+  return (
+    <div>
+      {flattenedPath}
+      <hr />
+      {JSON.stringify(post)}
+    </div>
+  );
+  // if (!post) notFound();
 
-  return <PostLayout post={post} />;
+  // return <PostLayout post={post} />;
 };
 
 export default PostPage;

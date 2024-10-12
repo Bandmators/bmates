@@ -16,7 +16,6 @@ export const openSidebarState = selector({
     return get(openSidebarAtom);
   },
   set: ({ set }, newVal) => {
-    console.log(newVal);
     if (newVal) {
       document.body.classList.toggle('hidden', true);
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;

@@ -11,7 +11,7 @@ export const siteConfig = {
   googleAnalyticsId: '',
   author: 'kyechan99',
   email: 'kyechan99@gmail.com',
-  profile: 'https://github.com/Bandmators/bmates/blob/main/apps/www/public/bmates_thumbnail.png',
+  profile: 'https://raw.githubusercontent.com/Bandmators/bmates/refs/heads/main/apps/www/public/bmates_thumbnail.png',
 };
 
 const getRelativeUrl = (url?: string) => {
@@ -27,6 +27,7 @@ export const getBaseMetadata = ({ title, path }: { title: string; path?: string 
   return {
     title,
     description,
+    metadataBase: new URL('https://bandmators.github.io'),
     openGraph: {
       title,
       description,
@@ -66,6 +67,7 @@ export const getArticleMetadata = (post: PostType): Metadata => {
     title: post.title,
     description,
     keywords: ['bmates'],
+    metadataBase: new URL('https://bandmators.github.io'),
     openGraph: {
       title: post.title,
       description,

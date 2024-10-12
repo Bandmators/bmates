@@ -41,7 +41,10 @@ export const Post = defineDocumentType(() => ({
         return headings;
       },
     },
-    path: { type: 'string', resolve: (doc: any) => doc._raw.flattenedPath.replace(/^(docs|project)\//, '') },
+    path: {
+      type: 'string',
+      resolve: (doc: any) => 'bmates/' + doc._raw.flattenedPath.replace(/^(docs|project)\//, ''),
+    },
     postType: { type: 'string', resolve: (doc: any) => doc._raw.sourceFileDir.split('/')[0] },
     searchTxt: { type: 'string', resolve: (doc: any) => searchTermOptimization(doc.title) },
     // slug: {

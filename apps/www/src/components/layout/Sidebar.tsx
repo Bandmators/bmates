@@ -62,7 +62,7 @@ export const Sidebar = ({ post }: { post?: PostType }) => {
           <path d="M6 6l12 12" />
         </svg>
       </PostSidebarCloseButtonMo>
-      <PostSidebar>
+      <PostSidebar className={post === undefined ? 'hide' : ''}>
         {showSidebar && <NavMenu />}
         <PostSidebarItemList>
           {Object.entries(allPostTree).map(([group, posts]) => (

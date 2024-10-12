@@ -13,7 +13,7 @@
     "@bmates/studio": "workspace:^",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "bmates-ui": "^1.0.2",
+    "bmates-ui": "^1.0.3",
     "clsx": "^2.1.1",
     "contentlayer": "^0.3.4",
     "cookies-next": "^4.1.0",

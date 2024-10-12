@@ -48,6 +48,11 @@ export const PostSidebar = styled.aside`
   padding: 2rem;
   overflow-y: auto;
   height: calc(100vh - var(--layoutHeader));
+  ${minMedia.mobile} {
+    &.hide {
+      display: none;
+    }
+  }
   ${maxMedia.mobile} {
     padding: 0rem 1rem 1rem 1rem;
   }

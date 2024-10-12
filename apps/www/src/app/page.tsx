@@ -3,9 +3,10 @@
 import { BMates, BmatesProvider, Editor, EditorStyleType, TrackDataType, useBMates } from '@bmates/studio';
 
 import styled from '@emotion/styled';
-import { Button, maxMedia, useToast } from 'bmates-ui';
+import { Button, InputFile, maxMedia, useToast } from 'bmates-ui';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
+import React from 'react';
 
 import { Container } from '@/components/common/grid/Container';
 import { Layout } from '@/components/layout';
@@ -210,6 +211,12 @@ const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; childr
 const ControlPanel = () => {
   const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download, editorRef } = useBMates();
   const { toast } = useToast();
+  const [fileName, setFileName] = React.useState<string | null>(null);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setFileName(file ? file.name : null);
+    await handleFileUpload(event);
+  };
 
   return (
     <ControlPanelStyled>
@@ -220,7 +227,9 @@ const ControlPanel = () => {
         <Button variant="primary" onClick={toggleStopPlay}>
           Stop
         </Button>
-        <input type="file" accept="audio/*" onChange={handleFileUpload} />
+        <InputFile variant="primary" id="file-upload" accept="audio/*" onChange={handleFileChange}>
+          {fileName}
+        </InputFile>
       </div>
       <div className="collapse">
         <Button variant="primary" onClick={download}>

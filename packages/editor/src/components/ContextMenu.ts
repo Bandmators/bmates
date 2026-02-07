@@ -86,7 +86,7 @@ export class ContextMenu extends Node {
       if (menuIndex >= 0 && menuIndex < this._menus.length) {
         const selectedItem = this._menus[menuIndex];
 
-        console.log(`Selected menu item: ${selectedItem}`);
+        // console.log(`Selected menu item: ${selectedItem}`);
         return selectedItem;
       }
     }

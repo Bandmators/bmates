@@ -122,7 +122,7 @@ const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; childr
 };
 
 const ControlPanel = () => {
-  const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download, editorRef } = useBMates();
+  const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download /* editorRef */ } = useBMates();
   const { toast } = useToast();
 
   return (
@@ -146,8 +146,8 @@ const ControlPanel = () => {
             variant: 'primary',
             time: 7000,
           });
-          console.log(`%c[ BMates Export Data ]`, 'background: black; color: white;');
-          console.log('Result: ', editorRef.current.export());
+          // console.log(`%c[ BMates Export Data ]`, 'background: black; color: white;');
+          // console.log('Result: ', editorRef.current.export());
         }}
       >
         Export

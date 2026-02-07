@@ -99,7 +99,6 @@ export abstract class Node extends Statable {
         const newX = this.x + (getClientPosition(evt.originalEvent).x || 0) - moveX;
         const newY = this.y + (getClientPosition(evt.originalEvent).y || 0) - moveY;
 
-        console.log(newX);
         this.x = newX;
         this.y = newY;
 

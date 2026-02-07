@@ -3,10 +3,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Bandmators/bmates/tree/master/.github/workflows">
-    <img src="https://img.shields.io/github/actions/workflow/status/Bandmators/bmates/deploy.yml" alt="Build Passing" />
+  <a href="https://www.repostatus.org/#active">
+    <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed." />
   </a>
-  <a href="https://github.com/Bandmators/bmates/blob/master/LICENSE.md">
+  <a href="https://github.com/Bandmators/bmates/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/Bandmators/bmates" alt="license">
   </a>
 </p>
@@ -16,7 +16,6 @@
 BMates is a powerful tool that helps users easily edit music.
 
 With an intuitive interface and a variety of features, anyone can create audio projects effortlessly.
-
 
 ## Installation
 
@@ -174,7 +173,6 @@ const style: EditorStyleType = {};
   style={style}
 />;
 ```
-
 
 ## Packages
 

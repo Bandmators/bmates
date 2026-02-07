@@ -5,8 +5,7 @@ import $ from './utils/$';
 import { bufferToBlob, mergeAudioBuffers } from './utils/wav';
 
 interface Cache {
-  source: AudioBufferSourceNode;
-  gain: GainNode;
+  buffer: AudioBuffer;
 }
 
 class AudioPlayer {
@@ -49,23 +48,22 @@ class AudioPlayer {
 
   async prepareWave(wave: Wave) {
     const cache = this._cache.get(wave.data.id);
+    const context = this.createContext();
 
-    if (cache) {
-      wave.gain = cache.gain;
-      wave.data.long = cache.source.buffer.duration;
-      wave.source = cache.source;
-    } else {
-      const buffer = await this.loadAudioBuffer(wave.data.src);
-      const context = this.createContext();
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      const gainNode = context.createGain();
-      gainNode.connect(context.destination);
-
-      wave.gain = gainNode;
-      wave.data.long = buffer.duration;
-      wave.source = source;
+    const buffer = cache?.buffer ?? (await this.loadAudioBuffer(wave.data.src));
+    if (!cache) {
+      this._cache.set(wave.data.id, { buffer });
     }
+
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    const gainNode = context.createGain();
+    gainNode.connect(context.destination);
+
+    wave.gain = gainNode;
+    wave.data.long = buffer.duration;
+    wave.source = source;
+
     this._duration = Math.max(this._duration, wave.data.start + wave.data.long);
   }
 

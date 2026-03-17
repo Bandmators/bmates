@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "pnpm -F @bmates/studio run dev",
+    "dev": "pnpm --parallel --filter @bmates/renderer --filter @bmates/editor --filter @bmates/studio run dev",
     "build": "pnpm --filter @bmates/renderer build && pnpm --filter @bmates/editor build && pnpm --filter @bmates/studio build",
     "publish": "pnpm --filter @bmates/renderer publish --access public && pnpm --filter @bmates/editor publish --access public && pnpm --filter @bmates/studio publish --access public",
     "editor": "pnpm -F @bmates/editor",

@@ -434,23 +434,17 @@ export class Editor extends Stage {
           continue;
         }
 
-        this._workground.getWaves().forEach(wave => {
-          if (wave.data.group > newNode.group) {
-            wave.data.group++;
-            wave.repositioning();
-          }
-        });
-
+        const newGroupIdx = this._workground.getTracks().length;
         const friends = newNodes
           .filter(node => node.group === newNode.group && !createdWaveIds.has(node.id))
           .map(node => {
             createdWaveIds.add(node.id);
-            return { ...node, group: node.group + 1 };
+            return { ...node, group: newGroupIdx };
           });
         const track = this._workground.addTrack({
           id: generateUniqueId(),
           name: 'New Track',
-          group: this._workground.getTracks().length,
+          group: newGroupIdx,
           songs: friends,
         });
         newWaves.push(...track.children);

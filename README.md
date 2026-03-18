@@ -176,6 +176,6 @@ const style: EditorStyleType = {};
 
 ## Packages
 
-- @bmates/renderer
-- @bmates/editor
-- @bmates/studio
+- [@bmates/renderer](https://www.npmjs.com/package/@bmates/renderer)
+- [@bmates/editor](https://www.npmjs.com/package/@bmates/editor)
+- [@bmates/studio](https://www.npmjs.com/package/@bmates/studio)

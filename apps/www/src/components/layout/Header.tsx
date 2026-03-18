@@ -64,9 +64,9 @@ export const NavMenu = () => {
         <NavDivider />
         <NavItem>
           <Select align="end">
-            <SelectToggleStyled>v0.0.4</SelectToggleStyled>
+            <SelectToggleStyled>v0.0.5</SelectToggleStyled>
             <SelectContent>
-              <SelectItemStyled value={'v0.0.4'}>v0.0.4</SelectItemStyled>
+              <SelectItemStyled value={'v0.0.5'}>v0.0.5</SelectItemStyled>
             </SelectContent>
           </Select>
         </NavItem>

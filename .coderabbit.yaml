@@ -1,0 +1,84 @@
+language: ko-KR
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  review_details: true
+  collapse_walkthrough: true
+  changed_files_summary: true
+  sequence_diagrams: false
+  estimate_code_review_effort: true
+  poem: false
+  enable_prompt_for_ai_agents: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+
+  path_filters:
+    - '!**/dist/**'
+    - '!**/.next/**'
+    - '!**/.contentlayer/**'
+    - '!apps/www/out/**'
+    - '!pnpm-lock.yaml'
+    - '!apps/www/public/audio/**'
+    - '!apps/www/public/**/*.png'
+    - '!apps/www/public/**/*.ico'
+
+  path_instructions:
+    - path: 'packages/renderer/src/**'
+      instructions: |
+        Review this as a framework-independent Canvas 2D engine.
+        - Flag dependencies on editor, audio, React, or application-specific concepts.
+        - Verify pointer coordinates when CSS size, canvas buffer size, device pixel ratio, or scroll offsets differ.
+        - Check hit testing, z-index ordering, parent-child ownership, and event propagation together.
+        - Flag animation-frame work that allocates or traverses unnecessarily on every frame.
+        - Verify every added DOM listener and animation frame is removed during destruction.
+
+    - path: 'packages/editor/src/**'
+      instructions: |
+        Prioritize behavioral correctness in the multitrack audio editor.
+        - Verify TrackDataType.group, SongDataType.group, visual track order, and Wave parent ownership remain synchronized and contiguous.
+        - Verify changes to clip start time also update its canvas position, and vice versa, using the same timeline scale.
+        - AudioBufferSourceNode is single-use: flag code that restarts a source instead of creating a new source from the cached AudioBuffer.
+        - Effective volume must combine track mute and clip mute state.
+        - For every mutation, check playback continuity, duration refresh, selection, undo/redo snapshots, exported data, and data-change events.
+        - Flag collisions, orphaned nodes, stale audio nodes, and operations that allow locked waves to move.
+        - Check cleanup of listeners, AudioNodes, AudioContexts, and object URLs where ownership ends.
+
+    - path: 'packages/studio/src/**'
+      instructions: |
+        Review this as the public React integration for @bmates/editor.
+        - Keep one Editor instance per mounted BMates component and verify cleanup on unmount or remount.
+        - Flag duplicated React/editor state, stale closures, incomplete effect dependencies, and events that leave the sidebar out of sync.
+        - Ensure optional props and partial style objects cannot be dereferenced before defaults are applied.
+        - Flag browser globals used during module evaluation because consumers may import the package under Next.js SSR.
+        - Treat BMates, BmatesProvider, useBMates, their props, and barrel exports as compatibility-sensitive public API.
+
+    - path: 'apps/www/**'
+      instructions: |
+        Review the documentation site for static Next.js deployment compatibility.
+        - Verify examples compile against exported package APIs and do not use repository-private internals.
+        - Check internal routes, asset paths, metadata, and links against the configured GitHub Pages base path.
+        - For UI changes, flag accessibility or responsive-layout regressions.
+        - Do not request edits to generated Next.js or Contentlayer output.
+
+    - path: 'apps/www/posts/docs/**/*.mdx'
+      instructions: |
+        Check technical accuracy against the current public API.
+        Require valid title, order, and lastUpdatedDate frontmatter, and keep terminology consistent with editor, track, wave/clip, timeline, playhead, and workground.
+
+    - path: '**/package.json'
+      instructions: |
+        Check workspace dependency direction: renderer -> editor -> studio -> docs.
+        Flag accidental runtime dependencies, inconsistent peer dependencies, invalid export/type entry points, non-pnpm package-manager assumptions, and version changes not applied consistently across dependent packages.
+
+    - path: '.github/workflows/**'
+      instructions: |
+        Check least-privilege permissions, pinned major action versions, pnpm frozen-lockfile installs, Node.js 20 compatibility, correct package build order, cache keys, and GitHub Pages artifact paths.
+
+chat:
+  auto_reply: true

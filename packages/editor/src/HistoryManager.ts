@@ -1,6 +1,11 @@
 export class Memento {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(public state: any[]) {}
+  private readonly state: any[];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(state: any[]) {
+    this.state = JSON.parse(JSON.stringify(state));
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   restore(): any[] {
@@ -12,6 +17,8 @@ export class Caretaker {
   private _undoStack: Memento[] = [];
   private _redoStack: Memento[] = [];
   private current: Memento = null;
+
+  constructor(private readonly maxEntries = 100) {}
 
   save(memento: Memento) {
     if (this.current) {
@@ -36,6 +43,7 @@ export class Caretaker {
 
   pushUndo(memento: Memento) {
     this._undoStack.push(memento);
+    if (this._undoStack.length > this.maxEntries) this._undoStack.shift();
   }
 
   redo(): Memento | undefined {
@@ -53,5 +61,6 @@ export class Caretaker {
 
   pushRedo(memento: Memento) {
     this._redoStack.push(memento);
+    if (this._redoStack.length > this.maxEntries) this._redoStack.shift();
   }
 }

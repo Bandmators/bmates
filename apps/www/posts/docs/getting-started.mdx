@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 order: 0
-lastUpdatedDate: 2024-9-29
+lastUpdatedDate: 2026-10-1
 ---
 
 ## Installation
@@ -25,7 +25,7 @@ Set the appropriate props for the BMates component.
 
 ```tsx
 const App = () => {
-  const editorRef = useRef<Editor>();
+  const editorRef = useRef<Editor | null>(null);
 
   return (
     <BmatesProvider editorRef={editorRef}>
@@ -83,14 +83,95 @@ const ControlPanel = () => {
 
 Other frameworks besides React are currently in preparation.
 
+The `style` and `trackEl` props are optional. BMates applies its default theme and a
+track-name renderer when they are omitted. Use `onError` to surface audio loading or
+decoding failures in your application.
+
+## Composable editor UI
+
+Use the compound API when your application needs custom layout and controls without directly managing an `Editor` ref.
+The React track list and Canvas timeline subscribe to the same store.
+
+```tsx
+import { BMates, useBMatesSelector, useBMatesStore } from '@bmates/studio';
+
+const Transport = () => {
+  const editor = useBMatesStore();
+  const playing = useBMatesSelector(state => state.isPlaying);
+
+  return <button onClick={() => void editor.togglePlayback()}>{playing ? 'Pause' : 'Play'}</button>;
+};
+
+const CustomEditor = () => (
+  <BMates.Root defaultData={data} onDataChange={saveProject}>
+    <Transport />
+    <div style={{ display: 'flex', height: 600 }}>
+      <BMates.TrackList>
+        {({ track, muted, toggleMute }) => (
+          <button onClick={toggleMute}>{muted ? `Unmute ${track.name}` : `Mute ${track.name}`}</button>
+        )}
+      </BMates.TrackList>
+      <BMates.Canvas style={{ flex: 1 }} />
+    </div>
+  </BMates.Root>
+);
+```
+
+`defaultData` initializes an uncontrolled editor. For integration outside the React tree, create a store with
+`createBMatesStore` and pass it to `BMates.Root` through the `store` prop.
+
+The project source of truth is the framework-independent `@bmates/core` store. Plugins and non-React integrations can
+share it with Studio:
+
+```tsx
+import { createProjectStore } from '@bmates/core';
+import { BMates, createBMatesStore } from '@bmates/studio';
+
+const projectStore = createProjectStore(data);
+const studioStore = createBMatesStore({ projectStore });
+
+<BMates.Root store={studioStore}>
+  <BMates.Canvas />
+</BMates.Root>;
+```
+
+Project export and undo/redo work headlessly. Playback and audio import/export require the mounted Canvas/Web Audio
+adapter.
+
+Use `project={project}` together with `onDataChange` for a controlled editor. Do not combine the controlled `project`
+prop with a `BMates.Project` component tree; each is a complete declarative owner.
+
+### Declarative tracks and clips
+
+Tracks and clips can be expressed directly as React components. The editor reconciles component mount, prop updates,
+and unmount by ID without recreating unchanged audio resources.
+
+```tsx
+<BMates.Root>
+  <BMates.Project>
+    <BMates.Track id={'drums'} name={'Drums'}>
+      <BMates.Clip id={'kick'} src={'/kick.wav'} start={0} instrument={'Kick'} />
+      <BMates.Clip id={'snare'} src={'/snare.wav'} start={1} instrument={'Snare'} />
+    </BMates.Track>
+  </BMates.Project>
+
+  <BMates.Canvas />
+</BMates.Root>
+```
+
+IDs must be unique within a project. User interactions continue to emit `onDataChange`; update the declared props from
+that callback when the React tree should remain fully controlled.
+
+Use `useBMatesTrack(id)` and `useBMatesClip(id)` to build UI that subscribes to one editor entity.
+
 ## Framework
 
-`@bmates/studio` is a library built for React based on `@bmates/editor`.
-If you want to use it in other frameworks, please utilize `@bmates/editor`.
+`@bmates/studio` is the React adapter. Use `@bmates/core` for framework-independent state and commands, and add
+`@bmates/editor` for Canvas rendering and Web Audio.
 
 ```shell
 # NPM
-npm install @bmates/editor
+npm install @bmates/core @bmates/editor
 ```
 
 We will support other frameworks soon.

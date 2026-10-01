@@ -1,7 +1,7 @@
 ---
 title: useBMates
 order: 8
-lastUpdatedDate: 2024-10-12
+lastUpdatedDate: 2026-9-30
 ---
 
 `useBMates` is a hook provided by BmatesContext, which can be used within the BmatesProvider. This hook allows access to the state and methods of the BmatesContext.
@@ -40,7 +40,9 @@ If you want detailed usage, access the [Editor](/docs/editor/editor) directly us
 
 A function to download the current audio.
 
-- Return: `void`
+- Return: `Promise<void>`
+
+The downloaded file is a WAV file.
 
 ### togglePlay ()
 
@@ -88,7 +90,7 @@ A function to handle file uploads.
 
 A reference to the Editor instance, allowing direct manipulation or access to its methods.
 
-- Type: `React.RefObject<Editor>`
+- Type: `React.MutableRefObject<Editor | null>`
 
 ## Notes
 

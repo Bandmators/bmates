@@ -4,12 +4,12 @@ import { Editor } from '@bmates/editor';
 import React, { createContext, useContext, useState } from 'react';
 
 export interface BmatesContextType {
-  download: () => void;
+  download: () => Promise<void>;
   togglePlay: () => Promise<void>;
   toggleStopPlay: () => Promise<void>;
   isPlaying: boolean;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  editorRef: React.RefObject<Editor>;
+  editorRef: React.MutableRefObject<Editor | null>;
   toggleMuteTrack: (trackId: string) => void;
   removeTrack: (trackId: string) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -17,10 +17,10 @@ export interface BmatesContextType {
 
 const BmatesContext = createContext<BmatesContextType | undefined>(undefined);
 
-export const BmatesProvider: React.FC<{ children: React.ReactNode; editorRef: React.RefObject<Editor> }> = ({
-  children,
-  editorRef,
-}) => {
+export const BmatesProvider: React.FC<{
+  children: React.ReactNode;
+  editorRef: React.MutableRefObject<Editor | null>;
+}> = ({ children, editorRef }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const play = async () => {
@@ -44,8 +44,8 @@ export const BmatesProvider: React.FC<{ children: React.ReactNode; editorRef: Re
     }
   };
 
-  const download = () => {
-    editorRef.current?.downloadBlob('bmates_audio.mp3');
+  const download = async () => {
+    await editorRef.current?.downloadBlob('bmates_audio.wav');
   };
 
   const togglePlay = async () => {
@@ -65,11 +65,15 @@ export const BmatesProvider: React.FC<{ children: React.ReactNode; editorRef: Re
     if (!file) return;
 
     const audioContext = new AudioContext();
-    const arrayBuffer = await file.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-    if (editorRef.current) {
-      await editorRef.current.addWaveBuffer(file, audioBuffer);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      if (editorRef.current) {
+        await editorRef.current.addWaveBuffer(file, audioBuffer);
+      }
+    } finally {
+      await audioContext.close();
+      event.target.value = '';
     }
   };
 

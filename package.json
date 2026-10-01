@@ -1,15 +1,19 @@
 {
   "name": "bmates",
   "version": "0.0.5",
+  "packageManager": "pnpm@10.9.0",
   "description": "",
   "main": "index.js",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "pnpm --parallel --filter @bmates/renderer --filter @bmates/editor --filter @bmates/studio run dev",
-    "build": "pnpm --filter @bmates/renderer build && pnpm --filter @bmates/editor build && pnpm --filter @bmates/studio build",
-    "publish": "pnpm --filter @bmates/renderer publish --access public && pnpm --filter @bmates/editor publish --access public && pnpm --filter @bmates/studio publish --access public",
+    "dev": "pnpm --parallel --filter @bmates/core --filter @bmates/renderer --filter @bmates/editor --filter @bmates/studio run dev",
+    "build": "pnpm --filter @bmates/core build && pnpm --filter @bmates/renderer build && pnpm --filter @bmates/editor build && pnpm --filter @bmates/studio build",
+    "test": "vitest run",
+    "lint": "eslint packages/core/src packages/renderer/src packages/editor/src packages/studio/src",
+    "publish": "pnpm --filter @bmates/core publish --access public && pnpm --filter @bmates/renderer publish --access public && pnpm --filter @bmates/editor publish --access public && pnpm --filter @bmates/studio publish --access public",
+    "core": "pnpm -F @bmates/core",
     "editor": "pnpm -F @bmates/editor",
     "renderer": "pnpm -F @bmates/renderer",
     "studio": "pnpm -F @bmates/studio",
@@ -31,7 +35,8 @@
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^3.7.1",
-    "vite-tsconfig-paths": "^4.2.2"
+    "vite-tsconfig-paths": "^4.2.2",
+    "vitest": "2.0.5"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [

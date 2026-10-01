@@ -39,6 +39,7 @@ Set the appropriate props for the BMates component.
 ```tsx
 <BMates
   data={data}
+  onError={error => console.error(error)}
   style={style}
   trackEl={({ track, muted, toggleMute }) => {
     return (
@@ -51,16 +52,70 @@ Set the appropriate props for the BMates component.
 />
 ```
 
+`style` and `trackEl` are optional. The component uses a complete default style and
+a track-name renderer when they are omitted. Audio downloads use the WAV format.
+
+When using `@bmates/editor` directly, await initialization before audio-dependent
+commands and destroy the instance when its owner unmounts:
+
+```tsx
+const editor = new Editor(canvas, data);
+await editor.ready;
+await editor.play();
+
+editor.destroy();
+```
+
 Other frameworks besides React are currently in preparation.
+
+### Composable React API
+
+Applications that own their editor UI can compose the canvas and track controls around one shared store:
+
+```tsx
+<BMates.Root defaultData={data} onDataChange={saveProject}>
+  <div style={{ display: 'flex', height: 600 }}>
+    <BMates.TrackList>
+      {({ track, muted, toggleMute }) => (
+        <button onClick={toggleMute}>{muted ? `Unmute ${track.name}` : `Mute ${track.name}`}</button>
+      )}
+    </BMates.TrackList>
+    <BMates.Canvas style={{ flex: 1 }} />
+  </div>
+</BMates.Root>
+```
+
+Use `useBMatesSelector` to read editor state and `useBMatesStore` to run playback, history, editing, and export commands.
+Project data and undo/redo are owned by the framework-independent `@bmates/core` store; Canvas and React are adapters
+over that same state.
+
+Tracks and clips can also be declared as React components. Mounting, updating, and unmounting these components
+incrementally reconciles the Canvas and audio engine by ID.
+
+```tsx
+<BMates.Root>
+  <BMates.Project>
+    <BMates.Track id={'drums'} name={'Drums'}>
+      <BMates.Clip id={'kick'} src={'/kick.wav'} start={0} instrument={'Kick'} />
+      <BMates.Clip id={'snare'} src={'/snare.wav'} start={1} instrument={'Snare'} />
+    </BMates.Track>
+  </BMates.Project>
+
+  <BMates.Canvas />
+</BMates.Root>
+```
+
+Track and clip IDs must be unique within the project.
 
 ## Framework or Detailed customization
 
 `@bmates/studio` is a library built for React based on `@bmates/editor`.
-If you want to use it in other frameworks, please utilize `@bmates/editor`.
+Use `@bmates/core` for headless state, validation, commands, and history in any framework. Add `@bmates/editor`
+when the application needs the Canvas and Web Audio adapter.
 
 ```shell
 # NPM
-npm install @bmates/editor
+npm install @bmates/core @bmates/editor
 ```
 
 We will support other frameworks soon.
@@ -80,7 +135,7 @@ type SongDataType<T extends string = string> = {
   instrument: T;
   mute?: boolean;
   lock?: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 type TrackDataType<T extends string = string> = {
   id: string;
@@ -176,6 +231,7 @@ const style: EditorStyleType = {};
 
 ## Packages
 
+- [@bmates/core](https://www.npmjs.com/package/@bmates/core)
 - [@bmates/renderer](https://www.npmjs.com/package/@bmates/renderer)
 - [@bmates/editor](https://www.npmjs.com/package/@bmates/editor)
 - [@bmates/studio](https://www.npmjs.com/package/@bmates/studio)

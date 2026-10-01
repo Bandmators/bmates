@@ -3,9 +3,18 @@
   "version": "0.0.5",
   "description": "web audio editor - react",
   "author": "kyechan99 <kyechan99@gmail.com>",
+  "type": "module",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "bugs": {
     "url": "https://github.com/Bandmators/bmates/issues"
   },
@@ -18,21 +27,21 @@
     "dev": "vite",
     "build": "tsc && vite build"
   },
-  "dependencies": {
-    "@bmates/editor": "workspace:*",
-    "bmates-ui": "^1.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "peerDependencies": {
+    "@bmates/core": "^0.0.5",
     "@bmates/editor": "^0.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@bmates/core": "workspace:*",
+    "@bmates/editor": "workspace:*",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
-    "@vitejs/plugin-react": "^4.2.1"
+    "@vitejs/plugin-react": "^4.2.1",
+    "bmates-ui": "^1.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "publishConfig": {
     "@kyechan99:registry": "https://npm.pkg.github.com/"

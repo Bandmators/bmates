@@ -16,6 +16,7 @@ export abstract class Stage extends Container<Layer> {
   };
 
   private _raf: number | null = null;
+  private readonly _contextMenuListener = (event: MouseEvent) => event.preventDefault();
 
   protected dT = 0;
   protected prevTime = performance.now();
@@ -38,9 +39,7 @@ export abstract class Stage extends Container<Layer> {
 
   protected _initListener() {
     EVENT_LIST.forEach(event => this.canvas.addEventListener(event, this));
-    this.canvas.addEventListener('contextmenu', (evt: MouseEvent) => {
-      evt.preventDefault();
-    });
+    this.canvas.addEventListener('contextmenu', this._contextMenuListener);
   }
 
   private _startLoop() {
@@ -105,7 +104,11 @@ export abstract class Stage extends Container<Layer> {
 
   destroy() {
     EVENT_LIST.forEach(event => this.canvas.removeEventListener(event, this));
+    this.canvas.removeEventListener('contextmenu', this._contextMenuListener);
 
-    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._raf !== null) {
+      cancelAnimationFrame(this._raf);
+      this._raf = null;
+    }
   }
 }

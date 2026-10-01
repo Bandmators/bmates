@@ -23,3 +23,17 @@ With an intuitive interface and a variety of features, anyone can create audio p
 # NPM
 npm install @bmates/editor
 ```
+
+## Lifecycle
+
+```ts
+const editor = new Editor(canvas, data);
+await editor.ready;
+await editor.play();
+
+editor.destroy();
+```
+
+`ready` resolves after the initial audio buffers are decoded. `destroy()` stops
+playback and releases listeners, audio nodes, the AudioContext, and owned object URLs.
+Mixed exports are WAV blobs and preserve channel interleaving.

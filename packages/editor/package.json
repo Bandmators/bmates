@@ -5,17 +5,27 @@
   "author": "kyechan99 <kyechan99@gmail.com>",
   "type": "module",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build && tsc"
   },
-  "dependencies": {
-    "@bmates/renderer": "workspace:*"
-  },
   "peerDependencies": {
+    "@bmates/core": "^0.0.5",
     "@bmates/renderer": "^0.0.5"
+  },
+  "devDependencies": {
+    "@bmates/core": "workspace:*",
+    "@bmates/renderer": "workspace:*"
   },
   "keywords": [
     "audio",

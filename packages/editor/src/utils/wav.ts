@@ -30,7 +30,9 @@ export const encodeWAV = (ab: AudioBuffer) => {
   for (let channel = 0; channel < numChannels; channel++) {
     const channelData = ab.getChannelData(channel);
     for (let i = 0; i < channelData.length; i++) {
-      view.setInt16(44 + (channel * ab.length + i) * 2, channelData[i] * 0x7fff, true);
+      const sample = Math.max(-1, Math.min(1, channelData[i]));
+      const interleavedIndex = i * numChannels + channel;
+      view.setInt16(44 + interleavedIndex * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
     }
   }
 
@@ -38,22 +40,41 @@ export const encodeWAV = (ab: AudioBuffer) => {
 };
 
 export const mergeAudioBuffers = (buffers: AudioBuffer[], startTimes: number[]) => {
-  const sampleRate = buffers[0].sampleRate;
-  const totalLength = Math.ceil(Math.max(...startTimes) * sampleRate) + Math.max(...buffers.map(b => b.length));
-  const mergedBuffer = new AudioBuffer({ length: totalLength, sampleRate });
+  if (buffers.length === 0 || buffers.length !== startTimes.length) {
+    throw new Error('Audio buffers and start times must be non-empty and have matching lengths.');
+  }
+
+  const sampleRate = Math.max(...buffers.map(buffer => buffer.sampleRate));
+  const numberOfChannels = Math.max(...buffers.map(buffer => buffer.numberOfChannels));
+  const duration = Math.max(...buffers.map((buffer, index) => startTimes[index] + buffer.duration));
+  const totalLength = Math.max(1, Math.ceil(duration * sampleRate));
+  const mergedBuffer = new AudioBuffer({ length: totalLength, numberOfChannels, sampleRate });
 
   buffers.forEach((buffer, index) => {
-    const startTime = startTimes[index];
-    const startSample = Math.floor(startTime * sampleRate);
-    const channelData = buffer.getChannelData(0);
+    const startSample = Math.floor(startTimes[index] * sampleRate);
+    const outputLength = Math.ceil(buffer.duration * sampleRate);
 
-    for (let i = 0; i < buffer.length; i++) {
-      const sampleIndex = startSample + i;
-      if (sampleIndex < mergedBuffer.length) {
-        mergedBuffer.getChannelData(0)[sampleIndex] += channelData[i];
+    for (let channel = 0; channel < numberOfChannels; channel++) {
+      const source = buffer.getChannelData(Math.min(channel, buffer.numberOfChannels - 1));
+      const output = mergedBuffer.getChannelData(channel);
+
+      for (let i = 0; i < outputLength && startSample + i < output.length; i++) {
+        const sourcePosition = (i * buffer.sampleRate) / sampleRate;
+        const leftIndex = Math.floor(sourcePosition);
+        const rightIndex = Math.min(leftIndex + 1, source.length - 1);
+        const ratio = sourcePosition - leftIndex;
+        const sample = source[leftIndex] * (1 - ratio) + source[rightIndex] * ratio;
+        output[startSample + i] += sample;
       }
     }
   });
+
+  for (let channel = 0; channel < numberOfChannels; channel++) {
+    const output = mergedBuffer.getChannelData(channel);
+    for (let i = 0; i < output.length; i++) {
+      output[i] = Math.max(-1, Math.min(1, output[i]));
+    }
+  }
 
   return mergedBuffer;
 };

@@ -32,7 +32,7 @@ export class Overlay extends Layer {
   private _initEvent() {
     this.on('mousemove', evt => {
       const isHoverItem = this._contextMenu.handleHover(evt.point.x, evt.point.y);
-      setCursor(isHoverItem ? 'pointer' : 'default');
+      setCursor(isHoverItem ? 'pointer' : 'default', this.canvas);
     });
     this.on('mousedown', evt => {
       const selectedMenuItem = this._contextMenu.handleClick(evt.point.x, evt.point.y);
@@ -55,7 +55,7 @@ export class Overlay extends Layer {
   closeContextMenu() {
     this._contextMenu.closeMenu();
     this.listening = false;
-    setCursor('default');
+    setCursor('default', this.canvas);
   }
 
   isOpenContextMenu() {

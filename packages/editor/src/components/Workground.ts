@@ -103,7 +103,7 @@ export class Workground extends Layer {
       startX = evt.originalEvent!.clientX;
 
       if (evt.originalEvent!.button !== 1) return;
-      setCursor('all-scroll');
+      setCursor('all-scroll', this.canvas);
 
       isDragging = true;
       moveX = evt.originalEvent!.clientX;
@@ -112,11 +112,11 @@ export class Workground extends Layer {
     this.on('mousemove', evt => {
       if (evt.target.name === 'Wave') {
         if (!isWaveOver) {
-          setCursor('pointer');
+          setCursor('pointer', this.canvas);
           isWaveOver = true;
         }
       } else if (isWaveOver) {
-        setCursor('default');
+        setCursor('default', this.canvas);
         isWaveOver = false;
       }
 
@@ -128,7 +128,7 @@ export class Workground extends Layer {
     });
 
     this.on('mouseup', evt => {
-      if (evt.originalEvent!.button === 1) setCursor('default');
+      if (evt.originalEvent!.button === 1) setCursor('default', this.canvas);
 
       isDragging = false;
 
@@ -290,6 +290,22 @@ export class Workground extends Layer {
 
   getWaves() {
     return this._trackGroup.getWaves();
+  }
+
+  normalizeStructure() {
+    this.getTracks().forEach((track, group) => {
+      track.data.group = group;
+      track.children.forEach(wave => {
+        wave.data.group = group;
+        wave.repositioning();
+      });
+      track.data.songs = track.children.map(wave => wave.data);
+    });
+  }
+
+  removeEmptyTracks(candidates: Track[] = this.getTracks()) {
+    candidates.filter(track => track.children.length === 0).forEach(track => track.destroy());
+    this.normalizeStructure();
   }
 
   refreshDurationTime() {

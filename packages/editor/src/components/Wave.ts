@@ -1,7 +1,6 @@
 import { Node } from '@bmates/renderer';
 
 import { EditorStyleType, SongDataType } from '../types';
-import { Editor } from './Editor';
 import { Track } from './Track';
 import { Workground } from './Workground';
 
@@ -14,11 +13,12 @@ export class Wave extends Node {
   private _selected = false;
   private _snappingY: number | null = null;
   private _isCollision = false;
+  private _dragOrigin: { track: Track; x: number; y: number; start: number; group: number } | null = null;
 
   set source(val) {
     this._source = val;
     this.waveform = this._extractWaveform(this.source.buffer);
-    this.width = this.style.timeline.gapWidth * (this.data.long * 10);
+    this.width = this.style.timeline.gapWidth * ((this.data.long ?? 0) * 10);
   }
   get source() {
     return this._source;
@@ -35,7 +35,7 @@ export class Wave extends Node {
       this.style.timeline.height +
       (this.style.wave.height + this.style.wave.margin) * this.data.group +
       this.style.wave.margin;
-    this.width = this.style.timeline.gapWidth * (this.data.long * 10);
+    this.width = this.style.timeline.gapWidth * ((this.data.long ?? 0) * 10);
     this.height = this.style.wave.height;
 
     // this._initEvent();
@@ -58,6 +58,7 @@ export class Wave extends Node {
     }
 
     const maxAmplitude = Math.max(...waveform);
+    if (maxAmplitude === 0) return waveform;
     for (let i = 0; i < sampleMount; i++) {
       waveform[i] /= maxAmplitude;
     }
@@ -164,6 +165,13 @@ export class Wave extends Node {
 
   private _initDrag() {
     this.on('dragstart', evt => {
+      this._dragOrigin = {
+        track: this.parent as Track,
+        x: this.x,
+        y: this.y,
+        start: this.data.start,
+        group: this.data.group,
+      };
       this.zIndex = 1000;
       this.parent.zIndex = 1000;
       this.parent.call('wave-dragstart', evt);
@@ -176,8 +184,7 @@ export class Wave extends Node {
           return;
         }
         if (this.x < 0) {
-          this.x = 0;
-          return;
+          this.setX(0);
         }
         if (evt.originalEvent.shiftKey) {
           this.x = evt.data.prevX;
@@ -211,51 +218,33 @@ export class Wave extends Node {
       }
     });
     this.on('dragend', evt => {
-      if (this._snappingY) {
-        this.zIndex = 0;
-        this.parent.zIndex = 0;
-
-        this.y = this._snappingY;
-        this._snappingY = null;
-
+      this.zIndex = 0;
+      this.parent.zIndex = 0;
+      if (this._snappingY !== null && this._dragOrigin) {
         const parentTrack = this.parent as Track;
         const parentWorkground = parentTrack.parent.parent as Workground;
-        const editor = parentWorkground.parent as Editor;
-        const audioPlayer = editor._audioPlayer;
-        const index = parentTrack.children.indexOf(this);
-        if (index !== -1) {
-          parentTrack.children.splice(index, 1);
-        }
-
         if (this._isCollision || this.data.group < 0) {
-          const otherWaves = parentWorkground.getWaves();
-          otherWaves.forEach(wave => {
-            if (wave.data.group > this.data.group) {
-              wave.data.group++;
-              wave.repositioning();
-            }
-          });
-          this.data.group++;
-          this.repositioning();
-
-          const newParent = parentWorkground.addTrack();
-          editor.call('data-change', { data: this.data, target: this }, false);
-          newParent.add(this);
-          audioPlayer.moveAudioTrack(this.data.id, newParent.data);
-          this.snapshot();
+          this.x = this._dragOrigin.x;
+          this.y = this._dragOrigin.y;
+          this.data.start = this._dragOrigin.start;
+          this.data.group = this._dragOrigin.group;
         } else {
+          this.y = this._snappingY;
+          const index = parentTrack.children.indexOf(this);
+          if (index !== -1) parentTrack.children.splice(index, 1);
+
           let newParent = parentWorkground.getTracks()[this.data.group] as Track;
           if (!newParent) {
             newParent = parentWorkground.addTrack();
-            editor.call('data-change', { data: this.data, target: this }, false);
           }
           newParent.add(this);
-
-          audioPlayer.moveAudioTrack(this.data.id, newParent.data);
+          parentWorkground.normalizeStructure();
           this.snapshot();
         }
+        this._snappingY = null;
       }
       this._isCollision = false;
+      this._dragOrigin = null;
       this.parent.call('wave-dragend', evt);
     });
   }
@@ -270,6 +259,13 @@ export class Wave extends Node {
       this.style.timeline.height +
       (this.style.wave.height + this.style.wave.margin) * this.data.group +
       this.style.wave.margin;
+  }
+
+  applyData(data: SongDataType) {
+    this.data = data;
+    this.x = this.style.timeline.gapWidth * (data.start * 10);
+    this.width = this.style.timeline.gapWidth * ((data.long ?? this.source?.buffer?.duration ?? 0) * 10);
+    this.repositioning();
   }
 
   setSelected(selected: boolean) {
@@ -291,8 +287,7 @@ export class Wave extends Node {
     this.y = attrs.y;
     this.width = attrs.width;
     this.height = attrs.height;
-    this.data = attrs.data;
-    this.repositioning();
+    this.applyData(attrs.data);
   }
 
   override toObject(): object {

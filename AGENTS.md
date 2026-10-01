@@ -13,15 +13,20 @@ The repository currently provides client-side libraries and documentation. Do no
 This is a pnpm workspace. The dependency direction is:
 
 ```text
-@bmates/renderer -> @bmates/editor -> @bmates/studio -> apps/www
+@bmates/core -----\
+                   -> @bmates/editor -> @bmates/studio -> apps/www
+@bmates/renderer -/
 ```
 
+- `packages/core`: framework-independent project state, validation, commands, subscriptions, and undo/redo history.
 - `packages/renderer`: framework-independent canvas scene graph, rendering loop, hit testing, and pointer event dispatch.
 - `packages/editor`: audio-domain editor built on the renderer. It owns tracks, waveform clips, timeline interactions, playback, history, import, and export.
 - `packages/studio`: React integration and the easiest public entry point. It owns the provider, hook, sidebar composition, and demo application.
 - `apps/www`: Next.js and Contentlayer documentation site. Documentation pages live under `apps/www/posts/docs`.
 
-Keep changes in the lowest appropriate layer. The renderer must not depend on editor or React concepts; the editor must not depend on Studio; Studio should compose public editor APIs instead of reaching into renderer internals.
+Keep changes in the lowest appropriate layer. Core must not depend on browser, renderer, editor, or React concepts. The
+renderer must not depend on editor or React concepts; the editor must not depend on Studio; Studio should compose
+public core and editor APIs instead of reaching into renderer internals.
 
 ## Setup and commands
 

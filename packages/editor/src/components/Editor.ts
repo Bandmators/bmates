@@ -1,9 +1,17 @@
+import { normalizeProject } from '@bmates/core';
 import { EventData, Stage } from '@bmates/renderer';
 
 import AudioPlayer from '../AudioPlayer';
 import { Caretaker } from '../HistoryManager';
-import { EditorStyleType, SongDataType, TrackDataType } from '../types';
-import { deepMerge, generateUniqueId } from '../utils';
+import {
+  DEFAULT_EDITOR_STYLE,
+  EditorHistoryController,
+  EditorStyleType,
+  ResolvedEditorStyleType,
+  SongDataType,
+  TrackDataType,
+} from '../types';
+import { clone, deepMerge, generateUniqueId } from '../utils';
 import { Overlay } from './Overlay';
 import { Track } from './Track';
 import { Wave } from './Wave';
@@ -12,54 +20,7 @@ import { Workground } from './Workground';
 export class Editor extends Stage {
   override name = 'BEditor';
   data: TrackDataType[] = [];
-  style: EditorStyleType = {
-    theme: {
-      background: 'white',
-      lineColor: '#e3e3e3',
-      strokeLineColor: '#999999',
-    },
-    timeline: {
-      gapHeight: 10,
-      gapWidth: 10,
-      timeDivde: 10,
-      height: 45,
-      textY: -3,
-    },
-    playhead: {
-      color: '#FF000099',
-      width: 5,
-      height: 10,
-    },
-    timeIndicator: {
-      fill: '#000',
-      font: '12px Arial',
-      top: 15,
-    },
-    sidebar: {
-      width: 300,
-      mobileWidth: 60,
-      mobileViewport: 768,
-    },
-    wave: {
-      height: 45,
-      borderRadius: 8,
-      margin: 10,
-      padding: 8,
-      disableAlpha: 0.5,
-      snapping: 'rgb(0, 0, 0, 0.6)',
-      background: '#c3c3c3',
-      fill: 'rgb(122, 122, 122)',
-      border: 'rgb(0, 0, 0, 0.6)',
-      predictionFill: '#c3c3c388',
-      selectedBorderColor: 'rgba(123, 123, 123, 0.5)',
-    },
-    context: {
-      menuWidth: 200,
-      menuPadding: 10,
-      itemHeight: 40,
-      itemPadding: 10,
-    },
-  };
+  style: ResolvedEditorStyleType;
   private _workground: Workground;
   private _overlay: Overlay;
   _audioPlayer: AudioPlayer;
@@ -67,21 +28,22 @@ export class Editor extends Stage {
   private _selectedNodes: Wave[] = [];
   private _clipboard: SongDataType[] = [];
   private _caretaker: Caretaker;
+  private _historyController?: EditorHistoryController;
+  readonly ready: Promise<void>;
+  private _keyboardListener: (event: KeyboardEvent) => void;
+  private _ownedObjectUrls = new Set<string>();
+  private _destroyed = false;
 
   constructor(element: HTMLCanvasElement, data: TrackDataType[], style: EditorStyleType = {}) {
     super(element);
 
     this._caretaker = new Caretaker();
 
-    this.data = data;
-    this.style = deepMerge(this.style, style) as EditorStyleType;
+    this.data = clone(data);
+    this.style = deepMerge(clone(DEFAULT_EDITOR_STYLE), style) as ResolvedEditorStyleType;
     this._onResize(null);
 
-    this.init();
-
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    (window as any).editor = this;
-    (window as any).style = style;
+    this.ready = this.init();
 
     this._resizeListener = e => this._onResize(e);
     window.addEventListener('resize', this._resizeListener);
@@ -91,6 +53,7 @@ export class Editor extends Stage {
     this._initLayout();
     this._initEvent();
     await this._loadTrackBuffers();
+    if (this._destroyed) return;
     this.saveState();
   }
 
@@ -164,7 +127,7 @@ export class Editor extends Stage {
       arrowright: () => this._act('ArrowRight'),
     };
 
-    this.canvas.addEventListener('keydown', e => {
+    this._keyboardListener = e => {
       const key = e.key.toLowerCase();
       const ctrl = e.ctrlKey || e.metaKey;
       const shift = e.shiftKey;
@@ -175,19 +138,22 @@ export class Editor extends Stage {
         e.preventDefault();
         keyboardShortcuts[shortcut]();
       }
-    });
+    };
+    this.canvas.addEventListener('keydown', this._keyboardListener);
   }
 
   private _onResize(e) {
-    const dpr = 1; // || window.devicePixelRatio || 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const w = e ? e.target : window;
 
     const sidebarWidth =
       w.innerWidth <= this.style.sidebar.mobileViewport ? this.style.sidebar.mobileWidth : this.style.sidebar.width;
 
-    const displayWidth = this.canvas.parentElement.clientWidth - sidebarWidth;
-    const displayHeight = this.canvas.parentElement.clientHeight;
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+    const displayWidth = Math.max(0, parent.clientWidth - sidebarWidth);
+    const displayHeight = Math.max(0, parent.clientHeight);
 
     this.canvas.width = displayWidth * dpr;
     this.canvas.height = displayHeight * dpr;
@@ -209,6 +175,8 @@ export class Editor extends Stage {
   }
 
   async play() {
+    await this.ready;
+    if (this._destroyed || this._audioPlayer.getWaves().length === 0) return;
     let currentTime = this._workground?.getCurrentTime();
 
     if (this._audioPlayer.getDuration() < currentTime) {
@@ -217,12 +185,12 @@ export class Editor extends Stage {
     }
 
     this._workground?.play();
-    this._audioPlayer?.play(currentTime);
+    await this._audioPlayer?.play(currentTime);
   }
 
   select(nodes: Wave[]) {
     this.unselect();
-    this._selectedNodes = nodes;
+    this._selectedNodes = [...new Set(nodes)];
     this._selectedNodes.forEach(node => {
       node.setSelected(true);
     });
@@ -232,6 +200,7 @@ export class Editor extends Stage {
     this._selectedNodes.forEach(node => {
       node.setSelected(false);
     });
+    this._selectedNodes = [];
   }
 
   pause() {
@@ -246,6 +215,7 @@ export class Editor extends Stage {
 
   muteTrack(trackId: string, isMuted: boolean | undefined = undefined) {
     this._audioPlayer.muteTrack(trackId, isMuted);
+    this.saveState();
   }
 
   removeTrack(trackId: string) {
@@ -255,7 +225,6 @@ export class Editor extends Stage {
     }
     this._audioPlayer.removeTrack(trackId);
     this.saveState();
-    this.call('data-change', { data: this.data, target: this });
     if (isPlaying) {
       this.play();
     }
@@ -263,27 +232,29 @@ export class Editor extends Stage {
 
   mute(songId: string, isMuted: boolean | undefined = undefined) {
     this._audioPlayer.mute(songId, isMuted);
+    this.saveState();
   }
 
   isMuted(trackId: string) {
     return this._audioPlayer.isMuted(trackId);
   }
 
-  async addWave(song: SongDataType) {
+  async addWave(song: SongDataType, audioBuffer?: AudioBuffer) {
+    await this.ready;
     const trackId = generateUniqueId();
+    const group = this._workground.getTracks().length;
+    const normalizedSong = { ...song, group };
     const newTrack = {
       id: trackId,
       name: 'New Track',
       mute: false,
-      group: this._workground.getTracks().length,
-      songs: [song],
+      group,
+      songs: [normalizedSong],
     };
 
     const track = this._workground.addTrack(newTrack);
-    this.data.push(newTrack);
-    if (track.children.length) await this._audioPlayer.prepareWave(track.children[0]);
-
-    this.call('data-change', { data: this.data, target: this });
+    if (track.children.length) await this._audioPlayer.prepareWave(track.children[0], audioBuffer);
+    this.saveState();
   }
 
   async addWaveBuffer(file: File, audioBuffer: AudioBuffer) {
@@ -291,26 +262,47 @@ export class Editor extends Stage {
     if (isPlaying) {
       this.pause();
     }
+    const objectUrl = URL.createObjectURL(file);
+    this._ownedObjectUrls.add(objectUrl);
     const newSong: SongDataType = {
       id: generateUniqueId(),
-      src: URL.createObjectURL(file),
+      src: objectUrl,
       user: 'BMates',
       start: 0,
       long: audioBuffer.duration,
       group: this._workground.getTracks().length,
       instrument: file.name,
-      source: {
-        buffer: audioBuffer,
-      },
     };
-    await this.addWave(newSong);
+    await this.addWave(newSong, audioBuffer);
     if (isPlaying) {
       this.play();
     }
   }
 
+  async replaceData(data: TrackDataType[]) {
+    await this.ready;
+    if (this._destroyed) return;
+
+    const wasPlaying = this.isPlaying();
+    if (wasPlaying) this.pause();
+    this.unselect();
+
+    const normalized = normalizeProject(data);
+
+    await this._workground._trackGroup.reconcile(normalized);
+    this.saveState();
+
+    if (wasPlaying) await this.play();
+  }
+
   override destroy() {
+    if (this._destroyed) return;
+    this._destroyed = true;
     this.stop();
+    this.canvas.removeEventListener('keydown', this._keyboardListener);
+    this._ownedObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    this._ownedObjectUrls.clear();
+    void this._audioPlayer.destroy().catch(() => undefined);
     super.destroy();
 
     window.removeEventListener('resize', this._resizeListener);
@@ -330,15 +322,13 @@ export class Editor extends Stage {
         break;
       case 'Mute':
         this._selectedNodes.forEach(node => {
-          node.data.mute = true;
-          this.mute(node.data.id, true);
+          this._audioPlayer.mute(node.data.id, true);
         });
         this.saveState();
         break;
       case 'Unmute':
         this._selectedNodes.forEach(node => {
-          node.data.mute = false;
-          this.mute(node.data.id, false);
+          this._audioPlayer.mute(node.data.id, false);
         });
         this.saveState();
         break;
@@ -355,15 +345,7 @@ export class Editor extends Stage {
         this.saveState();
         break;
       case 'Delete':
-        this._selectedNodes.forEach(node => {
-          this.data = this.data
-            .map(track => ({
-              ...track,
-              songs: track.songs.filter(song => song.id !== node.data.id),
-            }))
-            .filter(track => track.songs.length > 0);
-          node.destroy();
-        });
+        this._removeSelectedNodes();
         this.saveState();
         break;
       case 'Copy':
@@ -371,24 +353,20 @@ export class Editor extends Stage {
         break;
       case 'Paste':
         await this.paste();
-        this.saveState();
         break;
       case 'Duplicate':
         await this.duplicate();
-        this.saveState();
         break;
       case 'Cut':
         this._clipboard = this._selectedNodes.map(node => ({ ...node.data }));
-        this._selectedNodes.forEach(node => {
-          node.destroy();
-        });
+        this._removeSelectedNodes();
         this.saveState();
         break;
       case 'Redo':
-        this.redo();
+        await this.redo();
         break;
       case 'Undo':
-        this.undo();
+        await this.undo();
         break;
     }
     if (isPlaying) {
@@ -403,7 +381,7 @@ export class Editor extends Stage {
     if (nodes.length > 0) {
       const currentTime = this._workground.getCurrentTime();
       const minStartTime = Math.min(...nodes.map(node => node.start));
-      const newNodes = nodes
+      const newNodes = [...nodes]
         .sort((a, b) => a.group - b.group)
         .map(node => {
           const start = currentTime + node.start - minStartTime;
@@ -428,7 +406,19 @@ export class Editor extends Stage {
 
         if (!isCollision) {
           const newWave = new Wave(newNode, this.style);
-          otherWaves[0].parent.add(newWave);
+          let targetTrack = this._workground.getTracks()[newNode.group];
+          if (!targetTrack) {
+            targetTrack = this._workground.addTrack({
+              id: generateUniqueId(),
+              name: 'New Track',
+              group: this._workground.getTracks().length,
+              songs: [],
+            });
+            newNode.group = targetTrack.data.group;
+            newWave.data.group = targetTrack.data.group;
+            newWave.repositioning();
+          }
+          targetTrack.add(newWave);
           newWaves.push(newWave);
           createdWaveIds.add(newNode.id);
           continue;
@@ -451,7 +441,8 @@ export class Editor extends Stage {
       }
 
       await this._audioPlayer.prepareTrackAll(newWaves);
-      this.call('data-change', { data: this.data, target: this });
+      this.select(newWaves);
+      this.saveState();
     }
   }
 
@@ -464,7 +455,7 @@ export class Editor extends Stage {
   }
 
   export() {
-    return this._workground
+    const exported = this._workground
       .getTracks()
       .map(child => {
         if (child instanceof Track) {
@@ -473,32 +464,75 @@ export class Editor extends Stage {
         return null;
       })
       .filter(track => track !== null);
+    return clone(exported) as TrackDataType[];
   }
 
   tree() {
     return this.children;
   }
 
-  exportTracks() {
+  async exportTracks() {
+    await this.ready;
     return this._audioPlayer.toBlob();
   }
 
   async downloadBlob(filename: string) {
+    await this.ready;
     await this._audioPlayer.downloadBlob(filename);
   }
 
   saveState() {
+    this._workground.normalizeStructure();
+    this.data = this.export();
+    this._workground.data = this.data;
     this._caretaker.save(this._workground._trackGroup.createMemento());
     this.call('data-change', { data: this.data, target: this });
   }
 
-  undo() {
-    const lastMemento = this._caretaker.undo();
-    if (lastMemento) this._workground._trackGroup.restore(lastMemento);
+  setHistoryController(controller?: EditorHistoryController) {
+    this._historyController = controller;
   }
 
-  redo() {
+  async undo() {
+    if (this._historyController) {
+      await this._historyController.undo();
+      return;
+    }
+    const lastMemento = this._caretaker.undo();
+    if (lastMemento) {
+      this.unselect();
+      await this._workground._trackGroup.restore(lastMemento);
+      this._workground.normalizeStructure();
+      this.data = this.export();
+      this._workground.data = this.data;
+      this.call('data-change', { data: this.data, target: this });
+    }
+  }
+
+  async redo() {
+    if (this._historyController) {
+      await this._historyController.redo();
+      return;
+    }
     const nextMemento = this._caretaker.redo();
-    if (nextMemento) this._workground._trackGroup.restore(nextMemento);
+    if (nextMemento) {
+      this.unselect();
+      await this._workground._trackGroup.restore(nextMemento);
+      this._workground.normalizeStructure();
+      this.data = this.export();
+      this._workground.data = this.data;
+      this.call('data-change', { data: this.data, target: this });
+    }
+  }
+
+  private _removeSelectedNodes() {
+    const selected = [...this._selectedNodes];
+    const affectedTracks = [...new Set(selected.map(node => node.parent as Track))];
+    this.unselect();
+    selected.forEach(node => {
+      this._audioPlayer.releaseWave(node);
+      node.destroy();
+    });
+    this._workground.removeEmptyTracks(affectedTracks);
   }
 }

@@ -15,15 +15,16 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   build: {
-    ssr: true,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'index',
-      fileName: 'index',
+      formats: ['es', 'cjs'],
+      fileName: format => `index.${format === 'es' ? 'js' : 'cjs'}`,
       // formats: ['es', 'cjs'],
       // fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
+      external: ['@bmates/core', '@bmates/editor', 'react', 'react-dom', 'react/jsx-runtime'],
       output: {
         globals: {
           react: 'React',

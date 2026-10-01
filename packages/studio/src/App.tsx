@@ -1,11 +1,11 @@
-import { Editor, EditorStyleType, TrackDataType } from '@bmates/editor';
+import { EditorStyleType, TrackDataType } from '@bmates/editor';
 
 import { BMatesProvider as BMatesUIProvider, Button, useToast } from 'bmates-ui';
-import { useRef, useState } from 'react';
+import { ChangeEvent } from 'react';
 
 import './App.css';
 import { BMates } from './BMates';
-import { BmatesProvider, useBMates } from './BMatesContext';
+import { useBMatesSelector, useBMatesStore } from './BMatesComposer';
 import { DeepPartial } from './types/type';
 
 const data: TrackDataType[] = [
@@ -84,17 +84,9 @@ const style: DeepPartial<EditorStyleType> = {
 };
 
 const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void }) => {
-  const [isMuted, setIsMuted] = useState<boolean>(muted);
-
   return (
-    <Button
-      size="icon"
-      onClick={() => {
-        onClick();
-        setIsMuted(!isMuted);
-      }}
-    >
-      {isMuted ? (
+    <Button size="icon" onClick={onClick}>
+      {muted ? (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
           <path d="M12 3.75v16.5a.75.75 0 0 1-1.255.555L5.46 16H2.75A1.75 1.75 0 0 1 1 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805A.75.75 0 0 1 12 3.75ZM6.255 9.305a.748.748 0 0 1-.505.195h-3a.25.25 0 0 0-.25.25v4.5c0 .138.112.25.25.25h3c.187 0 .367.069.505.195l4.245 3.86V5.445ZM16.28 8.22a.75.75 0 1 0-1.06 1.06L17.94 12l-2.72 2.72a.75.75 0 1 0 1.06 1.06L19 13.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L20.06 12l2.72-2.72a.75.75 0 0 0-1.06-1.06L19 10.94l-2.72-2.72Z"></path>
         </svg>
@@ -108,7 +100,7 @@ const ToggleMute = ({ muted, onClick }: { muted: boolean; onClick: () => void })
   );
 };
 
-const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; children?: React.ReactElement }) => {
+const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; children?: React.ReactNode }) => {
   return (
     <Button
       size="icon"
@@ -122,8 +114,22 @@ const RemoveTrackButton = ({ onClick, children }: { onClick?: () => void; childr
 };
 
 const ControlPanel = () => {
-  const { isPlaying, togglePlay, toggleStopPlay, handleFileUpload, download /* editorRef */ } = useBMates();
+  const editor = useBMatesStore();
+  const isPlaying = useBMatesSelector(state => state.isPlaying);
   const { toast } = useToast();
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      await editor.addFile(file);
+    } finally {
+      event.target.value = '';
+    }
+  };
+  const togglePlay = () => void editor.togglePlayback();
+  const toggleStopPlay = () => editor.stop();
+  const download = () => void editor.download();
 
   return (
     <div>
@@ -146,8 +152,7 @@ const ControlPanel = () => {
             variant: 'primary',
             time: 7000,
           });
-          // console.log(`%c[ BMates Export Data ]`, 'background: black; color: white;');
-          // console.log('Result: ', editorRef.current.export());
+          console.log('Result: ', editor.exportProject());
         }}
       >
         Export
@@ -156,35 +161,56 @@ const ControlPanel = () => {
   );
 };
 
-const App = () => {
-  const editorRef = useRef<Editor>();
-
-  return (
-    <BMatesUIProvider>
-      <BmatesProvider editorRef={editorRef}>
-        <ControlPanel />
-        <BMates
-          data={data}
-          style={style}
-          trackEl={({ track, muted, toggleMute, removeTrack }) => {
-            return (
-              <div className="track">
-                <div className="name">{track.name}</div>
-                <div className="feature">
-                  <ToggleMute muted={muted} onClick={toggleMute} />
-                  <RemoveTrackButton onClick={removeTrack}>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                      <path d="M5.72 5.72a.75.75 0 0 1 1.06 0L12 10.94l5.22-5.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L13.06 12l5.22 5.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L12 13.06l-5.22 5.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L10.94 12 5.72 6.78a.75.75 0 0 1 0-1.06Z"></path>
-                    </svg>
-                  </RemoveTrackButton>
+const App = () => (
+  <BMatesUIProvider>
+    <BMates.Root style={style} onError={error => console.error(error)}>
+      <BMates.Project>
+        {data.map(track => (
+          <BMates.Track key={track.id} id={track.id} name={track.name} group={track.group} mute={track.mute}>
+            {track.songs.map(clip => (
+              <BMates.Clip
+                key={clip.id}
+                id={clip.id}
+                instrument={clip.instrument}
+                lock={clip.lock}
+                long={clip.long}
+                mute={clip.mute}
+                src={clip.src}
+                start={clip.start}
+                user={clip.user}
+              />
+            ))}
+          </BMates.Track>
+        ))}
+      </BMates.Project>
+      <ControlPanel />
+      <div id={'bmates'} className={'bmates'} style={{ display: 'flex', height: '100%' }}>
+        <div className={'bmates-sidebar'} style={{ width: style.sidebar?.width, flexShrink: 0 }}>
+          <div
+            className={'bmates-sidebar-head'}
+            style={{ height: (style.timeline?.height ?? 45) + (style.wave?.margin ?? 10) / 2 }}
+          />
+          <BMates.TrackList className={'bmates-sidebar-body'}>
+            {({ track, muted, toggleMute, remove }) => (
+              <div
+                className={'bmates-track'}
+                style={{ height: (style.wave?.height ?? 45) + (style.wave?.margin ?? 10) }}
+              >
+                <div className={'track'}>
+                  <div className={'name'}>{track.name}</div>
+                  <div className={'feature'}>
+                    <ToggleMute muted={muted} onClick={toggleMute} />
+                    <RemoveTrackButton onClick={remove}>Remove</RemoveTrackButton>
+                  </div>
                 </div>
               </div>
-            );
-          }}
-        />
-      </BmatesProvider>
-    </BMatesUIProvider>
-  );
-};
+            )}
+          </BMates.TrackList>
+        </div>
+        <BMates.Canvas style={{ flexGrow: 1 }} />
+      </div>
+    </BMates.Root>
+  </BMatesUIProvider>
+);
 
 export default App;

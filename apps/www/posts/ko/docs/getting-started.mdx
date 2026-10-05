@@ -1,0 +1,45 @@
+---
+title: 설치 및 시작
+description: React와 브라우저 환경에서 BMates를 시작하는 방법입니다.
+navTitle: 설치 및 시작
+order: 1
+lastUpdatedDate: 2026-10-02
+---
+
+BMates는 웹을 위한 임베더블 멀티트랙 오디오 편집기입니다. 가장 빠른 React 통합에는 `@bmates/studio`를 사용하세요.
+
+```sh
+pnpm add @bmates/studio
+```
+
+## 기본 React 에디터
+
+`BMates` 컴포넌트에 트랙 데이터를 전달하고, `trackEl`로 애플리케이션의 트랙 UI를 구성합니다.
+
+```tsx
+import { BMates, type TrackDataType } from '@bmates/studio';
+
+const tracks: TrackDataType[] = [
+  {
+    id: 'drums',
+    name: 'Drums',
+    group: 0,
+    songs: [{ id: 'kick', src: '/kick.wav', user: '', start: 0, group: 0, instrument: 'Kick' }],
+  },
+];
+
+<BMates
+  data={tracks}
+  trackEl={({ muted, toggleMute, track }) => (
+    <button onClick={toggleMute}>{muted ? `Unmute ${track.name}` : `Mute ${track.name}`}</button>
+  )}
+/>;
+```
+
+클립을 선택하고 타임라인에서 드래그해 이동할 수 있습니다. 음원 재생처럼 브라우저 권한이 필요한 동작은 사용자의 첫 입력 뒤에 실행하세요.
+
+## 다음 단계
+
+- 전체 UI를 직접 구성하려면 [BMates 컴포넌트](/ko/docs/bmates)를 확인하세요.
+- 프레임워크와 무관한 프로젝트 상태가 필요하면 [아키텍처와 Core](/ko/docs/core)를 확인하세요.
+- 바로 동작을 확인하려면 [라이브 데모](/ko/#live-demo)를 사용하세요.

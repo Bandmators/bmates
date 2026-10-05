@@ -8,7 +8,7 @@ import {
   deepMerge,
 } from '@bmates/editor';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BMatesCanvas, BMatesClip, BMatesProject, BMatesRoot, BMatesTrack, BMatesTrackList } from './BMatesComposer';
 import { useBMates } from './BMatesContext';
@@ -23,7 +23,7 @@ export interface TrackProps {
 export interface BMatesProps {
   data: TrackDataType[];
   style?: EditorStyleType;
-  trackEl?: (props: TrackProps) => JSX.Element;
+  trackEl?: (props: TrackProps) => ReactElement;
   onError?: (error: Error) => void;
 }
 

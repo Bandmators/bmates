@@ -1,0 +1,27 @@
+---
+title: Editing interactions
+description: Understand selection, dragging, collisions, keyboard commands, and track changes.
+navTitle: Editing interactions
+order: 5
+lastUpdatedDate: 2026-10-02
+---
+
+The timeline Canvas handles clip selection and dragging. A primary click selects a wave; holding Shift adds to the selection.
+Drag selected clips horizontally or between tracks. Locked clips do not move, and collision checks prevent invalid overlaps.
+
+## Keyboard commands
+
+Focus the Canvas before using shortcuts.
+
+| Shortcut                                 | Action                          |
+| ---------------------------------------- | ------------------------------- |
+| `Ctrl/Cmd + Z`                           | Undo                            |
+| `Ctrl/Cmd + Shift + Z` or `Ctrl/Cmd + Y` | Redo                            |
+| `Ctrl/Cmd + C`, `X`, `V`                 | Copy, cut, paste selected clips |
+| `Delete` or `Backspace`                  | Remove selected clips           |
+| Arrow keys                               | Nudge the selected clips        |
+
+## React controls
+
+Use `useBMatesStore` for transport and history actions, and `useBMatesSelector` for render state. Avoid a second React state
+copy of tracks; the BMates store is the source of truth for user-visible mutations.

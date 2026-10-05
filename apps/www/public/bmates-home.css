@@ -1,0 +1,62 @@
+.dg-home {
+  display: flex;
+  flex-direction: column;
+}
+
+.dg-home-hero {
+  order: 1;
+}
+
+.dg-home-content {
+  order: 2;
+}
+
+.dg-home-features {
+  order: 3;
+}
+
+.dg-home-sections {
+  order: 4;
+}
+
+.bmates-home-demo {
+  padding: 2rem 0 4.5rem;
+}
+
+.bmates-home-demo-heading {
+  max-width: 44rem;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.bmates-home-demo-heading > span {
+  color: var(--dg-faint);
+  font-family: var(--dg-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.bmates-home-demo-heading h2 {
+  margin: 0.65rem 0 0;
+  color: var(--dg-text-strong);
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+}
+
+.bmates-home-demo-heading p {
+  margin: 0.85rem 0 0;
+  color: var(--dg-muted);
+  line-height: 1.7;
+}
+
+.bmates-home-demo [data-docgo-client-preview] {
+  display: block;
+  width: 100%;
+}
+
+.bmates-home-demo [data-docgo-client-preview-isolation='inline'] > .bm-demo {
+  border: 1px solid var(--dg-border);
+  border-radius: var(--dg-radius-lg);
+}

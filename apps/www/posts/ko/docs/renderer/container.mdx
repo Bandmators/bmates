@@ -1,0 +1,9 @@
+---
+title: Container
+description: 자식 Node를 소유하고 렌더링과 hit test를 전달하는 scene graph 노드입니다.
+order: 200
+lastUpdatedDate: 2026-10-02
+---
+
+`Container`는 Node의 자식 집합을 관리합니다. `add(child)`, `remove(child)`, `update(dT)`, `draw(ctx)`,
+`hitTest(point, event)`를 제공합니다. Renderer 확장 시 부모-자식 관계와 destroy 수명주기를 함께 관리하세요.

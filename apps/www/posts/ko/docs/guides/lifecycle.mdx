@@ -1,0 +1,24 @@
+---
+title: 수명주기와 정리
+description: 브라우저 리소스 누수 없이 BMates 에디터를 마운트하고 해제합니다.
+navTitle: 수명주기와 정리
+order: 7
+lastUpdatedDate: 2026-10-02
+---
+
+BMates는 animation frame, DOM 이벤트, 오디오 노드, object URL 같은 브라우저 리소스를 사용합니다. Canvas가 준비된 뒤
+에디터를 만들고, 오디오 명령 전에는 `ready`를 기다리며, 소유 UI가 사라질 때 `destroy()`를 호출하세요.
+
+```ts
+const editor = new Editor(canvas, tracks, style);
+
+try {
+  await editor.ready;
+  await editor.play();
+} finally {
+  editor.destroy();
+}
+```
+
+React에서는 `<BMates />`와 `<BMates.Root>`가 store 수명주기를 관리합니다. 외부 상태가 프로젝트를 소유하면 `project`
+속성을 사용하고, 사용자가 편집한 내용을 별도 React state에 중복 저장하지 마세요.

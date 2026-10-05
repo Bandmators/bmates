@@ -1,0 +1,18 @@
+---
+title: Event
+description: Editor와 Renderer Node가 발생시키는 이벤트를 구독합니다.
+order: 102
+lastUpdatedDate: 2026-10-02
+---
+
+이벤트는 `on(eventType, handler)`로 구독하고 `off(eventType, handler)`로 해제합니다.
+
+```ts
+const onChange = event => save(event.data);
+editor.on('data-change', onChange);
+
+editor.off('data-change', onChange);
+```
+
+대표 이벤트는 `mousedown`, `mousemove`, `mouseup`, `dragstart`, `draging`, `dragend`, `data-change`, `pause`입니다.
+핸들러는 target Node, point, originalEvent, data를 포함한 EventData를 받습니다.

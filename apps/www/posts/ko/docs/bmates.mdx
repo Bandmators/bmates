@@ -1,0 +1,98 @@
+---
+title: BMates 컴포넌트
+description: 간편한 BMates 컴포넌트를 사용하거나 공유 Studio store를 중심으로 React 에디터를 조합합니다.
+navTitle: BMates 컴포넌트
+order: 6
+---
+
+`BMates`는 Canvas 에디터와 React 트랙 목록을 가장 빠르게 마운트하는 방법입니다. `Editor` 생성과 트랙 상태
+동기화를 처리하고, 컴포넌트가 해제될 때 브라우저 리소스를 정리합니다.
+
+## 간편한 컴포넌트
+
+```tsx
+import { BMates, BmatesProvider, type TrackDataType } from '@bmates/studio';
+
+const tracks: TrackDataType[] = [];
+
+export const AudioEditor = () => (
+  <BmatesProvider>
+    <BMates
+      data={tracks}
+      onError={error => console.error(error)}
+      trackEl={({ muted, removeTrack, toggleMute, track }) => (
+        <div>
+          <strong>{track.name}</strong>
+          <button onClick={toggleMute}>{muted ? '음소거 해제' : '음소거'}</button>
+          <button onClick={removeTrack}>삭제</button>
+        </div>
+      )}
+    />
+  </BmatesProvider>
+);
+```
+
+### Props
+
+| Prop      | 타입                                  | 설명                                   |
+| --------- | ------------------------------------- | -------------------------------------- |
+| `data`    | `TrackDataType[]`                     | 초기 트랙과 클립입니다.                |
+| `style`   | `EditorStyleType`                     | 선택적인 에디터 스타일 설정입니다.     |
+| `trackEl` | `(props: TrackProps) => ReactElement` | 각 트랙 행을 그리는 선택적 함수입니다. |
+| `onError` | `(error: Error) => void`              | 로딩 또는 초기화 오류를 전달합니다.    |
+
+간편한 컴포넌트의 재생 및 파일 명령이 필요하면 `BmatesProvider` 안에서 `useBMates`를 사용하세요.
+
+## 조합형 에디터
+
+레이아웃을 직접 구성하려면 compound component를 사용하세요. 트랙 목록, Canvas, 컨트롤과 외부 구독자가 하나의
+store를 공유하므로 동일한 프로젝트 상태를 관찰합니다.
+
+```tsx
+import { BMates, useBMatesSelector, useBMatesStore } from '@bmates/studio';
+
+const Transport = () => {
+  const store = useBMatesStore();
+  const isPlaying = useBMatesSelector(snapshot => snapshot.isPlaying);
+
+  return <button onClick={() => void (isPlaying ? store.pause() : store.play())}>{isPlaying ? '정지' : '재생'}</button>;
+};
+
+export const CustomAudioEditor = () => (
+  <BMates.Root defaultData={tracks} onDataChange={project => saveProject(project)}>
+    <Transport />
+    <BMates.TrackList>
+      {({ muted, remove, toggleMute, track }) => (
+        <div>
+          <span>{track.name}</span>
+          <button onClick={toggleMute}>{muted ? '음소거 해제' : '음소거'}</button>
+          <button onClick={remove}>삭제</button>
+        </div>
+      )}
+    </BMates.TrackList>
+    <BMates.Canvas aria-label="오디오 타임라인" />
+  </BMates.Root>
+);
+```
+
+에디터가 상태를 소유한다면 `defaultData`를 사용하세요. 애플리케이션이 전체 프로젝트를 의도적으로 제어하고
+`onDataChange` 결과를 반영할 때만 `project` prop을 사용하세요.
+
+## 선언형 프로젝트
+
+트랙과 클립을 React 컴포넌트로 선언할 수도 있습니다. 프로젝트 소유 방식은 하나만 선택해야 하므로
+`BMates.Root project`와 `BMates.Project`를 함께 사용하지 마세요.
+
+```tsx
+<BMates.Root>
+  <BMates.Project>
+    <BMates.Track id="vocals" name="Vocals">
+      <BMates.Clip id="lead" src="/audio/lead.wav" start={0} />
+    </BMates.Track>
+  </BMates.Project>
+  <BMates.Canvas />
+</BMates.Root>
+```
+
+간편한 컴포넌트 hook은 [useBMates](/ko/docs/usebmates), 상태 소유 규칙은
+[수명주기와 정리](/ko/docs/guides/lifecycle)를 확인하세요.

@@ -1,0 +1,21 @@
+---
+title: 설정
+description: BMates의 Canvas 타임라인과 waveform 스타일을 설정하는 방법입니다.
+navTitle: 설정
+order: 2
+lastUpdatedDate: 2026-10-02
+---
+
+`style` 속성으로 기본 에디터 스타일 일부만 덮어쓸 수 있습니다. 지정하지 않은 값은 BMates의 기본 설정을 사용합니다.
+
+```tsx
+<BMates
+  data={tracks}
+  style={{
+    sidebar: { width: 220, mobileWidth: 72 },
+    wave: { height: 88, background: '#dad9db', fill: '#2e2c30' },
+  }}
+/>
+```
+
+자세한 타임라인, playhead, waveform 옵션은 [Editor API](/ko/docs/editor/editor)에서 확인할 수 있습니다.

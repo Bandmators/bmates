@@ -168,7 +168,8 @@ export class Workground extends Layer {
     const SNAPPING_THRESHOLD = 10;
 
     const checkSnapping = (evt: EventData) => {
-      if (!(evt.originalEvent instanceof MouseEvent && !evt.originalEvent.shiftKey)) return;
+      const pointerEvent = evt.originalEvent as Partial<MouseEvent> | undefined;
+      if (!pointerEvent || typeof pointerEvent.clientX !== 'number' || pointerEvent.shiftKey) return;
 
       const wave = evt.target as Wave;
       const otherWaves = this.getWaves().filter(child => child !== evt.target && child.data.group !== wave.data.group);

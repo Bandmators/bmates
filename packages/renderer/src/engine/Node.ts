@@ -79,7 +79,8 @@ export abstract class Node extends Statable {
     let moveY = 0;
 
     const dragStart = evt => {
-      if (evt.originalEvent instanceof MouseEvent && evt.originalEvent?.button !== 0) return;
+      const button = (evt.originalEvent as Partial<MouseEvent> | undefined)?.button;
+      if (typeof button === 'number' && button !== 0) return;
       const stage = this.getStage();
       if (stage.isDragging) return;
 

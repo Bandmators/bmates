@@ -1,0 +1,78 @@
+---
+layout: home
+title: BMates
+description: Edit multitrack audio on the web.
+hero:
+  name: BMates
+  pattern: BMATES
+  text: Add multitrack audio editing to your app.
+  tagline: Build the interface you want with React.
+  preview: false
+  actions:
+    - text: Get started
+      link: /docs/getting-started
+      theme: brand
+    - text: Try the editor
+      link: /#live-demo
+      theme: alt
+features:
+  - icon: CORE
+    title: Reliable project state
+    details: Track changes with undo and redo.
+    link: /docs/core
+  - icon: REACT
+    title: Flexible React UI
+    details: Compose tracks and clips as components.
+    link: /docs/getting-started#declarative-tracks-and-clips
+  - icon: AUDIO
+    title: Audio editing
+    details: Play, arrange, mute, and export audio.
+    link: /#live-demo
+sections:
+  - type: split
+    eyebrow: QUICK START
+    title: Start with one package.
+    details: Add lower-level packages only when needed.
+    code: |-
+      pnpm add @bmates/studio
+    language: bash
+    actions:
+      - text: Installation guide
+        link: /docs/getting-started
+        theme: alt
+  - type: steps
+    eyebrow: ARCHITECTURE
+    title: Choose only what you need.
+    details: Each package has one clear role.
+    items:
+      - label: STATE
+        title: Manage state with Core
+        details: Keep project state and history in sync.
+      - label: MEDIA
+        title: Edit with Editor
+        details: Handle Canvas and audio editing.
+      - label: UI
+        title: Build UI with Studio
+        details: Create the editor layout you want.
+  - type: cards
+    eyebrow: OPEN SOURCE
+    title: Open and extensible.
+    items:
+      - label: CONTRIBUTE
+        title: Improve BMates
+        details: Share ideas, code, and documentation.
+        link: https://github.com/Bandmators/bmates
+      - label: SOURCE
+        title: Explore the source
+        details: See how each package works.
+        link: https://github.com/Bandmators/bmates/tree/main/packages
+---
+
+<section id="live-demo" className="bmates-home-demo" aria-label="Live BMates editor demo">
+  <div className="bmates-home-demo-heading">
+    <span>LIVE DEMO</span>
+    <h2>Try the editor.</h2>
+    <p>Move clips, play audio, and export your mix.</p>
+  </div>
+  <ClientPreview name="editor" isolation="inline" layout="fullscreen" minHeight={0} autoHeight={false} />
+</section>

@@ -1,0 +1,20 @@
+---
+title: 오디오와 프로젝트 내보내기
+description: 저장 가능한 프로젝트 데이터와 브라우저에서 생성한 믹스 오디오를 내보냅니다.
+navTitle: 오디오와 프로젝트 내보내기
+order: 9
+lastUpdatedDate: 2026-10-02
+---
+
+BMates의 내보내기에는 두 경로가 있습니다. 프로젝트 내보내기는 저장 가능한 데이터이고, 오디오 내보내기는 브라우저에서 생성한
+믹스 WAV 파일입니다.
+
+```ts
+const project = editor.export();
+const wav = await editor.exportTracks();
+
+await editor.downloadBlob('bmates-mix.wav');
+```
+
+프로젝트 데이터는 애플리케이션의 데이터베이스나 파일 형식에 저장하세요. 오디오 URL, 인증, 클라우드 저장소, 협업 기능은
+BMates 범위에 포함되지 않습니다.

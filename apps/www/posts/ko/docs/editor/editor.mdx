@@ -1,0 +1,30 @@
+---
+title: Editor
+description: Canvas 타임라인, waveform 편집, 재생, 히스토리를 관리하는 핵심 브라우저 에디터입니다.
+order: 100
+lastUpdatedDate: 2026-10-02
+---
+
+`Editor`는 `Stage`를 확장해 트랙, wave, 선택, 재생, 히스토리와 내보내기를 관리합니다.
+
+```ts
+const editor = new Editor(canvas, tracks, style);
+await editor.ready;
+
+await editor.play();
+editor.pause();
+editor.undo();
+editor.destroy();
+```
+
+## 주요 API
+
+- `ready`: 오디오 버퍼와 초기 히스토리가 준비되는 Promise
+- `play()`, `pause()`, `stop()`, `isPlaying()`: 재생 제어
+- `select(nodes)`, `unselect()`: wave 선택 제어
+- `addWave(song)`, `duplicate()`, `paste(nodes)`: 편집 명령
+- `mute(trackId, isMuted?)`, `isMuted(trackId)`: 트랙 음소거
+- `export()`, `exportTracks()`, `downloadBlob(filename)`: 데이터와 WAV 내보내기
+- `saveState()`, `undo()`, `redo()`: 히스토리 제어
+
+오디오 관련 명령은 `ready`가 완료된 뒤 호출하고, 소유 컴포넌트가 해제될 때 `destroy()`를 호출하세요.

@@ -1,0 +1,36 @@
+---
+title: Lifecycle and cleanup
+description: Mount, update, and dispose BMates editors without leaking browser resources.
+navTitle: Lifecycle and cleanup
+order: 4
+lastUpdatedDate: 2026-10-02
+---
+
+BMates owns browser resources such as animation frames, event listeners, audio nodes, and object URLs. Create an editor only
+after its canvas exists, await readiness before audio commands, and destroy it when the owner unmounts.
+
+## Imperative Editor
+
+```ts
+const editor = new Editor(canvas, tracks, style);
+
+try {
+  await editor.ready;
+  await editor.play();
+} finally {
+  editor.destroy();
+}
+```
+
+Do not reuse an `AudioBufferSourceNode` after stopping it. BMates reuses decoded buffers and creates fresh sources for each
+playback operation.
+
+## React
+
+`<BMates />` and `<BMates.Root>` own their store lifecycle. Unmount them when the editor is no longer visible. Keep a stable
+`defaultData` value for uncontrolled projects; use `project` when an external source owns the data.
+
+## During mutation
+
+Changes made during playback should preserve the intended play or pause state. Use public commands such as `moveClip`,
+`removeTrack`, and `setTrackMute` instead of changing exported data objects in place.

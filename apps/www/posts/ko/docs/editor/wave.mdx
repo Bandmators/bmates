@@ -1,0 +1,10 @@
+---
+title: Wave
+description: 타임라인 위의 오디오 클립과 waveform 렌더링을 나타냅니다.
+order: 108
+lastUpdatedDate: 2026-10-02
+---
+
+`Wave`는 clip의 `start` 시간과 Canvas의 x 좌표를 함께 관리합니다. 이동할 때 두 값은 항상 timeline scale에 맞춰
+동기화되어야 합니다. `setX(x)`, `setSelected(selected)`, `checkCollision(newX)`, `extractWaveform(buffer)`가 핵심 API입니다.
+잠긴 wave는 이동할 수 없습니다.

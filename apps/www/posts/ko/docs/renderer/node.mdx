@@ -1,0 +1,10 @@
+---
+title: Node
+description: 위치, 크기, 이벤트, 드래그 동작을 가지는 Renderer의 기본 요소입니다.
+order: 202
+lastUpdatedDate: 2026-10-02
+---
+
+`Node`는 x/y, width/height, visible, listening, parent와 이벤트 API를 제공합니다. `isIntersection(x, y)`,
+`hitTest(point, event)`, `getStage()`, `toObject()`, `destroy()`를 사용합니다. Node의 drag 이벤트는 iframe과 같은
+다른 window realm에서도 동작하도록 이벤트 속성 기반으로 판별합니다.

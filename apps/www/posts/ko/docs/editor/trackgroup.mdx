@@ -1,0 +1,9 @@
+---
+title: TrackGroup
+description: 전체 트랙 집합과 프로젝트 수준의 snapshot을 관리합니다.
+order: 107
+lastUpdatedDate: 2026-10-02
+---
+
+`TrackGroup`은 `getTracks()`, `getWaves()`로 전체 편집 상태를 순회합니다. `createMemento()`와 `restore()`는
+히스토리용 snapshot을 만들고 복원합니다. group index는 트랙 이동 또는 제거 뒤에도 연속된 값으로 유지해야 합니다.

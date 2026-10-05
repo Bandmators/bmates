@@ -12,23 +12,14 @@ export const getRelativeMousePosition = (
 };
 
 export const getClientPosition = (event: Event) => {
-  const clientX =
-    event instanceof MouseEvent
-      ? event.clientX
-      : event instanceof TouchEvent
-        ? event.touches.length > 0
-          ? event.touches[0].clientX
-          : 0
-        : 0;
+  const pointerEvent = event as Partial<MouseEvent>;
+  if (typeof pointerEvent.clientX === 'number' && typeof pointerEvent.clientY === 'number') {
+    return { x: pointerEvent.clientX, y: pointerEvent.clientY };
+  }
 
-  const clientY =
-    event instanceof MouseEvent
-      ? event.clientY
-      : event instanceof TouchEvent
-        ? event.touches.length > 0
-          ? event.touches[0].clientY
-          : 0
-        : 0;
+  const touch = (event as Partial<TouchEvent>).touches?.[0];
+  const clientX = touch?.clientX ?? 0;
+  const clientY = touch?.clientY ?? 0;
 
   return {
     x: clientX,

@@ -1,38 +1,16 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "ES2020",
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "typeRoots": ["node_modules/@types", "@/types/emotion.d.ts"],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "contentlayer/generated": ["./.contentlayer/generated"],
-      "@public": ["./public/*"],
-      "@/*": ["./src/*"]
-    }
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vite/client"]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".contentlayer/generated",
-    "src/libs/rehypeCodeWrap.ts"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["posts/previews/**/*.ts", "posts/previews/**/*.tsx"]
 }

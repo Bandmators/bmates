@@ -1,0 +1,66 @@
+---
+layout: home
+title: BMates
+description: 웹에서 멀티트랙 오디오를 편집하세요.
+hero:
+  name: BMates
+  pattern: BMATES
+  text: 앱에 멀티트랙 오디오 편집을 추가하세요.
+  tagline: React로 원하는 화면을 만드세요.
+  preview: false
+  actions:
+    - text: 시작하기
+      link: /docs/getting-started
+      theme: brand
+    - text: 에디터 사용해 보기
+      link: /#live-demo
+      theme: alt
+features:
+  - icon: CORE
+    title: 안정적인 상태 관리
+    details: 변경 기록과 실행 취소를 관리합니다.
+    link: /docs/core
+  - icon: REACT
+    title: 자유로운 React UI
+    details: 트랙과 클립을 컴포넌트로 구성합니다.
+    link: /docs/bmates
+  - icon: AUDIO
+    title: 오디오 편집
+    details: 재생하고 편집하고 WAV로 내보냅니다.
+    link: /#live-demo
+sections:
+  - type: split
+    eyebrow: 빠른 시작
+    title: 한 패키지로 시작하세요.
+    details: 필요한 경우에만 하위 패키지를 추가하세요.
+    code: |-
+      pnpm add @bmates/studio
+    language: bash
+    actions:
+      - text: 설치 가이드
+        link: /docs/getting-started
+        theme: alt
+  - type: steps
+    eyebrow: 아키텍처
+    title: 필요한 기능만 선택하세요.
+    details: 각 패키지는 역할이 분명합니다.
+    items:
+      - label: 상태
+        title: Core로 상태 관리
+        details: 프로젝트 상태와 기록을 관리합니다.
+      - label: 미디어
+        title: Editor로 편집
+        details: Canvas와 오디오를 처리합니다.
+      - label: UI
+        title: Studio로 UI 구성
+        details: 원하는 편집 화면을 만듭니다.
+---
+
+<section id="live-demo" className="bmates-home-demo" aria-label="BMates 라이브 에디터 데모">
+  <div className="bmates-home-demo-heading">
+    <span>라이브 데모</span>
+    <h2>에디터를 사용해 보세요.</h2>
+    <p>클립을 옮기고 재생한 뒤 파일로 내보내세요.</p>
+  </div>
+  <ClientPreview name="editor" isolation="inline" layout="fullscreen" minHeight={0} autoHeight={false} />
+</section>

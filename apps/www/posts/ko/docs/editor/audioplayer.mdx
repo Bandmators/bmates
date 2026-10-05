@@ -1,0 +1,20 @@
+---
+title: AudioPlayer
+description: 디코드한 오디오 버퍼, 재생 소스, 음소거, 믹스 WAV 내보내기를 관리합니다.
+order: 101
+lastUpdatedDate: 2026-10-02
+---
+
+`AudioPlayer`는 Web Audio adapter입니다. 디코드한 `AudioBuffer`는 재사용하지만, 재생할 때마다 새
+`AudioBufferSourceNode`를 만듭니다. source node는 한 번만 시작할 수 있기 때문입니다.
+
+## 주요 API
+
+- `loadAudioBuffer(src)`: URL에서 오디오 버퍼 로드
+- `prepareTrackAll(waves)`, `prepareWave(wave)`: wave의 재생 준비
+- `play(startTime)`, `pause()`, `stop()`: 재생 제어
+- `mute(trackId, isMuted)`, `isMuted(trackId)`: 트랙 음소거
+- `getDuration()`, `getAudioBuffer(trackId)`: 로드된 미디어 정보
+- `toBlob()`, `downloadBlob(filename)`: 믹스 WAV 생성과 다운로드
+
+대부분의 애플리케이션에서는 `Editor` 또는 Studio API를 사용하고 AudioPlayer를 직접 다루지 않아도 됩니다.

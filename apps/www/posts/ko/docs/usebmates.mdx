@@ -1,0 +1,25 @@
+---
+title: useBMates
+description: 기존 BMates Provider API로 재생, 정지, 다운로드를 제어합니다.
+navTitle: useBMates
+order: 5
+lastUpdatedDate: 2026-10-02
+---
+
+`BmatesProvider` 내부에서 `useBMates`를 사용하면 기존 컴포넌트 API의 재생과 파일 작업을 제어할 수 있습니다.
+
+```tsx
+const Transport = () => {
+  const { download, isPlaying, togglePlay, toggleStopPlay } = useBMates();
+
+  return (
+    <div>
+      <button onClick={() => void togglePlay()}>{isPlaying ? 'Pause' : 'Play'}</button>
+      <button onClick={() => void toggleStopPlay()}>Stop</button>
+      <button onClick={() => void download()}>Download WAV</button>
+    </div>
+  );
+};
+```
+
+새로운 조합형 API에서는 `useBMatesStore`와 `useBMatesSelector`를 사용해 동일한 store를 읽고 명령을 실행할 수 있습니다.

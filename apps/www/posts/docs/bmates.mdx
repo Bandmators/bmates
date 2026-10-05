@@ -1,70 +1,101 @@
 ---
 title: BMates
+description: Use the convenient BMates component or compose a custom React editor from the shared Studio store.
+navTitle: BMates
 order: 6
-lastUpdatedDate: 2024-10-12
 ---
 
-`BMates` is a component that integrates the audio editing functionalities provided by the `Editor` class from the `@bmates/editor` package. It manages audio tracks and provides a user interface for editing and playback.
+`BMates` is the quickest way to mount the Canvas editor and a React track list. It creates the `Editor`, keeps track
+state synchronized, and releases browser resources when the component unmounts.
 
-## BMates Component
+## Convenient component
+
+```tsx
+import { BMates, BmatesProvider, type TrackDataType } from '@bmates/studio';
+
+const tracks: TrackDataType[] = [];
+
+export const AudioEditor = () => (
+  <BmatesProvider>
+    <BMates
+      data={tracks}
+      onError={error => console.error(error)}
+      trackEl={({ muted, removeTrack, toggleMute, track }) => (
+        <div>
+          <strong>{track.name}</strong>
+          <button onClick={toggleMute}>{muted ? 'Unmute' : 'Mute'}</button>
+          <button onClick={removeTrack}>Remove</button>
+        </div>
+      )}
+    />
+  </BmatesProvider>
+);
+```
 
 ### Props
 
-- **data**: `TrackDataType[]` - An array of track data to be managed by the BMates component.
-- **style**: `EditorStyleType` (optional) - Style settings for the editor.
-- **trackEl**: `(props: TrackProps) => JSX.Element` (optional) - A function that returns a JSX element for rendering each track.
+| Prop      | Type                                  | Description                                  |
+| --------- | ------------------------------------- | -------------------------------------------- |
+| `data`    | `TrackDataType[]`                     | Initial tracks and clips.                    |
+| `style`   | `EditorStyleType`                     | Optional partial editor style configuration. |
+| `trackEl` | `(props: TrackProps) => ReactElement` | Optional renderer for each track row.        |
+| `onError` | `(error: Error) => void`              | Reports loading or editor startup failures.  |
 
-### Usage Example
+Use `useBMates` inside `BmatesProvider` when you need the legacy transport and file commands exposed by the
+convenient component.
 
-```typescript
-import BMates from './path/to/BMates';
+## Composable editor
 
-const trackData: TrackDataType[] = [
-  // ... your track data here
-];
+For custom layouts, use the compound components. They share one store, so the track list, Canvas, controls, and
+external subscribers observe the same project state.
 
-const MyEditor: React.FC = () => {
-  return (
-    <BMates data={trackData} />
-  );
-};
-```
+```tsx
+import { BMates, useBMatesSelector, useBMatesStore } from '@bmates/studio';
 
-## BMatesProvider
-
-`BMatesProvider` is a context provider that wraps the `BMates` component, allowing access to the audio editing functionalities and state management through the `useBMates` hook.
-
-### Usage
-
-To use `BMates`, it must be wrapped in a `BMatesProvider`. Here is an example:
-
-```typescript
-import React from 'react';
-import { BmatesProvider } from './path/to/BmatesContext';
-import BMates from './path/to/BMates';
-
-const App: React.FC = () => {
-  const trackData: TrackDataType[] = [
-    // ... your track data here
-  ];
+const Transport = () => {
+  const store = useBMatesStore();
+  const isPlaying = useBMatesSelector(snapshot => snapshot.isPlaying);
 
   return (
-    <BmatesProvider>
-        {/* Use the useBMates hook! */}
-        <BMates data={trackData} />
-        {/* Use the useBMates hook! */}
-    </BmatesProvider>
+    <button onClick={() => void (isPlaying ? store.pause() : store.play())}>{isPlaying ? 'Pause' : 'Play'}</button>
   );
 };
+
+export const CustomAudioEditor = () => (
+  <BMates.Root defaultData={tracks} onDataChange={project => saveProject(project)}>
+    <Transport />
+    <BMates.TrackList>
+      {({ muted, remove, toggleMute, track }) => (
+        <div>
+          <span>{track.name}</span>
+          <button onClick={toggleMute}>{muted ? 'Unmute' : 'Mute'}</button>
+          <button onClick={remove}>Remove</button>
+        </div>
+      )}
+    </BMates.TrackList>
+    <BMates.Canvas aria-label="Audio timeline" />
+  </BMates.Root>
+);
 ```
 
-> Related: [useBMates](/docs/usebmates)
+Use `defaultData` for editor-owned state. Use the controlled `project` prop only when the application intentionally
+owns the complete project and updates it from `onDataChange`.
 
-### Notes
+## Declarative project
 
-- The `BMates` component utilizes the `useBMates` hook to access methods such as `toggleMuteTrack` and `removeTrack`, allowing for interactive audio track management.
-- The `BMates` component also manages the lifecycle of the `Editor` instance, ensuring proper initialization and cleanup.
+Tracks and clips can also be declared as React components. Do not combine `BMates.Root project` with
+`BMates.Project`; choose one project ownership model.
 
+```tsx
+<BMates.Root>
+  <BMates.Project>
+    <BMates.Track id="vocals" name="Vocals">
+      <BMates.Clip id="lead" src="/audio/lead.wav" start={0} />
+    </BMates.Track>
+  </BMates.Project>
+  <BMates.Canvas />
+</BMates.Root>
 ```
 
-```
+See [useBMates](/docs/usebmates) for the convenient component hook and [Lifecycle and cleanup](/docs/guides/lifecycle)
+for ownership rules.

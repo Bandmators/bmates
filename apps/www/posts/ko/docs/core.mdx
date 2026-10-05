@@ -1,0 +1,36 @@
+---
+title: 아키텍처와 Core
+description: 프레임워크에 독립적인 BMates 프로젝트 상태와 패키지 경계를 설명합니다.
+navTitle: 아키텍처와 Core
+order: 3
+lastUpdatedDate: 2026-10-02
+---
+
+BMates는 프로젝트 상태와 브라우저 렌더링, 프레임워크 통합을 분리합니다.
+
+```text
+@bmates/core -----\
+                   -> @bmates/editor -> @bmates/studio
+@bmates/renderer -/
+```
+
+- `@bmates/core`: 프로젝트 데이터, 검증, 명령, 구독, 실행 취소와 다시 실행
+- `@bmates/renderer`: Canvas scene graph, 렌더링 루프, hit testing, 포인터 이벤트
+- `@bmates/editor`: 타임라인, waveform, 상호작용, 재생, 파일 입출력
+- `@bmates/studio`: React provider, hook, 선언형 조합 API
+
+## 헤드리스 프로젝트 상태
+
+```ts
+import { createProjectStore } from '@bmates/core';
+
+const project = createProjectStore(initialTracks);
+
+project.setTrackMute('drums', true);
+project.moveClip('kick', { trackId: 'drums', start: 2 });
+project.undo();
+
+const exported = project.getProject();
+```
+
+Core는 Canvas나 Web Audio에 의존하지 않습니다. 재생, 디코딩, 믹스 내보내기처럼 브라우저가 필요한 기능은 Editor 레이어가 담당합니다.

@@ -1,0 +1,11 @@
+---
+title: Stage
+description: Canvas, 이벤트 수신, 렌더링 루프를 관리하는 Renderer의 최상위 surface입니다.
+order: 203
+lastUpdatedDate: 2026-10-02
+---
+
+`Stage`는 `Container`를 확장하는 추상 Canvas surface입니다. Canvas와 2D context, scroll 위치를 보유하고
+마우스와 터치 이벤트를 hit test 결과의 Node로 전달합니다. `destroy()`는 이벤트 리스너와 animation frame을 해제합니다.
+
+다른 iframe이나 popup에서 Canvas를 마운트하는 경우에도 포인터 이벤트의 좌표와 버튼을 안전하게 처리합니다.

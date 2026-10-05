@@ -1,0 +1,29 @@
+---
+title: Export audio and project data
+description: Export serializable projects and browser-generated mixed audio safely.
+navTitle: Export audio and project data
+order: 6
+lastUpdatedDate: 2026-10-02
+---
+
+BMates has two separate export paths. Project export is serializable data for persistence. Audio export is a browser-generated
+mixed WAV file.
+
+```ts
+const project = editor.export();
+const wav = await editor.exportTracks();
+
+await editor.downloadBlob('bmates-mix.wav');
+```
+
+In React Studio, use `store.exportProject()` for project data and the browser adapter's download methods for audio files.
+
+## Persisting projects
+
+Store the exported tracks and clip metadata in your application database or file format. Audio URLs and files remain an
+application concern; BMates does not provide authentication, cloud storage, or collaboration services.
+
+## Browser requirements
+
+Audio download and playback require a user interaction in most browsers. Surface load or export errors through `onError`
+and make retry actions available in your UI.

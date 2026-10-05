@@ -87,7 +87,7 @@ export abstract class Stage extends Container<Layer> {
       const point = getRelativeMousePosition(e, this.canvas, this.scroll);
       this._dispatchEventToAll(eventType, point, e);
     }
-    if (eventType === 'mousedown' && e instanceof MouseEvent && e.button === 1) {
+    if (eventType === 'mousedown' && (e as Partial<MouseEvent>).button === 1) {
       e.preventDefault();
     }
   }

@@ -1,0 +1,60 @@
+---
+title: Architecture and Core
+description: Use the framework-independent BMates project store and understand the package boundaries.
+navTitle: Architecture and Core
+order: 3
+lastUpdatedDate: 2026-10-1
+---
+
+BMates separates project state from browser rendering and framework integration:
+
+```text
+@bmates/core -----\
+                   -> @bmates/editor -> @bmates/studio
+@bmates/renderer -/
+```
+
+- `@bmates/core` owns project data, validation, commands, subscriptions, and undo/redo.
+- `@bmates/renderer` provides the framework-independent Canvas scene graph and pointer dispatch.
+- `@bmates/editor` adapts project data to a timeline, waveform interactions, Canvas, and Web Audio.
+- `@bmates/studio` adapts Core and Editor to React.
+
+## Headless project state
+
+```ts
+import { createProjectStore } from '@bmates/core';
+
+const project = createProjectStore(initialTracks);
+
+const unsubscribe = project.subscribe((snapshot, change) => {
+  console.log(snapshot.revision, change.type);
+});
+
+project.setTrackMute('drums', true);
+project.moveClip('kick', { trackId: 'drums', start: 2 });
+project.undo();
+
+const exported = project.getProject();
+```
+
+Snapshots are structurally immutable. Use commands for changes and `getProject()` when a mutable exported copy is
+needed.
+
+## Share Core with React
+
+Pass the same Core store into Studio when plugins, another framework, or application services also need project access:
+
+```tsx
+import { createProjectStore } from '@bmates/core';
+import { BMates, createBMatesStore } from '@bmates/studio';
+
+const projectStore = createProjectStore(initialTracks);
+const studioStore = createBMatesStore({ projectStore });
+
+<BMates.Root store={studioStore}>
+  <BMates.Canvas />
+</BMates.Root>;
+```
+
+Project mutations, export, and history work headlessly. Playback, decoded audio buffers, mixed audio export, and file
+download remain browser adapter responsibilities.

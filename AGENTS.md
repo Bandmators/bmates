@@ -22,7 +22,8 @@ This is a pnpm workspace. The dependency direction is:
 - `packages/renderer`: framework-independent canvas scene graph, rendering loop, hit testing, and pointer event dispatch.
 - `packages/editor`: audio-domain editor built on the renderer. It owns tracks, waveform clips, timeline interactions, playback, history, import, and export.
 - `packages/studio`: React integration and the easiest public entry point. It owns the provider, hook, sidebar composition, and demo application.
-- `apps/www`: Next.js and Contentlayer documentation site. Documentation pages live under `apps/www/posts/docs`.
+- `apps/www`: Docgo static documentation site. Documentation pages live under `apps/www/posts`, and interactive
+  examples live under `apps/www/posts/previews`.
 
 Keep changes in the lowest appropriate layer. Core must not depend on browser, renderer, editor, or React concepts. The
 renderer must not depend on editor or React concepts; the editor must not depend on Studio; Studio should compose
@@ -30,7 +31,7 @@ public core and editor APIs instead of reaching into renderer internals.
 
 ## Setup and commands
 
-Use Node.js 20 and pnpm. The lockfile is `pnpm-lock.yaml`; do not create npm or Yarn lockfiles.
+Use Node.js 20.19+ (or 22.12+) and pnpm. The lockfile is `pnpm-lock.yaml`; do not create npm or Yarn lockfiles.
 
 ```sh
 pnpm install
@@ -53,7 +54,8 @@ There is currently no automated test suite and no root lint script. Do not repor
 - Let Prettier maintain import grouping and ordering. Package imports come before third-party imports, followed by aliases and relative imports.
 - Prefer explicit domain types from each package's `types` module. Avoid `any`, non-null assertions, and `@ts-ignore` in new code unless a browser or library boundary genuinely requires them; explain exceptional cases in code.
 - Preserve the public barrel exports in each package's `src/index.ts` when adding a supported public API.
-- Do not edit generated output such as `dist`, `.next`, or `.contentlayer`, and do not commit it unless a task explicitly requires generated artifacts.
+- Do not edit generated output such as package `dist` directories or `apps/www/out`, and do not commit it unless a
+  task explicitly requires generated artifacts.
 - Keep public naming and documentation in English. Match the terminology already used by the API: editor, track, wave/clip, timeline, playhead, and workground.
 - Avoid unrelated cleanup. Preserve existing behavior and API compatibility unless the task calls for a breaking change.
 
@@ -69,7 +71,8 @@ Audio and canvas behavior is stateful. Check these invariants whenever editing `
 - User-visible mutations must update exported data, create an undo snapshot where appropriate, and emit `data-change` so React consumers stay synchronized.
 - Locked waves must not move. Moving a wave must not leave overlaps or orphaned nodes.
 - Browser resources and lifecycle work must be cleaned up: animation frames, DOM listeners, audio nodes/contexts, and object URLs as applicable.
-- Do not access `window`, `document`, Canvas, or Web Audio at module evaluation time; the packages must remain safe to import in a Next.js environment.
+- Do not access `window`, `document`, Canvas, or Web Audio at module evaluation time; the packages must remain safe
+  to import in server-side and static-site build environments.
 
 For interaction changes, manually exercise dragging within and between tracks, collision behavior, selection, undo/redo, mute combinations, playback from a nonzero playhead, stop/replay, upload, removal, export, and resize as relevant to the change.
 
@@ -77,7 +80,8 @@ For interaction changes, manually exercise dragging within and between tracks, c
 
 - Keep the `BMates` component usable through `BmatesProvider` and `useBMates`; do not create a second source of truth for editor state.
 - Treat props and exported TypeScript types as public API. Update the root README, package README, and relevant MDX page when their behavior changes.
-- Documentation files require `title`, `order`, and `lastUpdatedDate` frontmatter. Keep examples compilable against the current public API.
+- Docgo documentation pages require a useful `title`; add descriptions to important entry points and keep examples
+  compilable against the current public API.
 - UI changes should be checked at desktop width and at the configured mobile viewport.
 
 ## Contribution workflow
